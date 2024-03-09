@@ -1,0 +1,30 @@
+appId: org.lrhh123.cocs
+productName: 懒人客服
+asar: true
+asarUnpack: "**\\*.{node,dll}"
+compression: maximum
+files:
+  - dist
+  - node_modules
+  - package.json
+afterSign: ".erb/scripts/notarize.js"
+win:
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  perMachine: true
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 懒人客服
+  uninstallDisplayName: ChatGPT-On-CS
+  deleteAppDataOnUninstall: true
+  artifactName: "${productName} ${version}.${ext}"
+directories:
+  app: release/app
+  buildResources: assets
+  output: release/build
+extraResources:
+  - "./assets/**"

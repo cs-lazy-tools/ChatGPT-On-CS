@@ -8,8 +8,11 @@
 - [x] 接入ChatGPT接口，根据客户的咨询内容智能生成回复，适用于处理复杂或者个性化的客户咨询。
 - [x] 发送图片和二进制文件：支持发送图片等二进制文件，满足多样化的客户服务需求。
 - [x] 知识库： 通过上传知识库文件自定义专属机器人，可作为数字分身、智能客服、私域助手使用，基于 [懒人百宝箱](https://chat.lazaytools.top/) 实现
-- [X] 各个平台独立的插件系统，支持插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用。 
+- [x] 各个平台独立的插件系统，支持插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用。 
 
+
+## 演示视频
+[观看视频](https://www.bilibili.com/video/BV1qz421Q73S)
 
 ## 开源社区
 如果有问题需要反馈，或者对项目有什么特性希望支持的，可以添加小助手微信加入开源项目交流群：
@@ -27,7 +30,8 @@
 
 ## 下载地址
 
-[点击下载]()
+<a href="https://wwp.lanzouo.com/iCntL1qukopc" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+
 
 ## 使用说明
 第一次启动时可能会有点慢，因为它需要先下载驱动文件和初始化回复数据库，所以请耐心等待。
