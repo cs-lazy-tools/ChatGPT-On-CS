@@ -18,6 +18,8 @@ import BackendServiceManager from './system/backend';
 let mainWindow: BrowserWindow | null = null;
 let backendServiceManager: BackendServiceManager | null = null;
 
+const gotTheLock = app.requestSingleInstanceLock();
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -76,6 +78,12 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+
+  if (!gotTheLock) {
+    // 如果获取不到锁，说明已有一个实例在运行，直接退出
+    app.quit();
+    return;
+  }
 
   setupIpcHandlers(mainWindow, backendServiceManager);
 

@@ -1,0 +1,18 @@
+{
+  "name": "chatgpt-on-cs",
+  "version": "1.0.1",
+  "description": "多平台智能客服，允许使用 ChatGPT 作为客服机器人",
+  "license": "AGPL-3.0",
+  "author": {
+    "name": "lrhh123",
+    "email": "lrhh123@users.noreply.github.com",
+    "url": "https://github.com/lrhh123"
+  },
+  "main": "./dist/main/main.js",
+  "scripts": {
+    "rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "postinstall": "pnpm run rebuild && pnpm run link-modules",
+    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
+  },  
+  "dependencies": {}
+}

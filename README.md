@@ -1,6 +1,7 @@
 ## 懒人客服简介
 本项目是基于大模型的智能对话客服工具，支持哔哩哔哩、抖音企业号、抖音、抖店、微博聊天、小红书专业号运营、小红书、知乎等平台接入，可选择 GPT3.5/GPT4.0/ [懒人百宝箱](https://chat.lazaytools.top/) （后续会支持更多平台），能处理文本、语音和图片，通过插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用。
 
+注：本项目只是一个用于对接外部平台的客服工具，不提供任何平台的账号，需要自行准备。并且知识库功能也需要自行准备，该项目目前只支持的 OpenAI 的 API 接口（或代理）接入
 
 ## 主要功能
 - [x] 多平台支持：当前支持哔哩哔哩、抖音企业号、抖音、抖店、微博聊天、小红书专业号运营、小红书、知乎等平台，未来将不断扩展支持更多社交媒体平台。
@@ -30,7 +31,7 @@
 
 ## 下载地址
 
-<a href="https://wwp.lanzouo.com/iCntL1qukopc" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://wwp.lanzouo.com/iwX9k1r0bitc" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
 
 ## 使用说明
