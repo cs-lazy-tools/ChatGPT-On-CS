@@ -16,7 +16,7 @@ import {
   getMessageList,
 } from '../../services/platform/controller';
 import SessionBox from './SessionBox';
-import analytics from '../../services/analytics/index_template';
+import analytics from '../../services/analytics';
 import { Message } from '../../services/platform/platform';
 
 // 假设数据通过 props.sessions 传递

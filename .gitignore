@@ -28,7 +28,4 @@ npm-debug.log.*
 *.sass.d.ts
 *.scss.d.ts
 assets/backend/*
-src/renderer/services/analytics/index.ts
-
-.env
-.vscode
+src/renderer/services/analytics/*

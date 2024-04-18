@@ -19,11 +19,11 @@ export async function updatePlatform(ids: string[]) {
   await POST('/api/v1/base/platform', ids);
 }
 
-export async function updateRunner(isPaused: boolean, isKeywordMatch: boolean) {
-  await POST('/api/v1/base/runner', {
-    is_paused: isPaused,
-    is_keyword_match: isKeywordMatch,
-  });
+export async function updateRunner(data: {
+  is_paused: boolean;
+  is_keyword_match: boolean;
+}) {
+  await POST('/api/v1/base/runner', data);
 }
 
 export async function getReplyList({

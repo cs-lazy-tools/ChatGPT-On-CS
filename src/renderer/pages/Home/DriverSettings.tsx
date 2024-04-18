@@ -26,7 +26,10 @@ const DriverSettings = () => {
 
       (async () => {
         try {
-          await updateRunner(isPaused, isKeywordMatch);
+          await updateRunner({
+            is_paused: isPaused,
+            is_keyword_match: isKeywordMatch,
+          });
         } catch (error: any) {
           console.error(error);
         }
@@ -61,9 +64,15 @@ const DriverSettings = () => {
         });
       }
 
-      updateRunner(checked, driverSettings.isKeywordMatch);
+      updateRunner({
+        is_paused: checked,
+        is_keyword_match: driverSettings.isKeywordMatch,
+      });
     } else if (field === 'isKeywordMatch') {
-      updateRunner(driverSettings.isPaused, checked);
+      updateRunner({
+        is_paused: driverSettings.isPaused,
+        is_keyword_match: checked,
+      });
     }
   };
 

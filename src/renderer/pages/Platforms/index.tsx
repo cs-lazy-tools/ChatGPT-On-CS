@@ -33,7 +33,7 @@ import {
   Platform,
   PlatformSettings as PS,
 } from '../../services/platform/platform';
-import analytics from '../../services/analytics/index_template';
+import analytics from '../../services/analytics';
 
 const PlatformSettings = () => {
   useEffect(() => {

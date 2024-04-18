@@ -27,13 +27,14 @@ interface WebSocketContextType {
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
+  const [isConnected, setIsConnected] = useState(false);
   const { lastMessage, sendMessage } = useWebSocket(
     `ws://127.0.0.1:${window.electron.getPort()}/api/v1/event/ws`,
     {
-      shouldReconnect: () => {
-        return true; // 总是尝试重连
-      },
+      shouldReconnect: () => !isConnected, // 仅当未连接时尝试重连
       reconnectInterval: 3000,
+      onOpen: () => setIsConnected(true), // 连接成功时设置为已连接
+      onClose: () => setIsConnected(false), // 连接关闭时设置为未连接
     },
   );
   const [eventHandlers, setEventHandlers] = useState<

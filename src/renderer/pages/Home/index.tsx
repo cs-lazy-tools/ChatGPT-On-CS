@@ -4,7 +4,7 @@ import PageContainer from '../../components/PageContainer';
 import PlatformTabs from './PlatformTabs';
 import DriverSettings from './DriverSettings';
 import ReplyKeyword from './ReplyKeyword';
-import analytics from '../../services/analytics/index_template';
+import analytics from '../../services/analytics';
 
 const HomePage = () => {
   useEffect(() => {

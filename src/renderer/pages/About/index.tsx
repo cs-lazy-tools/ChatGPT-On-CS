@@ -12,6 +12,9 @@ const AboutPage: React.FC = () => {
 ## 使用说明
 项目文档: [懒人百宝箱使用说明](https://gitee.com/alsritter/ChatGPT-On-CS)
 
+## 演示视频
+[哔哩哔哩](https://www.bilibili.com/video/BV1qz421Q73S)
+
 ## 项目地址
 
 * [GitHub](https://github.com/lrhh123/ChatGPT-On-CS)

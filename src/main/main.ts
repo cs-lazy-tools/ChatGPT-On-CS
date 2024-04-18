@@ -18,6 +18,8 @@ import BackendServiceManager from './system/backend';
 let mainWindow: BrowserWindow | null = null;
 let backendServiceManager: BackendServiceManager | null = null;
 
+app.commandLine.appendSwitch('lang', 'zh-CN');
+
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (process.env.NODE_ENV === 'production') {

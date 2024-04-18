@@ -10,6 +10,7 @@ import {
   Switch,
   Input,
   Select,
+  Highlight,
   Box,
   Slider,
   SliderFilledTrack,
@@ -64,7 +65,12 @@ const GptSettings = () => {
             <>
               <FormControl>
                 <FormLabel htmlFor="gptAddress" mt="8px">
-                  GPT 地址设置
+                  <Highlight
+                    query="/v1"
+                    styles={{ px: '1', py: '1', bg: 'orange.100' }}
+                  >
+                    GPT 地址设置（尾部需要加上 /v1）
+                  </Highlight>
                 </FormLabel>
                 <Input
                   id="gptAddress"

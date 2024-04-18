@@ -5,6 +5,7 @@ import {
   Tab,
   TabPanels,
   TabPanel,
+  Tooltip,
   Checkbox,
   Stack,
   Image,
@@ -25,7 +26,8 @@ import {
 } from '../../services/platform/constant';
 import { useSystemStore } from '../../stores/useSystemStore';
 import defaultPlatformIcon from '../../../../assets/base/default-platform-icon.png';
-import analytics from '../../services/analytics/index_template';
+import windowsIcon from '../../../../assets/base/windows.png';
+import analytics from '../../services/analytics';
 
 const PlatformTabs = () => {
   const { data, isLoading } = useQuery(['platformList'], getPlatformList);
@@ -95,6 +97,19 @@ const PlatformTabs = () => {
                 <Checkbox value={platform.id} isDisabled={!platform.impl}>
                   {platform.name}
                 </Checkbox>
+                {
+                  // 如果 id 前缀有 win_ 则显示一个小图标标识
+                  platform.id.startsWith('win_') && (
+                    <Tooltip label="客户端应用，需要先手动打开该应用">
+                      <Image
+                        src={windowsIcon}
+                        boxSize="10px"
+                        marginLeft="4px"
+                        alt="windows"
+                      />
+                    </Tooltip>
+                  )
+                }
               </Box>
             ))}
           </Grid>

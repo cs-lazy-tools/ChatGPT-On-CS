@@ -28,3 +28,6 @@ directories:
   output: release/build
 extraResources:
   - "./assets/**"
+# build:
+#   afterPack: "./removeLocales.js"
+afterPack: "./removeLocales.js"
