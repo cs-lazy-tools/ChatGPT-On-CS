@@ -31,8 +31,14 @@
 
 ## 下载地址
 
-<a href="https://wwp.lanzouo.com/iwxdP1r4g41e" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://github.com/lrhh123/ChatGPT-On-CS/releases/download/v1.0.2/1.0.2.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
+如果网络环境导致下载不了，可以使用百度云盘下载：
+
+```txt
+链接：https://pan.baidu.com/s/1jWMF0vP9ULopH4i9O8HMrg 
+提取码：82tf
+```
 
 ## 使用说明
 第一次启动时可能会有点慢，因为它需要先下载驱动文件和初始化回复数据库，所以请耐心等待。
