@@ -39,8 +39,8 @@
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
 ```txt
-链接：https://pan.baidu.com/s/1jWMF0vP9ULopH4i9O8HMrg 
-提取码：82tf
+链接：https://pan.baidu.com/s/1CKBAuXNkv0SeNhXXy9Dmzw?pwd=6666 
+提取码：6666
 ```
 
 ## 使用说明
