@@ -17,7 +17,7 @@ This project is an intelligent customer service tool based on large models, supp
 - [x] Each platform has an independent plugin system, supports plugins accessing external resources such as the internet, and supports enterprise AI applications customized based on proprietary knowledge bases.
 
 # Presentation video
-[观看视频](https://www.bilibili.com/video/BV1qz421Q73S)
+[Watch video](https://www.bilibili.com/video/BV1qz421Q73S)
 
 # Open source community
 If you have any feedback or features you would like to support for the project, you can add the assistant's WeChat to join the open source project discussion group:
@@ -69,3 +69,38 @@ Clicking the "Add Keyword" button allows you to customize keywords and reply con
 You can add several matching keywords.
 
 **Writing Rule Keywords**
+- `Hello`：It will reply with the response you set whenever the user inputs "Hello".
+
+- `Hello*`：For fuzzy matching using the * symbol. For example, "Hello*", whenever the user inputs something like "Hello", it will reply with the response you set.
+
+- `*Hello*`：If the set keyword is "Hello", then whenever the user's input contains
+
+**Special Case**： If you use the "Start Keyword" and "End Keyword" below, then the user's input only needs to start with the "Start Keyword" and end with the "End Keyword" to match the keywords you've set up.
+
+### 4. Writing Replies
+- `Keyword rules：`You can correspond to multiple reply contents. When a keyword is matched, it will randomly select one as the reply content.
+
+- `Insert random symbols：` This is because platforms like Pinduoduo do not allow repeating the same answer each time, so you can insert a random symbol to avoid this issue.
+
+- `Insert file：` This is mainly used for inserting images. You can insert the link to an image, allowing you to reply with a picture.
+
+### 5. Platform Independent ChatGPT API Settings
+Sometimes, we might need to set different ChatGPT API addresses for different platforms. You can do this here. You can create your own knowledge base based on [Lazy person's treasure trove](https://chat.lazaytools.top/) and then set it here.
+
+![alt text](docs/other_settings_1.png)
+
+When a platform-specific ChatGPT API address is set, it will prioritize using this address to call the ChatGPT API. If not set, it will use the global ChatGPT API address set above.
+### 6. Customer Service Related Settings
+![alt text](docs/other_settings_2.png)
+
+**Extract Information**: When selected for extracting phone numbers or querying product names, it will extract the phone number or product name from the user's message and store it in the path below.
+
+**Wait for Reply Time**: After a user sends a message, it will wait this long before replying. If you want an immediate reply, you can set this value to zero.
+
+**Context Message Count**: When using the ChatGPT API, it will take a specified number of chat contexts to call the ChatGPT API, helping the ChatGPT API better understand the user's questions. Note that the larger this value, the slower the call to the ChatGPT API.
+
+**Wait for Manual Interval**: When encountering ChatGPT blocking, it will wait this long before terminating the automatic customer service task and transferring it to manual customer service for manual processing.
+
+## Project Plan
+- [ ] Support platforms such as Pinduoduo, Taobao, JD.com, and other e-commerce platforms (if urgent, please private message the assistant).
+- [ ] Support loading local models.
