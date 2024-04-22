@@ -39,4 +39,33 @@ Currently, we have accumulated rich AI solutions in scenarios such as private do
 # Instructions
 The first startup may be a bit slow as it needs to download driver files and initialize the reply database, so please be patient.
 
+### 1. Set up GPT Address
+After launching the program, click on the settings button, set up your OpenAPI Key and proxy server address, then click save.
 
+![alt text](docs/first_settings_1.png)
+
+![alt text](docs/first_settings_2.png)
+
+### 2. Instructions for Homepage Operations
+First, you can see the "Connection" section on the homepage, with two checkboxes. By default, the software is paused. If you want the software to start working, uncheck this checkbox.
+
+![alt text](docs/home_settings_1.png)
+
+When first opened, it defaults to not being logged in. So, you need to manually pause it, then log in, and then uncheck the pause to start working.
+
+![alt text](docs/home_settings_2.png)
+
+After enabling automatic replies, it will read the platforms you have selected below and automatically open those pages to start working. Note that the checkboxes above cannot be clicked because the author does not have accounts for those platforms, so they cannot debug the platform's information. If you have accounts for these platforms and need support for automatic replies, please contact the customer service above.
+
+### 3. Writing Keywords
+When the "Enable Keyword Matching" above is checked, it will prioritize matching the keywords set here. If a keyword is matched, it will reply with the corresponding reply. If no keyword is matched, it will call on you to provide the ChatGPT API at the bottom to ask GPT to answer the user's question.
+
+![alt text](docs/reply_settings_1.png)
+
+Clicking the "Add Keyword" button allows you to customize keywords and reply content.
+
+![alt text](docs/reply_settings_2.png)
+
+You can add several matching keywords.
+
+**Writing Rule Keywords**
