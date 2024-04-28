@@ -8,24 +8,50 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
+import 'source-map-support/register';
+import './system/logger';
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import setupIpcHandlers from './ipcHandlers';
 import BackendServiceManager from './system/backend';
+import Server from './backend/backend';
 
 let mainWindow: BrowserWindow | null = null;
 let backendServiceManager: BackendServiceManager | null = null;
 
+/**
+ * Add event listeners...
+ */
+
+app.on('window-all-closed', async () => {
+  // Respect the OSX convention of having the application in memory even
+  // after all windows have been closed
+  console.log('window-all-closed');
+  await backendServiceManager?.stop();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('before-quit', async () => {
+  console.log('before-quit');
+  await backendServiceManager?.stop();
+});
+
+const originalUncaughtException = process.listeners('uncaughtException').pop();
+process.removeAllListeners('uncaughtException');
+process.on('uncaughtException', async (error, origin) => {
+  console.error('An error occurred in the main process:', error);
+  console.error(error.stack);
+  await backendServiceManager?.stop();
+  originalUncaughtException?.(error, origin);
+});
+
 app.commandLine.appendSwitch('lang', 'zh-CN');
 
 const gotTheLock = app.requestSingleInstanceLock();
-
-if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support');
-  sourceMapSupport.install();
-}
 
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
@@ -62,6 +88,7 @@ const createWindow = async () => {
       process.env.BKEXE_PATH || './backend/__main__.exe',
     ),
   );
+
   await backendServiceManager.start();
 
   const getAssetPath = (...paths: string[]): string => {
@@ -88,6 +115,16 @@ const createWindow = async () => {
   }
 
   setupIpcHandlers(mainWindow, backendServiceManager);
+  const server = new Server(backendServiceManager.getPort(), mainWindow);
+  // 启动服务器
+  server
+    .start()
+    .then(() => {
+      console.log('Server started successfully');
+    })
+    .catch((err) => {
+      console.error('Error starting server:', err);
+    });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -115,20 +152,6 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 };
-
-/**
- * Add event listeners...
- */
-
-app.on('window-all-closed', async () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  console.log('window-all-closed');
-  await backendServiceManager?.stop();
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
 
 app
   .whenReady()

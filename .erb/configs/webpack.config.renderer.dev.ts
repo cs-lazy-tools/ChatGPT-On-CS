@@ -35,7 +35,12 @@ if (
       'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"',
     ),
   );
-  execSync('npm run postinstall');
+
+  try {
+    execSync('npm run postinstall');
+  } catch (err) {
+    console.log(chalk.black.bgRed('Failed to build postinstall files', err));
+  }
 }
 
 const configuration: webpack.Configuration = {
@@ -115,7 +120,7 @@ const configuration: webpack.Configuration = {
     ],
   },
   plugins: [
-    ...(skipDLLs
+    ...(skipDLLs || !fs.existsSync(manifest)
       ? []
       : [
           new webpack.DllReferencePlugin({

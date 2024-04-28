@@ -27,14 +27,13 @@ const SettingsPage = () => {
   useEffect(() => {
     if (data && !isLoading) {
       setGptSettings({
-        useLazyTools: data.data.use_lazy || false,
+        useDify: data.data.use_dify || false,
         gptAddress: data.data.gpt_base_url || '',
         model: data.data.gpt_model || '',
         temperature: data.data.gpt_temperature || 0.7,
         apiKey: data.data.gpt_key || '',
         topP: data.data.gpt_top_p || 0.75,
         stream: data.data.stream || false,
-        lazyKey: data.data.lazy_key || '',
       });
       setCustomerServiceSettings({
         extractPhone: data.data.extract_phone || false,
@@ -63,15 +62,16 @@ const SettingsPage = () => {
         gpt_temperature: gptSettings.temperature,
         gpt_top_p: gptSettings.topP,
         stream: gptSettings.stream,
-        use_lazy: gptSettings.useLazyTools,
-        lazy_key: gptSettings.lazyKey,
+        use_dify: gptSettings.useDify,
       });
       toast({
+        position: 'top',
         title: '保存成功',
         status: 'success',
       });
     } catch (error: any) {
       toast({
+        position: 'top',
         title: '保存失败',
         description: error.message,
         status: 'error',

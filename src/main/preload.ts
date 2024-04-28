@@ -12,6 +12,7 @@ export type Channels =
   | 'electron-store-remove'
   | 'refresh-config'
   | 'open-directory'
+  | 'open-logger-folder'
   | 'select-file'
   | 'selected-file'
   | 'select-directory'
@@ -19,6 +20,7 @@ export type Channels =
   | 'open-url'
   | 'notification'
   | 'get-browser-version'
+  | 'broadcast'
   | 'get-version';
 
 const electronHandler = {

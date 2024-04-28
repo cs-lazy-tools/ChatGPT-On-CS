@@ -8,18 +8,12 @@ export async function getPlatformList() {
   return data;
 }
 
-export async function getActivePlatformList() {
-  const data = await GET<{
-    data: Platform[];
-  }>('/api/v1/base/platform/active');
-  return data;
-}
-
 export async function updatePlatform(ids: string[]) {
   await POST('/api/v1/base/platform', ids);
 }
 
 export async function updateRunner(data: {
+  ids: string[];
   is_paused: boolean;
   is_keyword_match: boolean;
 }) {
@@ -120,4 +114,19 @@ export async function updatePlatformSettings(settings: {
   active: boolean;
 }) {
   await POST('/api/v1/base/platform/settings', settings);
+}
+
+export async function checkGptHealth(data: {
+  base_url: string;
+  key: string;
+  model: string;
+  use_dify: boolean;
+}) {
+  const resp = await GET<{
+    status: boolean;
+    message: string;
+  }>('/api/v1/base/gpt/health', data, {
+    timeout: 5000,
+  });
+  return resp;
 }

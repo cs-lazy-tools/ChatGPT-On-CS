@@ -10,73 +10,71 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  VStack,
 } from '@chakra-ui/react';
 import { getVersionInfo } from '../../services/system/controller';
 import Markdown from '../Markdown';
 
 const Updater = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [updateInfo, setUpdateInfo] = useState<{
-    version: string;
-    url: string;
-    description: string;
-  } | null>(null);
+  const [updates, setUpdates] = useState<
+    {
+      version: string;
+      url: string;
+      description: string;
+    }[]
+  >([]);
   const [currentVersion, setCurrentVersion] = useState('');
 
   useEffect(() => {
     (async () => {
       const cv = window.electron.ipcRenderer.get('get-version');
-      const info = await getVersionInfo(cv);
-      if (info) {
-        setUpdateInfo(info);
+      const versionUpdates = await getVersionInfo(cv);
+      if (versionUpdates.length > 0) {
+        setUpdates(versionUpdates);
         setCurrentVersion(cv);
         setIsUpdateModalOpen(true);
       }
     })();
   }, []);
 
-  // 确认更新则跳转到下载链接
+  // 确认更新则跳转到最新版本的下载链接
   const confirmUpdate = () => {
-    if (updateInfo) {
-      window.electron.ipcRenderer.sendMessage('open-url', updateInfo.url);
+    const latestVersion = updates[0]; // 假设第一个总是最新版本
+    if (latestVersion) {
+      window.electron.ipcRenderer.sendMessage('open-url', latestVersion.url);
     }
   };
 
   return (
-    <>
-      <Modal
-        isOpen={isUpdateModalOpen}
-        onClose={() => setIsUpdateModalOpen(false)}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>版本更新</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {updateInfo && (
-              <>
-                <Text>
-                  当前版本是 {currentVersion} 检查到有最新版本{' '}
-                  {updateInfo?.version} 请问您是否立即更新？
-                </Text>
-
-                <Box mt="20px">
-                  <Markdown content={updateInfo?.description} />
-                </Box>
-              </>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={confirmUpdate}>
-              立即更新
-            </Button>
-            <Button variant="ghost" onClick={() => setIsUpdateModalOpen(false)}>
-              关闭
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal
+      isOpen={isUpdateModalOpen}
+      onClose={() => setIsUpdateModalOpen(false)}
+    >
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>版本更新</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Text>当前版本是 {currentVersion}. 检查到以下更新：</Text>
+          <VStack spacing={4} mt="20px">
+            {updates.map((update, index) => (
+              <Box key={index}>
+                <Markdown content={update.description} />
+              </Box>
+            ))}
+          </VStack>
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={confirmUpdate}>
+            立即更新到最新版本
+          </Button>
+          <Button variant="ghost" onClick={() => setIsUpdateModalOpen(false)}>
+            关闭
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 

@@ -18,7 +18,7 @@ import {
   AlertDialogOverlay,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useWebSocketContext } from '../../hooks/useWebSocketContext';
+import { useWebSocketContext } from '../../hooks/useBroadcastContext';
 import { useSystemStore } from '../../stores/useSystemStore';
 
 const SystemCheck = () => {
@@ -26,13 +26,12 @@ const SystemCheck = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const cancelRef = React.useRef<any>();
-  const { registerEventHandler, acknowledgeMessage } = useWebSocketContext();
+  const { registerEventHandler } = useWebSocketContext();
   const { setDriverSettings, driverSettings } = useSystemStore();
 
   useEffect(() => {
     const unregister = registerEventHandler((message) => {
       if (message.message === 'chrome_download') {
-        acknowledgeMessage('chrome_download', message.event_id);
         setIsModalOpen(true);
       } else if (message.message === 'human_task') {
         if (!message.data) {
@@ -56,7 +55,6 @@ const SystemCheck = () => {
           type: string;
         };
 
-        acknowledgeMessage('human_task', message.event_id);
         if (data.type === 'strategy') {
           setHumanTaskMsg(data.message);
           onOpen();
@@ -69,7 +67,7 @@ const SystemCheck = () => {
 
     // 组件卸载时注销事件处理器
     return () => unregister();
-  }, [registerEventHandler, acknowledgeMessage]); // eslint-disable-line
+  }, [registerEventHandler]); // eslint-disable-line
 
   const confirmDownload = () => {
     window.electron.ipcRenderer.sendMessage(

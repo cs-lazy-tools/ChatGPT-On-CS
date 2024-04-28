@@ -56,8 +56,9 @@ export interface Config {
   gpt_top_p?: number; // GPT服务top_p
   stream?: boolean; // 是否开启stream
 
-  use_lazy?: boolean; // 是否使用懒人百宝箱
-  lazy_key?: string; // 懒人百宝箱 key
+  use_dify?: boolean; // 是否使用 Dify 百宝箱
+  // use_lazy?: boolean; // 是否使用懒人百宝箱
+  // lazy_key?: string; // 懒人百宝箱 key
 }
 
 export interface CustomerServiceSettingsForm {
@@ -70,10 +71,9 @@ export interface CustomerServiceSettingsForm {
 }
 
 export interface GptSettingsForm {
-  useLazyTools: boolean;
+  useDify: boolean;
   gptAddress: string;
   apiKey: string;
-  lazyKey: string;
   model: string;
   temperature: number;
   topP: number;

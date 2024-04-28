@@ -26,6 +26,8 @@ module.exports = {
     'react/no-array-index-key': 'off',
     'class-methods-use-this': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
+    'no-console': 'off',
+    'max-classes-per-file': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,

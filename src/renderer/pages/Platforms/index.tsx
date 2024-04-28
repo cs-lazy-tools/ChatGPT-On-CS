@@ -60,6 +60,7 @@ const PlatformSettings = () => {
     },
     onSuccess: () => {
       toast({
+        position: 'top',
         title: '更新成功',
         status: 'success',
         duration: 3000,
@@ -68,6 +69,7 @@ const PlatformSettings = () => {
     },
     onError: () => {
       toast({
+        position: 'top',
         title: '更新失败',
         status: 'error',
         duration: 3000,

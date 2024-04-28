@@ -59,9 +59,9 @@ const SessionBox = ({
       </Flex>
       <Collapse in={isOpen} animateOpacity>
         <VStack mt={4} align="stretch">
-          {messages.map((message) => (
+          {messages.map((message, ii) => (
             <Box
-              key={message.id}
+              key={`${message.id}-${ii}`}
               p={4}
               borderWidth="1px"
               borderRadius="lg"

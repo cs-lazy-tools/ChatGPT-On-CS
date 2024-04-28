@@ -7,6 +7,8 @@ import {
   Notification,
 } from 'electron';
 import Store from 'electron-store';
+import os from 'os';
+import path from 'path';
 import { setCron } from './system/cron';
 import type BackendServiceManager from './system/backend';
 import { getBrowserVersionFromOS } from './system/chrome';
@@ -46,6 +48,12 @@ const setupIpcHandlers = (
 
   ipcMain.on('open-directory', async (event, args) => {
     shell.openPath(args);
+  });
+
+  ipcMain.on('open-logger-folder', async () => {
+    const logDir = path.join(os.tmpdir(), 'chatgpt-on-cs');
+
+    shell.openPath(logDir);
   });
 
   ipcMain.on('electron-store-get', async (event, val) => {
@@ -93,7 +101,6 @@ const setupIpcHandlers = (
       return;
     }
 
-    console.log('Checking health...');
     const isHealthy = await bsm.check_health();
     mainWindow.webContents.send('check-health', isHealthy);
   });

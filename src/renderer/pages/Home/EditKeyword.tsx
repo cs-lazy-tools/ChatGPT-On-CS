@@ -181,6 +181,7 @@ const EditKeyword = ({
       handleEdit();
     } catch (error: any) {
       toast({
+        position: 'top',
         title: error.message,
         status: 'error',
         duration: 3000,

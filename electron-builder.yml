@@ -9,6 +9,7 @@ files:
   - package.json
 afterSign: ".erb/scripts/notarize.js"
 win:
+  requestedExecutionLevel: requireAdministrator
   target:
     - nsis
 nsis:
@@ -28,6 +29,4 @@ directories:
   output: release/build
 extraResources:
   - "./assets/**"
-# build:
-#   afterPack: "./removeLocales.js"
 afterPack: "./removeLocales.js"

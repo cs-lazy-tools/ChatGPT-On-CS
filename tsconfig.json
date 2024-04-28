@@ -9,8 +9,11 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "strictPropertyInitialization": false, // 关闭严格属性初始化
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "allowJs": true,
     "outDir": ".erb/dll"
   },

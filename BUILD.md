@@ -47,3 +47,45 @@ pnpm i
   ]
 }
 ```
+
+## 构建 Electron 的 Sqlite3
+注意 Electron 有个 Sqlite3 的坑，需要重新编译，可以参考以下命令
+
+```bash
+pnpm --prefix=node_modules/sqlite3 run rebuild
+
+https://registry.npmmirror.com       
+
+# 使用 Visual Studio 社区中的 Desktop development with C++ 组件安装 C++ 工具集
+
+nvm use 18
+
+npm install --global windows-build-tools
+
+pnpm config set msvs_version=2022
+npm config set msvs_version 2022
+
+# 删除node_modules目录和package-lock.json文件：
+
+rm -rf node_modules
+rm package-lock.json
+
+# 重新编译sqlite3模块：
+
+npm i -g node-gyp
+
+# 项目根目录下执行
+pnpm i -D node-addon-api@7.0.0
+
+cd node_modules/sqlite3
+
+
+node-gyp rebuild --verbose
+# 或者执行
+node-gyp rebuild --target=26.2.1 --arch=x64 --target_platform=win32 --dist-url=https://electronjs.org/headers --module_name=node_sqlite3 --module_path=../lib/binding/electron-v26.2.1-win32-x64
+
+# 注意检查一下报错，可能需要在下面路径创建 node-addon-api（复制过去）
+
+pnpm i -D electron-builder
+pnpm run postinstall
+```

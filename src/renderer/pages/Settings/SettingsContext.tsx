@@ -34,10 +34,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     });
 
   const [gptSettings, setGptSettings] = useState<GptSettingsForm>({
-    useLazyTools: false,
+    useDify: false,
     gptAddress: '',
     apiKey: '',
-    lazyKey: '',
     model: '',
     temperature: 0,
     topP: 0,

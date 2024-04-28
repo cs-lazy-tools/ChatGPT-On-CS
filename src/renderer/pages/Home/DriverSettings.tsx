@@ -18,7 +18,8 @@ import LogBox from './LogBox';
 
 const DriverSettings = () => {
   const { toast } = useToast();
-  const { driverSettings, setDriverSettings } = useSystemStore();
+  const { driverSettings, setDriverSettings, selectedPlatforms } =
+    useSystemStore();
 
   useEffect(() => {
     window.electron.ipcRenderer.on('refresh-config', () => {
@@ -27,6 +28,7 @@ const DriverSettings = () => {
       (async () => {
         try {
           await updateRunner({
+            ids: selectedPlatforms,
             is_paused: isPaused,
             is_keyword_match: isKeywordMatch,
           });
@@ -39,7 +41,8 @@ const DriverSettings = () => {
     return () => {
       window.electron.ipcRenderer.remove('refresh-config');
     };
-  }, [driverSettings, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast]);
 
   const handleFormChange = (field: string) => (event: any) => {
     const { value, checked, type } = event.target;
@@ -54,11 +57,13 @@ const DriverSettings = () => {
     if (field === 'isPaused') {
       if (checked) {
         toast({
+          position: 'top',
           title: '已经暂停自动回复功能',
           status: 'warning',
         });
       } else {
         toast({
+          position: 'top',
           title: '已经开启自动回复功能',
           status: 'success',
         });
@@ -67,11 +72,13 @@ const DriverSettings = () => {
       updateRunner({
         is_paused: checked,
         is_keyword_match: driverSettings.isKeywordMatch,
+        ids: selectedPlatforms,
       });
     } else if (field === 'isKeywordMatch') {
       updateRunner({
         is_paused: driverSettings.isPaused,
         is_keyword_match: checked,
+        ids: selectedPlatforms,
       });
     }
   };

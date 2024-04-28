@@ -14,7 +14,7 @@ import PlatformSettings from './pages/Platforms';
 import { SettingsProvider } from './pages/Settings/SettingsContext';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
-import { WebSocketProvider } from './hooks/useWebSocketContext';
+import { BroadcastProvider } from './hooks/useBroadcastContext';
 import './App.css';
 import theme from './ui/styles/theme';
 
@@ -46,7 +46,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
-        <WebSocketProvider>
+        <BroadcastProvider>
           <ErrorBoundary>
             <Router>
               {isLoaded ? (
@@ -77,7 +77,7 @@ function App() {
               <Updater />
             </Router>
           </ErrorBoundary>
-        </WebSocketProvider>
+        </BroadcastProvider>
       </ChakraProvider>
     </QueryClientProvider>
   );

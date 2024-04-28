@@ -33,6 +33,8 @@ const MsgList = () => {
   const [endDate, setEndDate] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1); // 新增分页状态
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // 新增状态标识首次加载
+
   const [sessions, setSessions] = useState<
     {
       sessionId: string;
@@ -49,34 +51,35 @@ const MsgList = () => {
     isLoading: isMessagesLoading,
     isFetching,
     refetch,
-  } = useQuery(
-    ['messageList', page],
-    () =>
-      getMessageList({
-        page,
-        pageSize: 10,
-        ptfId: ptf,
-        keyword: searchTerm,
-        startTime: startDate,
-        endTime: endDate,
-      }),
-    {
-      keepPreviousData: true, // 保留旧数据，直到新数据加载完成
-    },
+  } = useQuery(['messageList', page], () =>
+    getMessageList({
+      page,
+      pageSize: 10,
+      ptfId: ptf,
+      keyword: searchTerm,
+      startTime: startDate,
+      endTime: endDate,
+    }),
   );
 
   useEffect(() => {
-    if (data?.data) {
-      // 参考下面的代码，懒加载取得的数据需要和旧的数据合并在一起重新分组
+    if (data?.data && !isFetching) {
       const newSessions = Object.entries(data.data).map(
         ([sessionId, messages]) => ({
           sessionId,
           messages,
         }),
       );
-      setSessions((prevSessions) => [...prevSessions, ...newSessions]);
+
+      if (isInitialLoad) {
+        setSessions(newSessions);
+        setIsInitialLoad(false);
+      } else {
+        setSessions((prevSessions) => [...prevSessions, ...newSessions]);
+      }
     }
-  }, [data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, isFetching]); // 添加isFetching依赖
 
   if (isPlatformsLoading || isMessagesLoading) {
     return (
@@ -89,7 +92,9 @@ const MsgList = () => {
   }
 
   const handlerSearch = () => {
-    setPage(1); // 搜索时重置页码
+    setIsInitialLoad(true); // 触发新搜索时，标记为初次加载
+    setSessions([]); // 清空现有会话
+    setPage(1); // 重置页码
     refetch();
   };
 
@@ -118,9 +123,7 @@ const MsgList = () => {
             isDisabled={isPlatformsLoading}
           >
             {platforms?.data.map((platform) => (
-              <option key={platform.id} value={platform.id}>
-                {platform.name}
-              </option>
+              <option value={platform.id}>{platform.name}</option>
             ))}
           </Select>
           <Input
@@ -128,7 +131,13 @@ const MsgList = () => {
             placeholder="Search messages"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Button colorScheme="orange" variant="solid" onClick={handlerSearch}>
+          <Button
+            colorScheme="orange"
+            variant="solid"
+            onClick={handlerSearch}
+            isLoading={isMessagesLoading || isFetching}
+            disabled={isMessagesLoading || isFetching}
+          >
             <Search2Icon />
           </Button>
 
@@ -150,7 +159,6 @@ const MsgList = () => {
       <VStack spacing={4} mt={5} align="stretch">
         {sessions.map((session, index) => (
           <SessionBox
-            key={session.sessionId}
             index={index}
             sessionId={session.sessionId}
             messages={session.messages}

@@ -10,9 +10,17 @@ class BackendServiceManager {
 
   private process: ReturnType<typeof spawn> | null;
 
+  private logStream: fs.WriteStream;
+
+  private logFilePath: string;
+
   private port: number;
 
   private autoRestart: boolean; // 新增自动重启标志
+
+  private MAX_LOG_SIZE = 5 * 1024 * 1024; // 5MB
+
+  private MAX_LOG_FILES = 10;
 
   constructor(executablePath: string, autoRestart: boolean = true) {
     this.executablePath = executablePath;
@@ -42,36 +50,67 @@ class BackendServiceManager {
     });
   }
 
+  private rotateLogs() {
+    this.logStream.close();
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const newLogFilePath = this.logFilePath.replace(
+      'process.log',
+      `process-${timestamp}.log`,
+    );
+    fs.renameSync(this.logFilePath, newLogFilePath);
+
+    const logFiles = fs.readdirSync(path.dirname(this.logFilePath)).sort();
+    while (logFiles.length > this.MAX_LOG_FILES) {
+      const oldestLogFile = logFiles.shift();
+      if (!oldestLogFile) {
+        break;
+      }
+      fs.unlinkSync(path.join(path.dirname(this.logFilePath), oldestLogFile));
+    }
+
+    this.logFilePath = path.join(path.dirname(this.logFilePath), 'process.log');
+    this.logStream = fs.createWriteStream(this.logFilePath, { flags: 'a' });
+  }
+
+  private checkLogSizeAndRotate() {
+    const logSize = fs.existsSync(this.logFilePath)
+      ? fs.statSync(this.logFilePath).size
+      : 0;
+    if (logSize > this.MAX_LOG_SIZE) {
+      this.rotateLogs();
+    }
+  }
+
   private launchProcess(port: number) {
-    // 获取系统的临时文件夹路径
     const tempDir = os.tmpdir();
-    // 在临时文件夹中创建一个名为 chatgpt-on-cs 的目录用于存放日志
     const logDir = path.join(tempDir, 'chatgpt-on-cs');
-    // 如果目录不存在，则创建它
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir);
     }
-    // 定义日志文件的路径
-    const logFilePath = path.join(logDir, 'process.log');
-    // 创建一个写入流
-    const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+    this.logFilePath = path.join(logDir, 'process.log');
+    this.logStream = fs.createWriteStream(this.logFilePath, { flags: 'a' });
 
     this.process = spawn(this.executablePath, ['--port', port.toString()]);
 
     this.process.stdout?.on('data', (data) => {
-      console.log(`stdout: ${data}`); // 可选：依然在控制台输出
-      logStream.write(`stdout: ${data}`); // 写入文件
+      this.logStream.write(`stdout: ${data}`);
+      this.checkLogSizeAndRotate();
     });
 
     this.process.stderr?.on('data', (data) => {
-      console.error(`stderr: ${data}`); // 可选：依然在控制台输出
-      logStream.write(`stderr: ${data}`); // 写入文件
+      this.logStream.write(`stderr: ${data}`);
+      this.checkLogSizeAndRotate();
     });
 
-    // 监听进程关闭事件，关闭写入流
     this.process.on('close', () => {
-      logStream.close();
+      this.logStream.close();
     });
+
+    this.process.on('error', (err) => {
+      console.error('Failed to start subprocess.', err);
+    });
+
+    console.log(`Backend process started with PID: ${this.process.pid}`);
   }
 
   async getAvailablePort(): Promise<number> {
@@ -94,7 +133,7 @@ class BackendServiceManager {
       const {
         data: { data },
       } = await axios.get(`http://127.0.0.1:${this.port}/api/v1/base/health`);
-      return data.init_db;
+      return data;
     } catch (error) {
       return false;
     }

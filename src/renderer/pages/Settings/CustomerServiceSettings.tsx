@@ -47,6 +47,7 @@ const CustomerServiceSettings = () => {
       );
     } else {
       toast({
+        position: 'top',
         title: '未选择文件夹',
         description: '请先选择一个文件夹路径。',
         status: 'warning',
