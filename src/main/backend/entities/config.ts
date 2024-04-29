@@ -78,6 +78,7 @@ export function initConfig(sequelize: Sequelize) {
       use_dify: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+        allowNull: true,
       },
       gpt_model: {
         type: DataTypes.STRING,

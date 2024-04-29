@@ -205,7 +205,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "mini-css-extract-plugin": "^2.7.6",
-    "node-addon-api": "file:C:/Users/33204/Documents/project/alsritter.icu/lazy-rap-web/tmp/node-addon-api",
+    "node-addon-api": "^8.0.0",
     "prettier": "^3.0.3",
     "prettier-eslint": "^16.3.0",
     "react-refresh": "^0.14.0",

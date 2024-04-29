@@ -43,3 +43,16 @@ Authorization: Bearer app-5uPNxwQ6Q8bU6FzO3WZ72tqV
     "user": "apiuser",
     "query": "Who won the world series in 2020?"
 }
+
+###
+
+POST http://chat.wangpisi.com/v1/chat-messages
+content-type: application/json
+Authorization: Bearer app-voGEBvo8IYKmymYkVtBgxBFF
+
+{
+    "inputs": {},
+    "response_mode": "blocking",
+    "user": "apiuser",
+    "query": "Who won the world series in 2020?"
+}

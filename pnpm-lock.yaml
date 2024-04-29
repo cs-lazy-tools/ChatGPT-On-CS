@@ -341,8 +341,8 @@ devDependencies:
     specifier: ^2.7.6
     version: 2.9.0(webpack@5.91.0)
   node-addon-api:
-    specifier: file:C:/Users/33204/Documents/project/alsritter.icu/lazy-rap-web/tmp/node-addon-api
-    version: file:tmp/node-addon-api
+    specifier: ^8.0.0
+    version: 8.0.0
   prettier:
     specifier: ^3.0.3
     version: 3.2.5
@@ -11181,6 +11181,11 @@ packages:
   /node-addon-api@7.0.0:
     resolution: {integrity: sha512-vgbBJTS4m5/KkE16t5Ly0WW9hz46swAstv0hYYwMtbG7AznRhNyfLRe8HZAiWIpcHzoO7HxhLuBQj9rJ/Ho0ZA==}
 
+  /node-addon-api@8.0.0:
+    resolution: {integrity: sha512-ipO7rsHEBqa9STO5C5T10fj732ml+5kLN1cAG8/jdHd56ldQeGj3Q7+scUS+VHK/qy1zLEwC4wMK5+yM0btPvw==}
+    engines: {node: ^18 || ^20 || >= 21}
+    dev: true
+
   /node-api-version@0.1.4:
     resolution: {integrity: sha512-KGXihXdUChwJAOHO53bv9/vXcLmdUsZ6jIptbvYvkpKfth+r7jw44JkVxQFA3kX5nQjzjmGu1uAu/xNNLNlI5g==}
     dependencies:
@@ -15085,8 +15090,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: false
-
-  file:tmp/node-addon-api:
-    resolution: {directory: tmp/node-addon-api, type: directory}
-    name: node-addon-api
-    dev: true

@@ -21,9 +21,10 @@ import Server from './backend/backend';
 let mainWindow: BrowserWindow | null = null;
 let backendServiceManager: BackendServiceManager | null = null;
 
-/**
- * Add event listeners...
- */
+// 修复 GPU process isn't usable. Goodbye. 错误
+// https://learn.microsoft.com/en-us/answers/questions/1193062/how-to-fix-electron-program-gpu-process-isnt-usabl
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('lang', 'zh-CN');
 
 app.on('window-all-closed', async () => {
   // Respect the OSX convention of having the application in memory even
@@ -48,8 +49,6 @@ process.on('uncaughtException', async (error, origin) => {
   await backendServiceManager?.stop();
   originalUncaughtException?.(error, origin);
 });
-
-app.commandLine.appendSwitch('lang', 'zh-CN');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -115,6 +114,7 @@ const createWindow = async () => {
   }
 
   setupIpcHandlers(mainWindow, backendServiceManager);
+
   const server = new Server(backendServiceManager.getPort(), mainWindow);
   // 启动服务器
   server

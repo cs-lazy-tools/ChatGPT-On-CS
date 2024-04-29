@@ -194,22 +194,6 @@ export default class MenuBuilder {
   buildDefaultTemplate() {
     const templateDefault = [
       {
-        label: '&File',
-        submenu: [
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
-            click: () => {
-              this.mainWindow.close();
-            },
-          },
-        ],
-      },
-      {
         label: '&View',
         submenu:
           process.env.NODE_ENV === 'development' ||
@@ -252,35 +236,29 @@ export default class MenuBuilder {
               ],
       },
       {
-        label: 'Help',
+        label: '帮助',
         submenu: [
           {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('https://electronjs.org');
-            },
-          },
-          {
-            label: 'Documentation',
+            label: '使用文档',
             click() {
               shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme',
+                'https://github.com/lrhh123/ChatGPT-On-CS/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E',
               );
             },
           },
           {
-            label: 'Community Discussions',
+            label: '反馈问题',
             click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
+              shell.openExternal(
+                'https://github.com/lrhh123/ChatGPT-On-CS/issues',
+              );
             },
           },
         ],
+      },
+      {
+        label: '调试',
+        submenu: [],
       },
     ];
 

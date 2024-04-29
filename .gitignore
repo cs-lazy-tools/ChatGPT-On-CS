@@ -29,3 +29,6 @@ npm-debug.log.*
 *.scss.d.ts
 assets/backend/*
 src/renderer/services/analytics/*
+
+
+open_ai.http
