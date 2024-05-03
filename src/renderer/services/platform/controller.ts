@@ -1,5 +1,5 @@
 import { Platform, Reply, Config, Message } from './platform';
-import { DELETE, GET, POST } from '../common/api/request';
+import { GET, POST } from '../common/api/request';
 
 export async function getPlatformList() {
   const data = await GET<{
@@ -49,7 +49,7 @@ export async function updateReplyKeyword(keyword: Reply) {
 }
 
 export async function deleteReplyKeyword(id: number) {
-  await DELETE('/api/v1/reply/delete', { id });
+  await POST('/api/v1/reply/delete', { id });
 }
 
 export async function getConfig() {
