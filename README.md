@@ -36,12 +36,12 @@
 
 ## 下载地址
 
-<a href="https://github.com/lrhh123/ChatGPT-On-CS/releases/download/v1.0.3.beta/1.0.3.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://github.com/lrhh123/ChatGPT-On-CS/releases/download/v1.0.3/1.0.3.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
 ```txt
-链接：https://pan.baidu.com/s/1sGAgyTv1KGRCg6ekUf_sqg?pwd=6666 
+链接：https://pan.baidu.com/s/113dLdcxHZGIhSFvSjwEJ2A?pwd=6666 
 提取码：6666
 ```
 
