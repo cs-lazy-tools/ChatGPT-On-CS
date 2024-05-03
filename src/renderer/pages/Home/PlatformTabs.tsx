@@ -12,8 +12,11 @@ import {
   Box,
   Skeleton,
   CheckboxGroup,
+  IconButton,
+  VStack,
   Grid,
 } from '@chakra-ui/react';
+import { SettingsIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import {
   getPlatformList,
@@ -97,19 +100,33 @@ const PlatformTabs = () => {
                 <Checkbox value={platform.id} isDisabled={!platform.impl}>
                   {platform.name}
                 </Checkbox>
-                {
-                  // 如果 id 前缀有 win_ 则显示一个小图标标识
-                  platform.id.startsWith('win_') && (
-                    <Tooltip label="客户端应用，需要先手动打开该应用">
-                      <Image
-                        src={windowsIcon}
-                        boxSize="10px"
-                        marginLeft="4px"
-                        alt="windows"
+                <VStack>
+                  {platform.impl && (
+                    <Tooltip label={`设置 ${platform.name} 平台`}>
+                      <IconButton
+                        variant="borderless"
+                        aria-label={`设置 ${platform.name} 平台`}
+                        fontSize="12px"
+                        w={2}
+                        h={2}
+                        icon={<SettingsIcon />}
                       />
                     </Tooltip>
-                  )
-                }
+                  )}
+                  {
+                    // 如果 id 前缀有 win_ 则显示一个小图标标识
+                    platform.id.startsWith('win_') && (
+                      <Tooltip label="客户端应用，需要先手动打开该应用">
+                        <Image
+                          src={windowsIcon}
+                          boxSize="10px"
+                          marginLeft="4px"
+                          alt="windows"
+                        />
+                      </Tooltip>
+                    )
+                  }
+                </VStack>
               </Box>
             ))}
           </Grid>

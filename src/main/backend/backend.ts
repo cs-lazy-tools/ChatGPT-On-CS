@@ -4,9 +4,9 @@ import asyncHandler from 'express-async-handler';
 import bodyParser from 'body-parser';
 import http from 'http';
 import { Server } from 'socket.io';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, shell } from 'electron';
 import './ormconfig';
-import { StrategyServiceStatusEnum } from './constants/constants';
+import { StrategyServiceStatusEnum } from './types';
 import { SessionController } from './controllers/sessionController';
 import { ConfigController } from './controllers/configController';
 import { MessageController } from './controllers/messageController';
@@ -321,6 +321,28 @@ class BKServer {
       const { id } = req.body;
       await autoReplyController.delete(id);
       res.json({ success: true });
+    });
+
+    this.app.post('/api/v1/reply/excel', async (req, res) => {
+      const { path } = req.body;
+      try {
+        await autoReplyController.importExcel(path);
+        res.json({ success: true });
+      } catch (error) {
+        // @ts-ignore
+        res.status(500).json({ success: false, message: error.message });
+      }
+    });
+
+    this.app.get('/api/v1/reply/excel', async (req, res) => {
+      try {
+        const path = await autoReplyController.exportExcel();
+        shell.openPath(path);
+        res.json({ success: true, data: path });
+      } catch (error) {
+        // @ts-ignore
+        res.status(500).json({ success: false, message: error.message });
+      }
     });
 
     // Health check endpoint

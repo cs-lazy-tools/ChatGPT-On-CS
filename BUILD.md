@@ -1,3 +1,6 @@
+## 项目技术栈
+- electron-react-boilerplate
+
 
 ## 本地调试说明
 首先下载 https://wwp.lanzouo.com/ipTev1qulx1i 里面的文件并解压到你的项目目录 assets/backend 目录下
@@ -54,8 +57,7 @@ pnpm i
 ```bash
 pnpm --prefix=node_modules/sqlite3 run rebuild
 
-https://registry.npmmirror.com       
-
+# https://registry.npmmirror.com
 # 使用 Visual Studio 社区中的 Desktop development with C++ 组件安装 C++ 工具集
 
 nvm use 18

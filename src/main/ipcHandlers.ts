@@ -39,9 +39,13 @@ const setupIpcHandlers = (
     event.reply('selected-directory', result.filePaths);
   });
 
-  ipcMain.on('select-file', async (event) => {
+  ipcMain.on('select-file', async (event, args) => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile'],
+      filters:
+        args && args.filters
+          ? args.filters
+          : [{ name: 'All Files', extensions: ['*'] }],
     });
     event.reply('selected-file', result.filePaths);
   });

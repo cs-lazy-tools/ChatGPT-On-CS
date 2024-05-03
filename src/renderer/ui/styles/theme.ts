@@ -1,6 +1,7 @@
 import { extendTheme } from '@chakra-ui/react';
 import colors from './colors';
 import { tableTheme } from './foundations/Table';
+import { iconButtonTheme } from './foundations/IconButton';
 
 const theme = extendTheme({
   styles: {
@@ -74,6 +75,7 @@ const theme = extendTheme({
   },
   components: {
     Table: tableTheme,
+    IconButton: iconButtonTheme,
   },
 });
 

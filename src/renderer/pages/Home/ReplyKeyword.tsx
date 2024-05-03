@@ -9,6 +9,7 @@ import {
   Flex,
   TableContainer,
   useDisclosure,
+  useToast,
   Text,
   Button,
   IconButton,
@@ -16,6 +17,7 @@ import {
   Skeleton,
   Stack,
   Tooltip,
+  HStack,
   Grid,
 } from '@chakra-ui/react';
 import { DeleteIcon, AddIcon, EditIcon } from '@chakra-ui/icons';
@@ -24,6 +26,8 @@ import EditKeyword from './EditKeyword';
 import {
   getReplyList,
   deleteReplyKeyword,
+  updateReplyExcel,
+  exportReplyExcel,
 } from '../../services/platform/controller';
 import { Reply } from '../../services/platform/platform';
 
@@ -31,6 +35,8 @@ const ReplyKeyword = () => {
   const [keywords, setKeywords] = useState<Reply[]>([]);
   const [editKeyword, setEditKeyword] = useState<Reply | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const [updated, setUpdated] = useState(false);
 
   const { data, isLoading, refetch } = useQuery(
     ['replyList'],
@@ -67,6 +73,85 @@ const ReplyKeyword = () => {
     );
   }
 
+  const handleInsertFile = () => {
+    window.electron.ipcRenderer.sendMessage('select-file', {
+      filters: [{ name: 'Excel 模板', extensions: ['xls', 'xlsx'] }],
+    });
+    window.electron.ipcRenderer.once('selected-file', async (path) => {
+      const selectedPath = path as string[];
+      if (!selectedPath.length || !selectedPath[0]) return;
+      console.log(selectedPath);
+      setUpdated(true);
+      try {
+        await updateReplyExcel({ path: selectedPath[0] });
+        refetch();
+        toast({
+          title: '导入成功',
+          description: '导入成功',
+          position: 'top',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (e) {
+        let message = '导入失败';
+        if (e instanceof Error) {
+          message = e.message;
+        } else if (typeof e === 'string') {
+          message = e;
+        } else {
+          message = JSON.stringify(e);
+        }
+
+        toast({
+          title: '导入失败',
+          description: message,
+          position: 'top',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      } finally {
+        setUpdated(false);
+      }
+    });
+  };
+
+  const handleExportReplyExcel = async () => {
+    try {
+      setUpdated(true);
+      await exportReplyExcel();
+      toast({
+        title: '导出成功',
+        description: '导出成功',
+        position: 'top',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (e) {
+      let message = '导出失败';
+      if (e instanceof Error) {
+        message = e.message;
+      } else if (typeof e === 'string') {
+        message = e;
+      } else {
+        message = JSON.stringify(e);
+      }
+
+      toast({
+        title: '导出失败',
+        description: message,
+        position: 'top',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setUpdated(false);
+    }
+  };
+
   const handleDoubleClick = (keyword: Reply) => {
     setEditKeyword(keyword);
     onOpen();
@@ -98,20 +183,43 @@ const ReplyKeyword = () => {
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Text>编辑回复关键词</Text>
         <Flex alignItems="center">
-          {' '}
-          <Button
-            leftIcon={<AddIcon />}
-            color="white"
-            bgGradient="linear(to-r, teal.500, green.500)"
-            _hover={{
-              bgGradient: 'linear(to-r, teal.300, green.300)',
-            }}
-            variant="solid"
-            onClick={handleAddKeyword}
-          >
-            新增关键词
-          </Button>
-          {/* 在图标旁边添加文案，并设置左边距 */}
+          <HStack>
+            <Button
+              size="sm"
+              leftIcon={<AddIcon />}
+              color="white"
+              bgGradient="linear(to-r, teal.500, green.500)"
+              _hover={{
+                bgGradient: 'linear(to-r, teal.300, green.300)',
+              }}
+              variant="solid"
+              onClick={handleAddKeyword}
+              isLoading={updated}
+            >
+              新增关键词
+            </Button>
+            <Tooltip label="导入并覆盖关键词">
+              <Button
+                size="sm"
+                variant="solid"
+                colorScheme="linkedin"
+                onClick={handleInsertFile}
+                isLoading={updated}
+              >
+                覆盖导入
+              </Button>
+            </Tooltip>
+            <Tooltip label="导出关键词（下载模板）">
+              <Button
+                size="sm"
+                variant="solid"
+                onClick={handleExportReplyExcel}
+                isLoading={updated}
+              >
+                导出
+              </Button>
+            </Tooltip>
+          </HStack>
         </Flex>
       </Box>
       <TableContainer maxH={'300px'} overflowY="scroll">

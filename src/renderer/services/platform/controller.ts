@@ -52,6 +52,15 @@ export async function deleteReplyKeyword(id: number) {
   await POST('/api/v1/reply/delete', { id });
 }
 
+export async function updateReplyExcel(data: { path: string }) {
+  await POST('/api/v1/reply/excel', data);
+}
+
+export async function exportReplyExcel() {
+  const data = await GET('/api/v1/reply/excel');
+  return data;
+}
+
 export async function getConfig() {
   const data = await GET<{
     data: Config;

@@ -2,8 +2,8 @@ import { spawn, exec } from 'child_process';
 import { createServer } from 'net';
 import axios from 'axios';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
+import { getTempPath } from '../utils';
 
 class BackendServiceManager {
   private executablePath: string;
@@ -82,11 +82,7 @@ class BackendServiceManager {
   }
 
   private launchProcess(port: number) {
-    const tempDir = os.tmpdir();
-    const logDir = path.join(tempDir, 'chatgpt-on-cs');
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir);
-    }
+    const logDir = getTempPath();
     this.logFilePath = path.join(logDir, 'process.log');
     this.logStream = fs.createWriteStream(this.logFilePath, { flags: 'a' });
 

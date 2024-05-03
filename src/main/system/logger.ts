@@ -1,17 +1,12 @@
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
+import { getTempPath } from '../utils';
 
 const MAX_LOG_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_LOG_FILES = 10;
 
-// 获取系统的临时文件夹路径
-const tempDir = os.tmpdir();
 // 在临时文件夹中创建一个名为 chatgpt-on-cs 的目录用于存放日志
-const logDir = path.join(tempDir, 'chatgpt-on-cs');
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
-}
+const logDir = getTempPath();
 
 // 定义日志文件的路径
 let logFilePath = path.join(logDir, 'renderer.log');
