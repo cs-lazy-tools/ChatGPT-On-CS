@@ -10,7 +10,6 @@ import SettingsPage from './pages/Settings';
 import AboutPage from './pages/About';
 import MsgList from './pages/MsgList';
 import FullScreenLoader from './pages/FullScreenLoader';
-import PlatformSettings from './pages/Platforms';
 import { SettingsProvider } from './pages/Settings/SettingsContext';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
@@ -56,7 +55,6 @@ function App() {
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/msg" element={<MsgList />} />
-                      <Route path="/platforms" element={<PlatformSettings />} />
                       <Route
                         path="/settings"
                         element={

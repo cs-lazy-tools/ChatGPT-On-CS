@@ -68,15 +68,17 @@ class BKServer {
       transports: ['websocket'],
     });
 
-    this.messageService = new MessageService(
-      configController,
-      messageController,
-      autoReplyController,
-    );
     this.configService = new ConfigService(
       configController,
       platformConfigController,
     );
+
+    this.messageService = new MessageService(
+      this.configService,
+      messageController,
+      autoReplyController,
+    );
+
     this.broadcastService = new BroadcastService(mainWindow);
     this.strategyService = new StrategyService(this.io);
     this.sessionService = new SessionService(
@@ -173,22 +175,20 @@ class BKServer {
 
     // 获取平台设置
     this.app.get(
-      '/api/v1/base/platform/settings',
+      '/api/v1/base/platform/setting',
       asyncHandler(async (req, res) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { total, data } = await platformConfigController.list({
-          page: 1,
-          pageSize: 100,
-        });
-        res.json({ success: true, data });
+        const { platformId } = req.query;
+        // @ts-ignore
+        const obj = await platformConfigController.getByPlatformId(platformId);
+        res.json({ success: true, data: obj.settings });
       }),
     );
 
     this.app.post(
-      '/api/v1/base/platform/settings',
+      '/api/v1/base/platform/setting',
       asyncHandler(async (req, res) => {
-        const { platform_id: platformId, config } = req.body;
-        await platformConfigController.updateByPlatformId(platformId, config);
+        const { platformId, settings } = req.body;
+        await platformConfigController.updateByPlatformId(platformId, settings);
         res.json({ success: true });
       }),
     );
@@ -198,6 +198,7 @@ class BKServer {
       const {
         is_paused: isPaused,
         is_keyword_match: isKeywordMatch,
+        is_use_gpt: isUseGptReply,
         ids,
       } = req.body;
       try {
@@ -212,7 +213,7 @@ class BKServer {
         }
 
         if (isKeywordMatch) {
-          this.messageService.updateKeywordMatch(isKeywordMatch);
+          this.messageService.updateKeywordMatch(isKeywordMatch, isUseGptReply);
         }
 
         await this.strategyService.updateStrategies(ids);
@@ -229,6 +230,8 @@ class BKServer {
     this.app.get('/api/v1/base/settings', async (req, res) => {
       try {
         const config = await configController.getConfig();
+        // @ts-ignore 兼容性处理
+        config.reply_speed = [config.reply_speed, config.reply_random_speed];
         res.json({ success: true, data: config });
       } catch (error) {
         if (error instanceof Error) {
@@ -240,9 +243,44 @@ class BKServer {
     // Endpoint to update configuration settings
     this.app.post('/api/v1/base/settings', async (req, res) => {
       try {
-        const cfg = req.body;
-        await configController.updateConfig(1, cfg); // Assuming the ID is known and static
-        // globalVariable.merged_message_num = cfg.merged_message_num;
+        const cfg = req.body as {
+          extract_phone: boolean; // 提取手机号
+          extract_product: boolean; // 提取商品
+          save_path?: string; // 保存路径
+          default_reply?: string; // 默认回复
+          reply_speed: number[]; // 回复速度
+          context_count: number; // 合并消息数量
+          wait_humans_time: number; // 等待人工时间
+          gpt_base_url?: string; // GPT服务地址
+          gpt_key?: string; // GPT服务key
+          gpt_model?: string; // GPT服务模型
+          gpt_temperature?: number; // GPT服务温度
+          gpt_top_p?: number; // GPT服务top_p
+          stream?: boolean; // 是否开启stream
+          use_dify?: boolean; // 是否使用 Dify 百宝箱
+        };
+
+        if (!cfg.reply_speed || cfg.reply_speed.length !== 2) {
+          cfg.reply_speed = [0, 0];
+        }
+
+        await configController.updateConfig(1, {
+          extract_phone: cfg.extract_phone,
+          extract_product: cfg.extract_product,
+          default_reply: cfg.default_reply,
+          save_path: cfg.save_path,
+          reply_speed: cfg.reply_speed[0],
+          reply_random_speed: cfg.reply_speed[1],
+          context_count: cfg.context_count,
+          wait_humans_time: cfg.wait_humans_time,
+          gpt_base_url: cfg.gpt_base_url,
+          gpt_key: cfg.gpt_key,
+          gpt_model: cfg.gpt_model,
+          gpt_temperature: cfg.gpt_temperature,
+          gpt_top_p: cfg.gpt_top_p,
+          stream: cfg.stream,
+          use_dify: cfg.use_dify,
+        });
         res.json({ success: true });
       } catch (error) {
         if (error instanceof Error) {

@@ -25,10 +25,12 @@ type State = {
   driverSettings: {
     isPaused: boolean;
     isKeywordMatch: boolean;
+    isUseGpt: boolean;
   };
   setDriverSettings: (settings: {
     isPaused: boolean;
     isKeywordMatch: boolean;
+    isUseGpt: boolean;
   }) => void;
 };
 
@@ -44,7 +46,7 @@ export const useSystemStore = create<State>()(
         },
         driverSettings: {
           isPaused: true,
-          runMode: 'AUTO_SWITCH',
+          isUseGpt: true,
           isKeywordMatch: true,
         },
         setDriverSettings: (settings) => {

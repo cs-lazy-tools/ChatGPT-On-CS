@@ -6,11 +6,7 @@ export class PlatformConfig extends Model {
 
   declare platform_id: string;
 
-  declare openai_url: string;
-
-  declare api_key: string;
-
-  declare prompt: string;
+  declare settings: any;
 
   declare active: boolean;
 }
@@ -27,16 +23,8 @@ export function initPlatformConfig(sequelize: Sequelize) {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      openai_url: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-      },
-      api_key: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-      },
-      prompt: {
-        type: DataTypes.STRING(255),
+      settings: {
+        type: DataTypes.JSON,
         allowNull: false,
       },
       active: {
@@ -47,7 +35,7 @@ export function initPlatformConfig(sequelize: Sequelize) {
     {
       sequelize,
       modelName: 'PlatformConfig',
-      tableName: 'platform_config',
+      tableName: 'platform_cfg', // 创建一个新的表，用于存储 JSON 格式的配置
       timestamps: false,
     },
   );

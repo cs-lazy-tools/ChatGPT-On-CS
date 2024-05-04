@@ -23,6 +23,7 @@ import {
   updatePlatform,
 } from '../../services/platform/controller';
 import { Platform } from '../../services/platform/platform';
+import PlatformSettings from '../../components/PlatformConfigs';
 import {
   PlatformTypeMap,
   PlatformTypeEnum,
@@ -35,6 +36,11 @@ import analytics from '../../services/analytics';
 const PlatformTabs = () => {
   const { data, isLoading } = useQuery(['platformList'], getPlatformList);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedPlatformId, setSelectedPlatformId] = useState<string | null>(
+    null,
+  );
+
   const { selectedPlatforms, setSelectedPlatforms } = useSystemStore();
 
   // 处理数据加载完毕后的平台分组
@@ -110,6 +116,10 @@ const PlatformTabs = () => {
                         w={2}
                         h={2}
                         icon={<SettingsIcon />}
+                        onClick={() => {
+                          setSelectedPlatformId(platform.id);
+                          setIsSettingsOpen(true);
+                        }}
                       />
                     </Tooltip>
                   )}
@@ -136,15 +146,25 @@ const PlatformTabs = () => {
   };
 
   return (
-    <Tabs>
-      <TabList>
-        {Object.keys(groupedPlatforms || {}).map((type) => (
-          <Tab key={type}>{PlatformTypeMap[type as PlatformTypeEnum]}</Tab>
-        ))}
-      </TabList>
+    <>
+      <Tabs>
+        <TabList>
+          {Object.keys(groupedPlatforms || {}).map((type) => (
+            <Tab key={type}>{PlatformTypeMap[type as PlatformTypeEnum]}</Tab>
+          ))}
+        </TabList>
 
-      <TabPanels>{renderTabPanels()}</TabPanels>
-    </Tabs>
+        <TabPanels>{renderTabPanels()}</TabPanels>
+      </Tabs>
+
+      {selectedPlatformId && (
+        <PlatformSettings
+          platformId={selectedPlatformId}
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      )}
+    </>
   );
 };
 

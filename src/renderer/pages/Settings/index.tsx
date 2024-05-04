@@ -39,9 +39,10 @@ const SettingsPage = () => {
         extractPhone: data.data.extract_phone || false,
         extractProduct: data.data.extract_product || false,
         folderPath: data.data.save_path || '',
-        replySpeed: data.data.reply_speed || 0,
-        mergeUnprocessedMessagesCount: data.data.merged_message_num || 7,
+        replySpeed: data.data.reply_speed || [0, 0],
+        contextCount: data.data.context_count || 1,
         manualInterventionInterval: data.data.wait_humans_time || 60,
+        defaultReply: data.data.default_reply || '',
       });
     }
   }, [isLoading, data, setGptSettings, setCustomerServiceSettings]);
@@ -53,8 +54,8 @@ const SettingsPage = () => {
         extract_product: customerServiceSettings.extractProduct,
         save_path: customerServiceSettings.folderPath,
         reply_speed: customerServiceSettings.replySpeed,
-        merged_message_num:
-          customerServiceSettings.mergeUnprocessedMessagesCount,
+        default_reply: customerServiceSettings.defaultReply,
+        context_count: customerServiceSettings.contextCount,
         wait_humans_time: customerServiceSettings.manualInterventionInterval,
         gpt_base_url: gptSettings.gptAddress,
         gpt_key: gptSettings.apiKey,

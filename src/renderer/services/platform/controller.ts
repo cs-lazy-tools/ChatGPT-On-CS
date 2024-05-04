@@ -16,6 +16,7 @@ export async function updateRunner(data: {
   ids: string[];
   is_paused: boolean;
   is_keyword_match: boolean;
+  is_use_gpt: boolean;
 }) {
   await POST('/api/v1/base/runner', data);
 }
@@ -103,26 +104,16 @@ export async function getMessageList({
   return data;
 }
 
-export async function getPlatformSettings() {
-  const data = await GET<{
-    data: {
-      platform_id: string;
-      openai_url: string;
-      api_key: string;
-      prompt: string;
-      active: boolean;
-    }[];
-  }>('/api/v1/base/platform/settings');
+export async function getPlatformSetting(platformId: string) {
+  const data = await GET<any>('/api/v1/base/platform/setting', { platformId });
   return data;
 }
 
-export async function updatePlatformSettings(settings: {
-  openai_url: string;
-  api_key: string;
-  prompt: string;
-  active: boolean;
+export async function updatePlatformSetting(data: {
+  platformId: string;
+  settings: any;
 }) {
-  await POST('/api/v1/base/platform/settings', settings);
+  await POST('/api/v1/base/platform/setting', data);
 }
 
 export async function checkGptHealth(data: {

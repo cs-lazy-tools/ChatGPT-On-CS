@@ -28,6 +28,8 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'error',
     'no-console': 'off',
     'max-classes-per-file': 'off',
+    'no-continue': 'off',
+    'no-plusplus': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,

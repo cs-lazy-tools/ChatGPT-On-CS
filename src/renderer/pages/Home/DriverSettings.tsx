@@ -23,7 +23,7 @@ const DriverSettings = () => {
 
   useEffect(() => {
     window.electron.ipcRenderer.on('refresh-config', () => {
-      const { isPaused, isKeywordMatch } = driverSettings;
+      const { isPaused, isKeywordMatch, isUseGpt } = driverSettings;
 
       (async () => {
         try {
@@ -31,6 +31,7 @@ const DriverSettings = () => {
             ids: selectedPlatforms,
             is_paused: isPaused,
             is_keyword_match: isKeywordMatch,
+            is_use_gpt: isUseGpt,
           });
         } catch (error: any) {
           console.error(error);
@@ -73,12 +74,21 @@ const DriverSettings = () => {
         is_paused: checked,
         is_keyword_match: driverSettings.isKeywordMatch,
         ids: selectedPlatforms,
+        is_use_gpt: driverSettings.isUseGpt,
       });
     } else if (field === 'isKeywordMatch') {
       updateRunner({
         is_paused: driverSettings.isPaused,
         is_keyword_match: checked,
         ids: selectedPlatforms,
+        is_use_gpt: driverSettings.isUseGpt,
+      });
+    } else if (field === 'isUseGpt') {
+      updateRunner({
+        is_paused: driverSettings.isPaused,
+        is_keyword_match: driverSettings.isKeywordMatch,
+        ids: selectedPlatforms,
+        is_use_gpt: checked,
       });
     }
   };
@@ -108,7 +118,15 @@ const DriverSettings = () => {
                 onChange={handleFormChange('isKeywordMatch')}
               >
                 <Tooltip label="将优先匹配关键词，未匹配的才去调用 GPT 接口">
-                  开启关键词匹配
+                  关键词匹配
+                </Tooltip>
+              </Checkbox>
+              <Checkbox
+                isChecked={driverSettings.isUseGpt}
+                onChange={handleFormChange('isUseGpt')}
+              >
+                <Tooltip label="是否开启 GPT 回复，关闭后只会使用关键词回复">
+                  GPT 回复
                 </Tooltip>
               </Checkbox>
             </HStack>

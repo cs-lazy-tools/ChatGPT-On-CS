@@ -101,6 +101,7 @@
     "@emotion/styled": "^11.11.0",
     "@hw-hmscore/analytics-web": "6.9.9-301",
     "@tanstack/react-query": "4.36.1",
+    "@types/lodash": "^4.17.1",
     "ansi-styles": "^6.2.1",
     "axios": "^1.6.7",
     "body-parser": "^1.20.2",

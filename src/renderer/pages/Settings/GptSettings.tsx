@@ -9,7 +9,6 @@ import {
   FormLabel,
   Switch,
   Input,
-  Select,
   Highlight,
   Box,
   Slider,
@@ -88,11 +87,11 @@ const GptSettings = () => {
         </h2>
         <AccordionPanel pb={4}>
           <FormControl display="flex" alignItems="center">
-            <FormLabel htmlFor="useLazyTools" mb="0">
+            <FormLabel htmlFor="useDify" mb="0">
               使用 Dify
             </FormLabel>
             <Switch
-              id="useLazyTools"
+              id="useDify"
               isChecked={gptSettings.useDify}
               onChange={(e) =>
                 setGptSettings({
@@ -136,25 +135,23 @@ const GptSettings = () => {
               />
             </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor="model" mt="8px">
-                使用的模型
-              </FormLabel>
-              <Select
-                id="model"
-                value={gptSettings.model}
-                onChange={(e) =>
-                  setGptSettings({
-                    ...gptSettings,
-                    model: e.target.value,
-                  })
-                }
-              >
-                <option value="gpt3">GPT-3</option>
-                <option value="gpt3.5">GPT-3.5</option>
-                <option value="gpt4">GPT-4</option>
-              </Select>
-            </FormControl>
+            {!gptSettings.useDify && (
+              <FormControl>
+                <FormLabel htmlFor="model" mt="8px">
+                  使用的模型
+                </FormLabel>
+                <Input
+                  id="model"
+                  value={gptSettings.model}
+                  onChange={(e) =>
+                    setGptSettings({
+                      ...gptSettings,
+                      model: e.target.value,
+                    })
+                  }
+                />
+              </FormControl>
+            )}
 
             <FormControl>
               <FormLabel htmlFor="temperature" mt="8px">

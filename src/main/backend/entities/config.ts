@@ -2,7 +2,7 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 
 // Extend the Model class with the attributes interface
 export class Config extends Model {
-  declare id: number; // Note that the `null assertion` `!` is required in strict mode.
+  declare id: number;
 
   declare extract_phone: boolean;
 
@@ -12,9 +12,13 @@ export class Config extends Model {
 
   declare reply_speed: number;
 
-  declare merged_message_num: number;
+  declare reply_random_speed: number;
+
+  declare context_count: number;
 
   declare wait_humans_time: number;
+
+  declare default_reply: string;
 
   declare gpt_base_url: string;
 
@@ -29,10 +33,39 @@ export class Config extends Model {
   declare gpt_top_p: number;
 
   declare stream: boolean;
+}
 
-  declare use_lazy: boolean;
+export async function checkAndAddFields(sequelize: Sequelize) {
+  const tableDescription = await Config.describe();
 
-  declare lazy_key: string;
+  // @ts-ignore
+  if (!tableDescription.reply_random_speed) {
+    await sequelize
+      .getQueryInterface()
+      .addColumn('Config', 'reply_random_speed', {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.context_count) {
+    await sequelize.getQueryInterface().addColumn('Config', 'context_count', {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.default_reply) {
+    await sequelize.getQueryInterface().addColumn('Config', 'default_reply', {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: '',
+    });
+  }
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -46,34 +79,44 @@ export function initConfig(sequelize: Sequelize) {
       extract_phone: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+        allowNull: true,
       },
       extract_product: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+        allowNull: true,
       },
       save_path: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       reply_speed: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
-      merged_message_num: {
+      reply_random_speed: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
+      },
+      default_reply: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      context_count: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
       },
       wait_humans_time: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
       gpt_base_url: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       gpt_key: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       use_dify: {
         type: DataTypes.BOOLEAN,
@@ -82,27 +125,19 @@ export function initConfig(sequelize: Sequelize) {
       },
       gpt_model: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       gpt_temperature: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
       gpt_top_p: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
       stream: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
-      },
-      use_lazy: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-      },
-      lazy_key: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
@@ -112,4 +147,6 @@ export function initConfig(sequelize: Sequelize) {
       timestamps: false,
     },
   );
+
+  checkAndAddFields(sequelize);
 }

@@ -17,7 +17,6 @@ import {
   ChatIcon,
   CalendarIcon,
 } from '@chakra-ui/icons';
-import { FiAirplay } from 'react-icons/fi';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -54,12 +53,6 @@ const Navbar = () => {
             {/* 直接在MenuItem上使用onClick进行导航 */}
             <MenuItem icon={<ChatIcon />} onClick={handleNavigate('/')}>
               首页
-            </MenuItem>
-            <MenuItem
-              icon={<FiAirplay />}
-              onClick={handleNavigate('/platforms')}
-            >
-              平台
             </MenuItem>
             <MenuItem icon={<CalendarIcon />} onClick={handleNavigate('/msg')}>
               记录

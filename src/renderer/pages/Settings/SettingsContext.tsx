@@ -28,16 +28,17 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       extractPhone: false,
       extractProduct: false,
       folderPath: '',
-      replySpeed: 0,
-      mergeUnprocessedMessagesCount: 0,
+      replySpeed: [0, 0],
+      contextCount: 0,
       manualInterventionInterval: 0,
+      defaultReply: '',
     });
 
   const [gptSettings, setGptSettings] = useState<GptSettingsForm>({
     useDify: false,
     gptAddress: '',
     apiKey: '',
-    model: '',
+    model: 'gpt3',
     temperature: 0,
     topP: 0,
     stream: false,

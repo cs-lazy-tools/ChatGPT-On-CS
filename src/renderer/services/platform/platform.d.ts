@@ -45,8 +45,9 @@ export interface Config {
   extract_phone: boolean; // 提取手机号
   extract_product: boolean; // 提取商品
   save_path?: string; // 保存路径
-  reply_speed: number; // 回复速度
-  merged_message_num: number; // 合并消息数量
+  reply_speed: number[]; // 回复速度
+  default_reply: string; // 默认回复
+  context_count: number; // 合并消息数量
   wait_humans_time: number; // 等待人工时间
 
   gpt_base_url?: string; // GPT服务地址
@@ -57,16 +58,15 @@ export interface Config {
   stream?: boolean; // 是否开启stream
 
   use_dify?: boolean; // 是否使用 Dify 百宝箱
-  // use_lazy?: boolean; // 是否使用懒人百宝箱
-  // lazy_key?: string; // 懒人百宝箱 key
 }
 
 export interface CustomerServiceSettingsForm {
   extractPhone: boolean;
   extractProduct: boolean;
   folderPath: string;
-  replySpeed: number;
-  mergeUnprocessedMessagesCount: number;
+  replySpeed: number[];
+  defaultReply: string;
+  contextCount: number;
   manualInterventionInterval: number;
 }
 

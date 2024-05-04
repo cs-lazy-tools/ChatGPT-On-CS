@@ -3,29 +3,38 @@ import { PlatformConfig } from '../entities/platformConfig';
 export class PlatformConfigController {
   async updateByPlatformId(
     platformId: string,
-    platformConfigData: Partial<PlatformConfig>,
+    settings: any,
   ): Promise<PlatformConfig> {
     const platformConfig = await PlatformConfig.findOne({
       where: { platform_id: platformId },
     });
 
+    const active = settings && settings.active ? settings.active : false;
+
     if (platformConfig) {
       // @ts-ignore
-      return this.update(platformConfig.id, platformConfigData);
+      return this.update(platformConfig.id, { settings, active });
     }
+
     return this.create({
       platform_id: platformId,
-      ...platformConfigData,
+      settings,
+      active,
     });
   }
 
   async getByPlatformId(platformId: string) {
-    const data = await PlatformConfig.findOne({
+    let data = await PlatformConfig.findOne({
       where: { platform_id: platformId },
     });
 
     if (!data) {
-      throw new Error('PlatformConfig not found');
+      // 创建一个对象
+      data = await PlatformConfig.create({
+        platform_id: platformId,
+        active: false,
+        settings: {},
+      });
     }
 
     return data;
@@ -40,9 +49,11 @@ export class PlatformConfigController {
     const platformConfig = await PlatformConfig.findOne({
       where: { id },
     });
-    // @ts-ignore
-    const data = Object.assign(platformConfig, platformConfigData);
-    return data;
+    if (!platformConfig) {
+      return;
+    }
+
+    await platformConfig.update(platformConfigData);
   }
 
   async delete(id: number): Promise<void> {
@@ -53,19 +64,5 @@ export class PlatformConfigController {
       return;
     }
     await platformConfig.destroy();
-  }
-
-  async list(page: { page: number; pageSize: number }): Promise<{
-    total: number;
-    data: PlatformConfig[];
-  }> {
-    const data = await PlatformConfig.findAll({
-      limit: page.pageSize,
-      offset: (page.page - 1) * page.pageSize,
-    });
-
-    const total = await PlatformConfig.count();
-
-    return { total, data };
   }
 }

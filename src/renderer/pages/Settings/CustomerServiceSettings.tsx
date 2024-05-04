@@ -18,6 +18,10 @@ import {
   SliderFilledTrack,
   SliderThumb,
   SliderTrack,
+  RangeSlider,
+  RangeSliderTrack,
+  RangeSliderFilledTrack,
+  RangeSliderThumb,
   Text,
   useToast,
   Tooltip,
@@ -55,6 +59,13 @@ const CustomerServiceSettings = () => {
         isClosable: true,
       });
     }
+  };
+
+  const getReplySpeedStr = (value: any) => {
+    if (Array.isArray(value)) {
+      return `${value[0]}秒 ${value[0] !== value[1] ? `~ ${value[1]}秒` : ''}`;
+    }
+    return `${value}秒`;
   };
 
   return (
@@ -122,31 +133,61 @@ const CustomerServiceSettings = () => {
             打开本地文件夹
           </Button>
 
-          <Text mb="8px">
-            回复等待时间（单位秒）: {customerServiceSettings.replySpeed}秒
-          </Text>
-          <Slider
+          <Flex my={3}>
+            <Tooltip label="接口报错，或者没有匹配到回复时的返回值">
+              <Text mb="8px">默认回复</Text>
+            </Tooltip>
+            <Input
+              placeholder="输入默认回复内容"
+              w={'80%'}
+              ml={3}
+              value={customerServiceSettings.defaultReply}
+              onChange={(e) => {
+                setCustomerServiceSettings({
+                  ...customerServiceSettings,
+                  defaultReply: e.target.value,
+                });
+              }}
+            />
+          </Flex>
+          <Tooltip label="回复等待时间，当设置了随机时间则，等待时间为 “固定等待时间” + “随机等待时间”">
+            <Text mb="8px">
+              回复等待时间（单位秒）:{' '}
+              {getReplySpeedStr(customerServiceSettings.replySpeed)}
+            </Text>
+          </Tooltip>
+          <RangeSlider
             min={0}
-            max={10}
+            max={5}
             step={0.1}
-            value={customerServiceSettings.replySpeed}
-            onChange={(value) =>
+            colorScheme="pink"
+            defaultValue={[0, 0]}
+            value={
+              Array.isArray(customerServiceSettings.replySpeed)
+                ? customerServiceSettings.replySpeed
+                : [0, 0]
+            }
+            onChange={(value) => {
               setCustomerServiceSettings({
                 ...customerServiceSettings,
                 replySpeed: value,
-              })
-            }
+              });
+            }}
           >
-            <SliderTrack>
-              <SliderFilledTrack />
-            </SliderTrack>
-            <SliderThumb />
-          </Slider>
+            <RangeSliderTrack>
+              <RangeSliderFilledTrack />
+            </RangeSliderTrack>
+            <Tooltip label="固定等待时间">
+              <RangeSliderThumb index={0} />
+            </Tooltip>
+            <Tooltip label="随机等待时间">
+              <RangeSliderThumb index={1} />
+            </Tooltip>
+          </RangeSlider>
 
           <Flex mt={3}>
             <Text mb="8px" mr={3}>
-              上下文消息数:{' '}
-              {customerServiceSettings.mergeUnprocessedMessagesCount}
+              上下文消息数: {customerServiceSettings.contextCount}
             </Text>
             <Tooltip label="使用 GPT 回复会指定的消息数量传递给 GPT 去生成下一条回复，数量设置的越大回复的速度越慢">
               <Box color={'gray.500'}>
@@ -158,11 +199,11 @@ const CustomerServiceSettings = () => {
             min={1}
             max={20}
             step={1}
-            value={customerServiceSettings.mergeUnprocessedMessagesCount}
+            value={customerServiceSettings.contextCount}
             onChange={(value) =>
               setCustomerServiceSettings({
                 ...customerServiceSettings,
-                mergeUnprocessedMessagesCount: value,
+                contextCount: value,
               })
             }
           >
@@ -200,34 +241,6 @@ const CustomerServiceSettings = () => {
             </SliderTrack>
             <SliderThumb />
           </Slider>
-
-          {/* <Flex mt={3}>
-            <Text mb="8px" mr={3}>
-              关键字触发间隔: {customerServiceSettings.keywordTriggerInterval}秒
-            </Text>
-            <Tooltip label="关键字触发间隔">
-              <Box color={'gray.500'}>
-                <Icon as={FiHelpCircle} w={6} h={6} />
-              </Box>
-            </Tooltip>
-          </Flex>
-          <Slider
-            min={10}
-            max={180}
-            step={10}
-            value={customerServiceSettings.keywordTriggerInterval}
-            onChange={(value) =>
-              setCustomerServiceSettings({
-                ...customerServiceSettings,
-                keywordTriggerInterval: value,
-              })
-            }
-          >
-            <SliderTrack>
-              <SliderFilledTrack />
-            </SliderTrack>
-            <SliderThumb />
-          </Slider> */}
         </AccordionPanel>
       </AccordionItem>
     </Accordion>

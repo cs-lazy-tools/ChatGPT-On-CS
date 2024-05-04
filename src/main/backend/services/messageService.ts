@@ -3,19 +3,19 @@ import { DateTime } from 'luxon';
 import OpenAI from 'openai';
 import socketIo from 'socket.io';
 import axios from 'axios';
-import { ConfigController } from '../controllers/configController';
+import { ConfigService } from './configService';
 import { MessageController } from '../controllers/messageController';
 import { AutoReplyController } from '../controllers/autoReplyController';
-import { MessageDTO, ReplyDTO } from '../types';
+import { MessageDTO, ReplyDTO, MessageType } from '../types';
 import { Session } from '../entities/session';
 import { Config } from '../entities/config';
 import { AutoReply } from '../entities/autoReply';
 import { TimeoutError, HumanTaskError } from '../errors/errors';
 
-const errorMessages = '抱歉，消息有点多，我稍后再回复您。';
-
 export class MessageService {
   private isKeywordMatch: boolean;
+
+  private isUseGptReply: boolean;
 
   private baseUrl: string;
 
@@ -23,21 +23,22 @@ export class MessageService {
 
   private openaiClient: OpenAI;
 
-  private configController: ConfigController;
+  private configService: ConfigService;
 
   private messageController: MessageController;
 
   private autoReplyController: AutoReplyController;
 
   constructor(
-    configController: ConfigController,
+    configService: ConfigService,
     messageController: MessageController,
     autoReplyController: AutoReplyController,
   ) {
     this.isKeywordMatch = true;
+    this.isUseGptReply = true;
     this.baseUrl = '';
     this.apiKey = '';
-    this.configController = configController;
+    this.configService = configService;
     this.messageController = messageController;
     this.autoReplyController = autoReplyController;
   }
@@ -46,33 +47,57 @@ export class MessageService {
   public registerHandlers(socket: socketIo.Socket): void {
     socket.on('messageService-getMessages', async (data, callback) => {
       const { sess, msgs } = data;
+      const session = {
+        id: sess.id,
+        username: sess.uname,
+        platform_id: sess.pid,
+        platform: sess.plat,
+        last_active: sess.last,
+      };
+
+      const messages = msgs.map((msg: any) => ({
+        session_id: msg.sid || session.id, // 处理默认值
+        platform_id: msg.pid || session.platform_id,
+        unique: msg.uniq,
+        content: msg.cnt,
+        role: msg.role,
+        msg_type: msg.type || 'text', // 处理默认值
+      }));
+
+      let reply = { msg_type: 'text', content: '' };
+      let config: Config;
+
       try {
-        const session = {
-          id: sess.id,
-          username: sess.uname,
-          platform_id: sess.pid,
-          platform: sess.plat,
-          last_active: sess.last,
-        };
-
-        const messages = msgs.map((msg: any) => ({
-          session_id: msg.sid || session.id, // 处理默认值
-          platform_id: msg.pid || session.platform_id,
-          unique: msg.uniq,
-          content: msg.cnt,
-          role: msg.role,
-          msg_type: msg.type || 'text', // 处理默认值
-        }));
-
-        // @ts-ignore
-        const reply = await this.getMessages(session, messages);
-        callback({
-          msg_type: reply.msg_type,
-          content: reply.content,
-        });
+        config = await this.configService.getConfigByPlatformId(
+          session.platform_id,
+        );
       } catch (error) {
         console.error(`Error in getMessages: ${error}`);
-        callback({ msg_type: 'text', content: errorMessages });
+
+        config = await this.configService.getConfig();
+        callback({ msg_type: 'text', content: config.default_reply });
+        return;
+      }
+
+      try {
+        // @ts-ignore
+        reply = await this.getMessages(config, session, messages);
+        callback(reply);
+      } catch (error) {
+        console.error(`Error in getMessages: ${error}`);
+        reply = { msg_type: 'text', content: config.default_reply };
+        callback(reply);
+      } finally {
+        messages.push({
+          session_id: session.id,
+          platform_id: session.platform_id,
+          unique: DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'),
+          content: reply.content,
+          role: 'assistant',
+          msg_type: reply.msg_type,
+        });
+
+        await this.messageController.batchCreateMsgs(session.id, messages);
       }
     });
 
@@ -111,6 +136,8 @@ export class MessageService {
           gpt_key: data.apiKey,
           query: 'Hello',
         });
+
+        console.warn('Dify API response:', reply);
 
         if (reply === '') {
           return {
@@ -153,6 +180,8 @@ export class MessageService {
         top_p: 1,
       });
 
+      console.warn('OpenAI API response:', response);
+
       if (
         !response.choices ||
         !response.choices.length ||
@@ -191,17 +220,41 @@ export class MessageService {
     }
   }
 
-  updateKeywordMatch(isKeywordMatch: boolean) {
+  updateKeywordMatch(isKeywordMatch: boolean, isUseGptReply: boolean) {
     this.isKeywordMatch = isKeywordMatch;
+    this.isUseGptReply = isUseGptReply;
   }
 
-  async getMessages(session: Session, messages: MessageDTO[]) {
+  async getMessages(config: Config, session: Session, msgs: MessageDTO[]) {
+    let messages = [...msgs];
     if (!messages.length) {
       throw new Error('messages cannot be empty');
     }
 
+    // 再进行一次过滤，根据 config 中的 context_count
+    if (config.context_count > 0) {
+      messages = messages.slice(-config.context_count);
+    }
+
+    // 检查如果不存在用户的消息，则补上一条
+    if (!messages.some((msg) => msg.role === 'user')) {
+      // 从 msgs 中找到最后一条 user 的消息
+      const lastUserMsg = messages
+        .slice()
+        .reverse()
+        .find((msg) => msg.role === 'user');
+
+      if (lastUserMsg) {
+        messages.push(lastUserMsg);
+      } else {
+        return {
+          msg_type: 'text',
+          content: config.default_reply,
+        };
+      }
+    }
+
     console.log('Starting to generate message content...');
-    const config = await this.configController.getConfig();
     const lastMessage = messages[messages.length - 1];
 
     if (lastMessage.role === 'user') {
@@ -216,17 +269,13 @@ export class MessageService {
       );
 
       reply.msg_type = this.getMsgType(reply);
-      await new Promise((resolve) =>
-        setTimeout(resolve, config.reply_speed * 1000),
-      );
-      messages.push({
-        session_id: session.id,
-        platform_id: session.platform_id,
-        unique: DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'),
-        content: reply.content,
-        role: 'assistant',
-        msg_type: reply.msg_type,
+      await new Promise((resolve) => {
+        const min = config.reply_speed; // 5 seconds
+        const max = config.reply_random_speed + config.reply_speed; // 10 seconds
+        const randomTime = min + Math.random() * (max - min);
+        setTimeout(resolve, randomTime * 1000);
       });
+
       return reply;
     } catch (error) {
       if (error instanceof TimeoutError) {
@@ -235,10 +284,8 @@ export class MessageService {
       console.error(`Error in getMessages: ${error}`);
       return {
         msg_type: 'text',
-        content: errorMessages,
+        content: config.default_reply,
       };
-    } finally {
-      await this.messageController.batchCreateMsgs(session.id, messages);
     }
   }
 
@@ -287,7 +334,7 @@ export class MessageService {
     }
 
     // 如果关键词匹配无效或未启用关键词匹配，调用 OpenAI 生成回复
-    if (!replyContent) {
+    if (!replyContent && this.isUseGptReply) {
       console.log(
         'Keyword matching failed or not used, using OpenAI to generate reply...',
       );
@@ -304,6 +351,11 @@ export class MessageService {
           session.platform_id,
         );
       }
+    } else {
+      replyContent = {
+        content: config.default_reply,
+        msg_type: 'text' as MessageType,
+      };
     }
 
     replyContent.msg_type = this.getMsgType(replyContent);
@@ -356,7 +408,7 @@ export class MessageService {
 
         return {
           msg_type: 'text',
-          content: errorMessages,
+          content: cfg.default_reply,
         };
       }
 
@@ -366,7 +418,7 @@ export class MessageService {
       console.error(`Error in getOpenAIResponse: ${error}`);
       return {
         msg_type: 'text',
-        content: errorMessages,
+        content: cfg.default_reply,
       };
     }
   }
@@ -531,10 +583,7 @@ export class MessageService {
   // https://docs.dify.ai/v/zh-hans/guides/application-publishing/developing-with-apis
   // https://github.com/fatwang2/dify2openai
   private async getDifyResponse(
-    cfg: {
-      gpt_base_url: string;
-      gpt_key: string;
-    },
+    cfg: Config,
     messages: MessageDTO[],
     prompt: string = 'Tell me a message',
   ): Promise<ReplyDTO> {
@@ -562,13 +611,14 @@ export class MessageService {
     if (answer === '') {
       return {
         msg_type: 'text',
-        content: errorMessages,
+        content: cfg.default_reply,
       };
     }
 
     return {
       msg_type: 'text',
-      content: answer,
+      // @ts-ignore
+      content: answer || cfg.default_reply,
     };
   }
 
@@ -582,7 +632,7 @@ export class MessageService {
       {
         inputs: {},
         query: data.query,
-        response_mode: 'blocking',
+        response_mode: 'streaming',
         user: 'apiuser',
         auto_generate_name: false,
       },
@@ -591,10 +641,57 @@ export class MessageService {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${data.gpt_key}`,
         },
+        responseType: 'stream',
       },
     );
 
-    const { answer } = resp.data;
-    return answer;
+    return new Promise((resolve, reject) => {
+      try {
+        let result = '';
+        let buffer = '';
+
+        const stream = resp.data;
+        stream.on('data', (chunk: any) => {
+          buffer += chunk.toString();
+          const lines = buffer.split('\n');
+
+          for (let i = 0; i < lines.length - 1; i++) {
+            const line = lines[i].trim();
+            if (line === '') continue;
+            let chunkObj;
+            try {
+              const cleanedLine = line.replace(/^data: /, '').trim();
+              if (cleanedLine.startsWith('{') && cleanedLine.endsWith('}')) {
+                chunkObj = JSON.parse(cleanedLine);
+              } else {
+                continue;
+              }
+            } catch (error) {
+              console.error('Error parsing JSON:', error);
+              continue;
+            }
+
+            if (
+              chunkObj.event === 'message' ||
+              chunkObj.event === 'agent_message'
+            ) {
+              result += chunkObj.answer;
+            }
+          }
+
+          buffer = lines[lines.length - 1];
+        });
+
+        stream.on('end', () => {
+          resolve(result);
+        });
+
+        stream.on('error', (error: Error) => {
+          reject(error);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }
