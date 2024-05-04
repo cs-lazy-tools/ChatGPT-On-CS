@@ -316,6 +316,8 @@ export class MessageService {
     messages: MessageDTO[],
     session: Session,
   ) {
+    console.warn('getReplyTask', messages, session);
+
     // 提前定义好回复内容
     let replyContent = null;
 
@@ -333,29 +335,31 @@ export class MessageService {
       }
     }
 
-    // 如果关键词匹配无效或未启用关键词匹配，调用 OpenAI 生成回复
-    if (!replyContent && this.isUseGptReply) {
-      console.log(
-        'Keyword matching failed or not used, using OpenAI to generate reply...',
-      );
-      if (config.use_dify) {
-        replyContent = await this.getDifyResponse(
-          config,
-          messages,
-          session.platform_id,
+    if (!replyContent) {
+      // 如果关键词匹配无效或未启用关键词匹配，调用 OpenAI 生成回复
+      if (this.isUseGptReply) {
+        console.log(
+          'Keyword matching failed or not used, using OpenAI to generate reply...',
         );
+        if (config.use_dify) {
+          replyContent = await this.getDifyResponse(
+            config,
+            messages,
+            session.platform_id,
+          );
+        } else {
+          replyContent = await this.getOpenAIResponse(
+            config,
+            messages,
+            session.platform_id,
+          );
+        }
       } else {
-        replyContent = await this.getOpenAIResponse(
-          config,
-          messages,
-          session.platform_id,
-        );
+        replyContent = {
+          content: config.default_reply,
+          msg_type: 'text' as MessageType,
+        };
       }
-    } else {
-      replyContent = {
-        content: config.default_reply,
-        msg_type: 'text' as MessageType,
-      };
     }
 
     replyContent.msg_type = this.getMsgType(replyContent);
@@ -478,6 +482,7 @@ export class MessageService {
         found: true,
       };
     }
+
     return {
       content: { content: '', msg_type: 'text' },
       found: false,
@@ -494,22 +499,40 @@ export class MessageService {
     return this.matchKeyword(pattern, msg);
   }
 
-  private matchKeyword(pattern: string, msg: string) {
+  private matchKeyword(ptt: string, msg: string): boolean {
+    let pattern = ptt.trim();
+
+    // 如果模式只是一个星号，它应该匹配任何消息。
+    if (pattern === '*') {
+      return true;
+    }
+
+    // 合并连续的 '*' 字符为一个 '*'
+    pattern = pattern.replace(/\*+/g, '*');
+
+    // 如果模式不包含 '*'，则直接比较是否相等
     if (!pattern.includes('*')) {
       return pattern === msg;
     }
 
     const parts = pattern.split('*');
     let lastIndex = 0;
+
     // eslint-disable-next-line no-restricted-syntax
     for (const part of parts) {
-      // eslint-disable-next-line no-continue
+      // 跳过空字符串（它们来自模式开始、结束或连续 '*'）
       if (part === '') continue;
+
       const index = msg.indexOf(part, lastIndex);
-      if (index === -1 || index < lastIndex) return false;
+      // 如果找不到部分或部分不是按顺序出现，则匹配失败
+      if (index === -1 || index < lastIndex) {
+        return false;
+      }
       lastIndex = index + part.length;
     }
-    return true;
+
+    // 确保消息的剩余部分可以被模式尾部的 '*' 匹配
+    return parts[parts.length - 1] === '' || lastIndex <= msg.length;
   }
 
   private replaceSpecialTokens(replyMsg: string) {

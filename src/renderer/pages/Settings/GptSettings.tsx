@@ -15,7 +15,6 @@ import {
   SliderFilledTrack,
   SliderThumb,
   SliderTrack,
-  HStack,
   InputGroup,
   InputRightElement,
   Button,
@@ -199,24 +198,6 @@ const GptSettings = () => {
                 </SliderTrack>
                 <SliderThumb />
               </Slider>
-            </FormControl>
-
-            <FormControl>
-              <HStack mb="4" mt="8px">
-                <FormLabel htmlFor="stream" width="30%">
-                  Stream(可选)
-                </FormLabel>
-                <Switch
-                  id="stream"
-                  isChecked={gptSettings.stream}
-                  onChange={(e) => {
-                    setGptSettings({
-                      ...gptSettings,
-                      stream: e.target.checked,
-                    });
-                  }}
-                />
-              </HStack>
             </FormControl>
           </>
 

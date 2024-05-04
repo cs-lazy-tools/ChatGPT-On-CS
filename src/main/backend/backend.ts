@@ -212,10 +212,7 @@ class BKServer {
           );
         }
 
-        if (isKeywordMatch) {
-          this.messageService.updateKeywordMatch(isKeywordMatch, isUseGptReply);
-        }
-
+        this.messageService.updateKeywordMatch(isKeywordMatch, isUseGptReply);
         await this.strategyService.updateStrategies(ids);
 
         res.json({ success: true });
