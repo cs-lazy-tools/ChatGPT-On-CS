@@ -32,9 +32,6 @@ dependencies:
   '@tanstack/react-query':
     specifier: 4.36.1
     version: 4.36.1(react-dom@18.3.0)(react@18.3.0)
-  '@types/lodash':
-    specifier: ^4.17.1
-    version: 4.17.1
   ansi-styles:
     specifier: ^6.2.1
     version: 6.2.1
@@ -217,6 +214,9 @@ devDependencies:
   '@types/jest':
     specifier: ^29.5.5
     version: 29.5.12
+  '@types/lodash':
+    specifier: ^4.17.1
+    version: 4.17.1
   '@types/luxon':
     specifier: ^3.4.2
     version: 3.4.2
@@ -4242,7 +4242,6 @@ packages:
 
   /@types/lodash@4.17.1:
     resolution: {integrity: sha512-X+2qazGS3jxLAIz5JDXDzglAF3KpijdhFxlf/V1+hEsOUc+HnWi81L/uv/EvGuV90WY+7mPGFCUDGfQC3Gj95Q==}
-    dev: false
 
   /@types/luxon@3.4.2:
     resolution: {integrity: sha512-TifLZlFudklWlMBfhubvgqTXRzLDI5pCbGa4P8a3wPyUQSW+1xQ5eDsreP9DWHX3tjq1ke96uYG/nwundroWcA==}
