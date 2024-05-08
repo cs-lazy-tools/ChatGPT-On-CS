@@ -35,10 +35,13 @@ class BackendServiceManager {
       return;
     }
 
-    const port = await this.getAvailablePort();
-    this.port = port;
+    // 避免重复启动时端口冲突
+    if (!this.port) {
+      const port = await this.getAvailablePort();
+      this.port = port;
+    }
 
-    this.launchProcess(port);
+    this.launchProcess(this.port);
 
     // 监听退出事件并可能重启
     this.process?.on('close', (code) => {
