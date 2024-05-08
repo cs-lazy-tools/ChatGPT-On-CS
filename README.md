@@ -5,7 +5,7 @@
 
 注：本项目只是一个用于对接外部平台的客服工具，不提供任何平台的账号，需要自行准备。并且知识库功能也需要自行准备，该项目目前只支持的 OpenAI 的 API 接口（或代理）接入
 
-* [GitHub] https://github.com/lrhh123/ChatGPT-On-CS
+* [GitHub] https://github.com/cs-lazy-tools/ChatGPT-On-CS
 * [Gitee] https://gitee.com/alsritter/ChatGPT-On-CS · (国内用户推荐)
 
 ## 主要功能
@@ -36,12 +36,12 @@
 
 ## 下载地址
 
-<a href="https://github.com/lrhh123/ChatGPT-On-CS/releases/download/v1.0.4.beta/1.0.4.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.0.4/1.0.4.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
 ```txt
-链接：https://pan.baidu.com/s/1rJY7ZIg5SDRwvi5f7q8IJA?pwd=6666 
+链接：https://pan.baidu.com/s/1haME3djtdrY298F2nXvYgg?pwd=6666 
 提取码：6666
 ```
 
