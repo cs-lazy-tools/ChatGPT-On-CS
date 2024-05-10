@@ -20,7 +20,7 @@ export class SessionService {
     socket.on('sessionService-getSession', async (data: any, callback) => {
       const { platformId, username, goodsName, goodsAvatar } = data;
 
-      const ptf = this.strategyService.getPlatformInfoById(platformId);
+      const ptf = await this.strategyService.getPlatformInfoById(platformId);
       const startTime = new Date().getTime();
       try {
         if (!username) {
@@ -86,7 +86,7 @@ export class SessionService {
       return this.sessionController.update(session.id, session);
     }
 
-    const ptf = this.strategyService.getPlatformInfoById(platformId);
+    const ptf = await this.strategyService.getPlatformInfoById(platformId);
 
     return this.sessionController.create({
       platform_id: platformId,

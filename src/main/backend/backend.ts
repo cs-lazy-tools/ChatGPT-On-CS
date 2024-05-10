@@ -166,7 +166,7 @@ class BKServer {
       '/api/v1/base/platform/all',
       asyncHandler(async (req, res) => {
         if (this.ptfs.length === 0) {
-          this.ptfs = this.strategyService.getAllPlatforms();
+          this.ptfs = await this.strategyService.getAllPlatforms();
         }
 
         res.json({ success: true, data: this.ptfs });
@@ -300,7 +300,7 @@ class BKServer {
 
       const data = autoReplies;
       if (this.ptfs.length === 0) {
-        this.ptfs = this.strategyService.getAllPlatforms();
+        this.ptfs = await this.strategyService.getAllPlatforms();
       }
 
       const ptfMap = new Map(this.ptfs.map((ptf) => [ptf.id, ptf]));
