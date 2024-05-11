@@ -84,7 +84,7 @@ export class StrategyService {
       const data = await this.emitAndWait<Platform[]>(
         'strategyService-getAllPlatforms',
       );
-      return data;
+      return data.length > 0 ? data : ALL_PLATFORMS;
     } catch (error) {
       console.error('Failed to update strategies', error);
       return ALL_PLATFORMS;

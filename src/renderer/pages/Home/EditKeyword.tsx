@@ -74,8 +74,9 @@ const EditKeyword = ({
     }
 
     setPtf(editKeyword?.platform_id || '');
+
     if (editKeyword) {
-      setIsGlobal(editKeyword.platform_id === '');
+      setIsGlobal(!editKeyword.platform_id);
     }
   }, [editKeyword]);
 

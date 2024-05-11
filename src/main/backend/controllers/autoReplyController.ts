@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import fs from 'fs';
+import { Op } from 'sequelize';
 import { AutoReply } from '../entities/autoReply';
 import { ALL_PLATFORMS } from '../constants';
 import { getTempPath } from '../../utils';
@@ -146,7 +147,9 @@ export class AutoReplyController {
 
     const globalKeywords = await AutoReply.findAll({
       where: {
-        platform_id: '',
+        platform_id: {
+          [Op.or]: [null, ''],
+        },
       },
     });
 
