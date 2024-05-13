@@ -23,7 +23,7 @@
 ## 开源社区
 如果有问题需要反馈，或者对项目有什么特性希望支持的，可以添加小助手微信加入开源项目交流群：
 
-![微信扫码添加客服]![7976e57ff0784287a4f2d2029ff2d85](https://github.com/Crisp0015/ChatGPT-On-CS/assets/169279325/a0edb678-8441-4760-985c-b3dd13d8222f)
+![微信扫码添加客服](https://github.com/Crisp0015/ChatGPT-On-CS/assets/169279325/a0edb678-8441-4760-985c-b3dd13d8222f)
 
 
 <!-- 
