@@ -23,7 +23,8 @@
 ## 开源社区
 如果有问题需要反馈，或者对项目有什么特性希望支持的，可以添加小助手微信加入开源项目交流群：
 
-![微信扫码添加客服](docs/contact.png)
+![微信扫码添加客服]![7976e57ff0784287a4f2d2029ff2d85](https://github.com/Crisp0015/ChatGPT-On-CS/assets/169279325/a0edb678-8441-4760-985c-b3dd13d8222f)
+
 
 <!-- 
 ## 商业支持
@@ -97,6 +98,7 @@
 
 ### 5、平台独立的 ChatGPT API 设置
 有时候，我们可能需要针对不同的平台设置不同的 ChatGPT API 地址，这时候就可以在这里设置。你可以基于 [懒人百宝箱](https://chat.lazaytools.top/) 实现自己的知识库，然后设置到这里。
+
 
 ![alt text](docs/other_settings_1.png)
 
