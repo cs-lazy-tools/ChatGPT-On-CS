@@ -37,12 +37,12 @@
 
 ## 下载地址
 
-<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.0.4/1.0.4.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.0.5-beta.2/1.0.5-beta.2.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
 ```txt
-链接：https://pan.baidu.com/s/1Cnw8w6rgZWmJ6s-fPiDQZA?pwd=6666 
+链接：https://pan.baidu.com/s/1PkJUnp17I-yGpF0HVN65Ag?pwd=6666 
 提取码：6666
 ```
 
@@ -97,7 +97,7 @@
 - `插入文件：` 则主要是用于插入图片，可以插入图片的链接，这样就可以回复图片了
 
 ### 5、平台独立的 ChatGPT API 设置
-有时候，我们可能需要针对不同的平台设置不同的 ChatGPT API 地址，这时候就可以在这里设置。你可以基于 [懒人百宝箱](https://chat.lazaytools.top/) 实现自己的知识库，然后设置到这里。
+有时候，我们可能需要针对不同的平台设置不同的 ChatGPT API 地址，这时候就可以在这里设置。你可以基于 FastGPT/Dify 之类的工具实现自己的知识库，然后设置到这里。
 
 
 ![alt text](docs/other_settings_1.png)
@@ -131,8 +131,8 @@
 - [ ] 支持导出聊天记录到 Excel
 - [x] 添加中文路径的支持
 - [ ] 实现小红书回复后，自动私聊的功能
-- [ ] 优化微信平台的回复速度
-- [ ] 支持企业微信外部群聊天功能
+- [x] 优化微信平台的回复速度
+- [x] 支持企业微信外部群聊天功能
 - [ ] 支持企业微信自动加人功能
 - [ ] 支持自动检测人类操作后自动暂停项目
 - [ ] 支持抖音直播平台自动回复功能
