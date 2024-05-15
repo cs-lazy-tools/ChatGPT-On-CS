@@ -132,6 +132,11 @@ export class AutoReplyController {
       worksheet.addRow([autoReply.keyword, autoReply.reply, name]);
     });
 
+    // 检查是否存在 excels 文件夹，不存在则创建
+    if (!fs.existsSync(`${getTempPath()}/excels`)) {
+      fs.mkdirSync(`${getTempPath()}/excels`);
+    }
+
     // 保存文件
     const filePath = `${getTempPath()}/excels/自动回复-${Date.now()}.xlsx`;
     await workbook.xlsx.writeFile(filePath);
