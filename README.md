@@ -131,3 +131,12 @@
 <a href="#readme">
     <img src="https://img.shields.io/badge/-返回顶部-7d09f1.svg" alt="#" align="right">
 </a>
+
+
+## 使用协议
+本仓库遵循 [AGPL-3.0 开源协议](./LICENSE)。
+
+1. 允许个人使用，如果需要商业使用，请联系作者。
+2. 除非获得商业授权，否则无论以何种方式修改或者使用代码，都需要开源，并保留相关版权信息。
+3. 详细内容请参见 [AGPL-3.0 开源协议](./LICENSE)。
+4. 联系请加上面的小助手，或者在 GitHub 上提 issue。
