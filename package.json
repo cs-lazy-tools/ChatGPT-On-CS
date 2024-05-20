@@ -1,7 +1,7 @@
 {
   "name": "chatgpt-on-cs",
   "description": "多平台智能客服，允许使用 ChatGPT 作为客服机器人",
-  "version": "1.0.5-beta.2",
+  "version": "1.0.5-beta.3",
   "keywords": [
     "electron",
     "boilerplate",

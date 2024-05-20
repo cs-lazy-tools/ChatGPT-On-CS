@@ -56,12 +56,12 @@
 
 ## 下载地址
 
-<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.0.5-beta.2/1.0.5-beta.2.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.0.5-beta.3/1.0.5-beta.3.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
 ```txt
-链接：https://pan.baidu.com/s/1PkJUnp17I-yGpF0HVN65Ag?pwd=6666 
+链接：https://pan.baidu.com/s/1QDrp6c38G7-NIWu_btLCMQ?pwd=6666 
 提取码：6666
 ```
 
@@ -72,24 +72,26 @@
 - [x] 支持微信平台的基础聊天功能
 - [x] 支持千牛平台的基础聊天功能
 - [x] 支持京麦平台的基础聊天功能
-- [ ] 支持多平台文章自动发送功能
 - [x] 添加关闭自动回复，只使用关键词回复的功能
 - [x] 添加延时随机时间
 - [x] 优化各个平台的独立配置功能
 - [x] 支持 Excel 导入回复内容
 - [x] 支持导出回复内容到 Excel
-- [ ] 支持导出聊天记录到 Excel
-- [x] 添加中文路径的支持
-- [ ] 支持关键词匹配测试功能
-- [ ] 优化千牛的对接模式
-- [ ] 实现小红书回复后，自动私聊的功能
+- [x] 优化千牛的对接模式
 - [x] 优化微信平台的回复速度
-- [ ] 支持企业微信自动识别内部群聊
+- [x] 添加中文路径的支持
 - [x] 支持企业微信外部群聊天功能
-- [ ] 支持企业微信自动加人功能
 - [ ] 支持自动检测人类操作后自动暂停项目
+- [ ] 新增 wx 群聊需要使用 @ 机器人才能回复的功能
+- [ ] 支持浏览器多开功能
+- [ ] 支持导出聊天记录到 Excel
+- [ ] 支持关键词匹配测试功能
+- [ ] 实现小红书回复后，自动私聊的功能
+- [ ] 支持企业微信自动识别内部群聊
+- [ ] 支持企业微信自动加人功能
 - [ ] 支持抖音直播平台自动回复功能
 - [ ] 支持拼多多
+- [ ] 支持多平台文章自动发送功能
 - [ ] 支持本地聊天模型的加载
 
 
