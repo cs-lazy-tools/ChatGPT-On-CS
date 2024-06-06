@@ -38,9 +38,8 @@ export interface ReplyDTO {
 export interface Platform {
   id: string;
   name: string;
-  impl: boolean;
   type?: string;
-  urls?: string[];
   avatar?: string;
   desc?: string;
+  env?: string;
 }

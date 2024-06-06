@@ -3,9 +3,8 @@ import { PlatformTypeEnum } from './constant';
 export interface Platform {
   id: string;
   name: string;
-  impl: boolean;
+  env: string;
   type?: PlatformTypeEnum;
-  urls?: string[];
   avatar?: string;
   desc?: string;
 }

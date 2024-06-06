@@ -1,15 +1,11 @@
 import socketIo from 'socket.io';
 import { Platform, StrategyServiceStatusEnum } from '../types';
-import { ALL_PLATFORMS } from '../constants';
 
 export class StrategyService {
   private io: socketIo.Server;
 
-  private platformInfo: Platform[];
-
   constructor(io: socketIo.Server) {
     this.io = io;
-    this.platformInfo = [];
   }
 
   async emitAndWait<T>(
@@ -50,17 +46,6 @@ export class StrategyService {
     return response;
   }
 
-  async updateStrategies(ids: string[]): Promise<any> {
-    try {
-      return await this.emitAndWait('strategyService-updateStrategies', {
-        ids,
-      });
-    } catch (error) {
-      console.error('Failed to update strategies', error);
-      return null;
-    }
-  }
-
   async updateStatus(status: StrategyServiceStatusEnum): Promise<any> {
     try {
       return await this.emitAndWait('strategyService-updateStatus', { status });
@@ -70,24 +55,28 @@ export class StrategyService {
     }
   }
 
-  public async getPlatformInfoById(id: string): Promise<Platform | null> {
-    const platforms = await this.getAllPlatforms();
-    return platforms.find((platform) => platform.id === id) || null;
-  }
-
   public async getAllPlatforms(): Promise<Platform[]> {
-    if (this.platformInfo.length > 0) {
-      return this.platformInfo;
+    const maxRetries = 10;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const data = await this.emitAndWait<Platform[]>(
+          'strategyService-getAppsInfo',
+        );
+        return data;
+      } catch (error) {
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        attempt++;
+        console.error(`Attempt ${attempt} failed to update strategies`, error);
+        if (attempt >= maxRetries) {
+          return [];
+        }
+      }
     }
 
-    try {
-      const data = await this.emitAndWait<Platform[]>(
-        'strategyService-getAllPlatforms',
-      );
-      return data.length > 0 ? data : ALL_PLATFORMS;
-    } catch (error) {
-      console.error('Failed to update strategies', error);
-      return ALL_PLATFORMS;
-    }
+    return [];
   }
 }

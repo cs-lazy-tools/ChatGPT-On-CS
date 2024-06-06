@@ -2,6 +2,7 @@ import { Platform, Reply, Config, Message } from './platform';
 import { GET, POST } from '../common/api/request';
 
 export async function getPlatformList() {
+  console.log('getPlatformList');
   const data = await GET<{
     data: Platform[];
   }>('/api/v1/base/platform/all');

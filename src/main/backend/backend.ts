@@ -46,8 +46,6 @@ class BKServer {
 
   private systemService: SystemService;
 
-  private ptfs: any[] = [];
-
   constructor(port: number, mainWindow: BrowserWindow) {
     this.app = express();
     this.app.use(bodyParser.json());
@@ -150,26 +148,15 @@ class BKServer {
       }),
     );
 
-    // 使用平台
-    this.app.post(
-      '/api/v1/base/platform',
-      asyncHandler(async (req, res) => {
-        const ids = req.body;
-        console.log(`ids: ${ids}`);
-        const data = await this.strategyService.updateStrategies(ids);
-        res.json({ success: true, data });
-      }),
-    );
-
     // 获取所有平台
     this.app.get(
       '/api/v1/base/platform/all',
       asyncHandler(async (req, res) => {
-        if (this.ptfs.length === 0) {
-          this.ptfs = await this.strategyService.getAllPlatforms();
-        }
-
-        res.json({ success: true, data: this.ptfs });
+        const data = await this.strategyService.getAllPlatforms();
+        res.json({
+          success: data && data.length > 0,
+          data,
+        });
       }),
     );
 
@@ -199,7 +186,6 @@ class BKServer {
         is_paused: isPaused,
         is_keyword_match: isKeywordMatch,
         is_use_gpt: isUseGptReply,
-        ids,
       } = req.body;
       try {
         if (isPaused) {
@@ -213,7 +199,6 @@ class BKServer {
         }
 
         this.messageService.updateKeywordMatch(isKeywordMatch, isUseGptReply);
-        await this.strategyService.updateStrategies(ids);
 
         res.json({ success: true });
       } catch (error) {
@@ -299,11 +284,9 @@ class BKServer {
       const { total, autoReplies } = await autoReplyController.list(query);
 
       const data = autoReplies;
-      if (this.ptfs.length === 0) {
-        this.ptfs = await this.strategyService.getAllPlatforms();
-      }
+      const ptfs = await this.strategyService.getAllPlatforms();
 
-      const ptfMap = new Map(this.ptfs.map((ptf) => [ptf.id, ptf]));
+      const ptfMap = new Map(ptfs.map((ptf) => [ptf.id, ptf]));
       const results: any[] = [];
       data.forEach((item) => {
         const ptfId = item.platform_id;
