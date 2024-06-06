@@ -1,22 +1,10 @@
 import React, { useEffect } from 'react';
-import {
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  Checkbox,
-  Stack,
-  HStack,
-  Tooltip,
-} from '@chakra-ui/react';
+import { Checkbox, Stack, HStack, Tooltip } from '@chakra-ui/react';
+import { updateRunner } from '../../../services/platform/controller';
+import { useSystemStore } from '../../../stores/useSystemStore';
+import { useToast } from '../../../hooks/useToast';
 
-import { updateRunner } from '../../services/platform/controller';
-import { useSystemStore } from '../../stores/useSystemStore';
-import { useToast } from '../../hooks/useToast';
-import LogBox from './LogBox';
-
-const DriverSettings = () => {
+const Panels = () => {
   const { toast } = useToast();
   const { driverSettings, setDriverSettings, selectedPlatforms } =
     useSystemStore();
@@ -43,7 +31,7 @@ const DriverSettings = () => {
       window.electron.ipcRenderer.remove('refresh-config');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
+  }, []);
 
   const handleFormChange = (field: string) => (event: any) => {
     const { value, checked, type } = event.target;
@@ -94,52 +82,36 @@ const DriverSettings = () => {
   };
 
   return (
-    <Tabs>
-      <TabList>
-        <Tab>连接</Tab>
-        <Tab>日志</Tab>
-      </TabList>
-
-      <TabPanels>
-        <TabPanel>
-          <Stack spacing={4}>
-            <HStack width="full" alignItems="center">
-              <Checkbox
-                mr={4}
-                isChecked={driverSettings.isPaused}
-                onChange={handleFormChange('isPaused')}
-              >
-                <Tooltip label="暂停软件后，将不再自动回复消息">
-                  暂停软件
-                </Tooltip>
-              </Checkbox>
-              <Checkbox
-                isChecked={driverSettings.isKeywordMatch}
-                onChange={handleFormChange('isKeywordMatch')}
-              >
-                <Tooltip label="将优先匹配关键词，未匹配的才去调用 GPT 接口">
-                  关键词匹配
-                </Tooltip>
-              </Checkbox>
-              <Checkbox
-                isChecked={driverSettings.isUseGpt}
-                onChange={handleFormChange('isUseGpt')}
-              >
-                <Tooltip label="是否开启 GPT 回复，关闭后只会使用关键词回复">
-                  GPT 回复
-                </Tooltip>
-              </Checkbox>
-            </HStack>
-          </Stack>
-        </TabPanel>
-        <TabPanel>
-          <Stack spacing={4}>
-            <LogBox />
-          </Stack>
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+    <>
+      <Stack spacing={4}>
+        <HStack width="full" alignItems="center">
+          <Checkbox
+            mr={4}
+            isChecked={driverSettings.isPaused}
+            onChange={handleFormChange('isPaused')}
+          >
+            <Tooltip label="暂停软件后，将不再自动回复消息">暂停软件</Tooltip>
+          </Checkbox>
+          <Checkbox
+            isChecked={driverSettings.isKeywordMatch}
+            onChange={handleFormChange('isKeywordMatch')}
+          >
+            <Tooltip label="将优先匹配关键词，未匹配的才去调用 GPT 接口">
+              关键词匹配
+            </Tooltip>
+          </Checkbox>
+          <Checkbox
+            isChecked={driverSettings.isUseGpt}
+            onChange={handleFormChange('isUseGpt')}
+          >
+            <Tooltip label="是否开启 GPT 回复，关闭后只会使用关键词回复">
+              GPT 回复
+            </Tooltip>
+          </Checkbox>
+        </HStack>
+      </Stack>
+    </>
   );
 };
 
-export default DriverSettings;
+export default React.memo(Panels);

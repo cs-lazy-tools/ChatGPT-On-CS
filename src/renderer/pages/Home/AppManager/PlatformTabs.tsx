@@ -21,17 +21,17 @@ import { useQuery } from '@tanstack/react-query';
 import {
   getPlatformList,
   updatePlatform,
-} from '../../services/platform/controller';
-import { Platform } from '../../services/platform/platform';
-import PlatformSettings from '../../components/PlatformConfigs';
+} from '../../../services/platform/controller';
+import { Platform } from '../../../services/platform/platform';
+import PlatformSettings from '../../../components/PlatformConfigs';
 import {
   PlatformTypeMap,
   PlatformTypeEnum,
-} from '../../services/platform/constant';
-import { useSystemStore } from '../../stores/useSystemStore';
+} from '../../../services/platform/constant';
+import { useSystemStore } from '../../../stores/useSystemStore';
 import defaultPlatformIcon from '../../../../assets/base/default-platform-icon.png';
 import windowsIcon from '../../../../assets/base/windows.png';
-import analytics from '../../services/analytics';
+import { trackCheckboxChange } from '../../../services/analytics';
 
 const PlatformTabs = () => {
   const { data, isLoading } = useQuery(['platformList'], getPlatformList);
@@ -63,15 +63,9 @@ const PlatformTabs = () => {
   }, [firstLoad, setFirstLoad, selectedPlatforms]);
 
   const handleCheckboxChange = async (selectedIds: string[]) => {
-    const oldSelectedIds = selectedPlatforms;
     setSelectedPlatforms(selectedIds);
     await updatePlatform(selectedIds);
-
-    analytics.onEvent('$ModifySetting', {
-      $NewValue: selectedIds,
-      $OldValue: oldSelectedIds,
-      $Type: 'platforms',
-    });
+    trackCheckboxChange('platforms', selectedIds);
   };
 
   if (isLoading) {

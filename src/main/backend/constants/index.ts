@@ -309,7 +309,7 @@ export const ALL_PLATFORMS: Platform[] = [
     avatar:
       'https://wwcdn.weixin.qq.com/node/wwnl/wwnl/style/images/independent/favicon/favicon_32h$a41a4426.png',
     desc: '',
-    impl: false,
+    impl: true,
   },
   {
     id: 'win_qianniu',

@@ -5,14 +5,12 @@ import GptSettings from './GptSettings';
 import CustomerServiceSettings from './CustomerServiceSettings';
 import { getConfig, updateConfig } from '../../services/platform/controller';
 import { useSettings } from './SettingsContext';
-import analytics from '../../services/analytics';
+import { trackPageView } from '../../services/analytics';
 
 const SettingsPage = () => {
   useEffect(() => {
     // 页面访问埋点
-    analytics.onEvent('$PageView', {
-      $PageName: 'settings',
-    });
+    trackPageView('Settings');
   }, []);
 
   const {

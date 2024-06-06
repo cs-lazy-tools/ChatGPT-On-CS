@@ -22,14 +22,14 @@ import {
 } from '@chakra-ui/react';
 import { DeleteIcon, AddIcon, EditIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
-import EditKeyword from './EditKeyword';
+import EditKeyword from '../EditKeyword';
 import {
   getReplyList,
   deleteReplyKeyword,
   updateReplyExcel,
   exportReplyExcel,
-} from '../../services/platform/controller';
-import { Reply } from '../../services/platform/platform';
+} from '../../../services/platform/controller';
+import { Reply } from '../../../services/platform/platform';
 
 const ReplyKeyword = () => {
   const [keywords, setKeywords] = useState<Reply[]>([]);

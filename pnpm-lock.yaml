@@ -5,12 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@agconnect/api':
-    specifier: ^1.3.2
-    version: 1.3.2
-  '@agconnect/instance':
-    specifier: ^1.3.2
-    version: 1.3.2
   '@chakra-ui/anatomy':
     specifier: ^2.2.2
     version: 2.2.2
@@ -26,12 +20,12 @@ dependencies:
   '@emotion/styled':
     specifier: ^11.11.0
     version: 11.11.5(@emotion/react@11.11.4)(@types/react@18.3.0)(react@18.3.0)
-  '@hw-hmscore/analytics-web':
-    specifier: 6.9.9-301
-    version: 6.9.9-301(debug@4.3.4)
   '@tanstack/react-query':
     specifier: 4.36.1
     version: 4.36.1(react-dom@18.3.0)(react@18.3.0)
+  '@vercel/analytics':
+    specifier: ^1.3.1
+    version: 1.3.1(react@18.3.0)
   ansi-styles:
     specifier: ^6.2.1
     version: 6.2.1
@@ -119,6 +113,9 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.3.0(react@18.3.0)
+  react-ga4:
+    specifier: ^2.1.0
+    version: 2.1.0
   react-hook-form:
     specifier: ^7.50.1
     version: 7.51.3(react@18.3.0)
@@ -430,90 +427,6 @@ packages:
   /@adobe/css-tools@4.3.3:
     resolution: {integrity: sha512-rE0Pygv0sEZ4vBWHlAgJLGDU7Pm8xoO6p3wsEceb7GYAjScrOHpEo8KK/eVkAcnSM+slAEtXjA2JpdjLp4fJQQ==}
     dev: true
-
-  /@agconnect/api-types@1.3.2:
-    resolution: {integrity: sha512-ON91lFZrolyAwlebx284lXQaDpYEUa5Krg+AfgZsLf+LQxm+/8gNxt90NPfPwvn1Y0Qt0WpCId09dofUrNB9FA==}
-    dev: false
-
-  /@agconnect/api@1.3.2:
-    resolution: {integrity: sha512-9GR0yqvfvltL2yvNpo8thrmf8mG2C3yUjZSkLI/WYD/PIVmt0zW4JaMEZSwsmyvaln+a/wL2aTA3Lcf/hkyxnQ==}
-    dependencies:
-      '@agconnect/api-types': 1.3.2
-    dev: false
-
-  /@agconnect/core@1.3.2:
-    resolution: {integrity: sha512-7gRO/NpaltGc1UKqEmWSlmEsQ+E4QIlMVCAsz5pgN3LGT3uKPkbLTE4QFBFhU+ZtCnj4o93kUMjf/tQOdIWZ/g==}
-    dev: false
-
-  /@agconnect/instance-types@1.3.2:
-    resolution: {integrity: sha512-7fwFO8LsPXoQSWhfFq9ZOczaOK/oWSrYui93MMT6YW089cXBrBxWHwzAwCoJ4dZ7bQKPSNzfdQFmSbheTGnd4w==}
-    dev: false
-
-  /@agconnect/instance@1.3.2:
-    resolution: {integrity: sha512-AeNvv7sdQGKSNo5XPe+2QzS77Dv1oNIaQqgXIj/BKEUl01ZSGBjAcMCLLMNjdSTJgGLhN2hc5Sse8TJXbRqRuQ==}
-    dependencies:
-      '@agconnect/api': 1.3.2
-      '@agconnect/api-types': 1.3.2
-      '@agconnect/core': 1.3.2
-      '@agconnect/instance-types': 1.3.2
-      '@agconnect/log': 1.3.2
-    dev: false
-
-  /@agconnect/log@1.3.2:
-    resolution: {integrity: sha512-qOXNMr2AC+GivMbuI9dgYjmOVe02AEKyMimUmz17NAccmBDvO+WgOOxoigoDdyGhdnGYJcF2BRC1UXZ8LYIz/g==}
-    dependencies:
-      '@agconnect/api': 1.3.2
-      '@agconnect/api-types': 1.3.2
-      '@agconnect/instance-types': 1.3.2
-    dev: false
-
-  /@agconnect/network-types@1.3.2:
-    resolution: {integrity: sha512-r92hbxBWWHqVvAFf2AUlvkcnjbJP2flf/zb9f/ZOrir35I/RXoWVlPrCOZskcnsLwc5MFJCnvGqKoh6fXRUJZQ==}
-    dev: false
-
-  /@agconnect/network@1.3.2(debug@4.3.4):
-    resolution: {integrity: sha512-ftOLzrCgMsq/I9Qisi+5Um1papxUViLRZB8KLOQD3iolvh/RI+/JaMsgubvp/INX6Pf5A1qbdwHPFnVxUWKuHg==}
-    dependencies:
-      '@agconnect/api': 1.3.2
-      '@agconnect/api-types': 1.3.2
-      '@agconnect/instance': 1.3.2
-      '@agconnect/instance-types': 1.3.2
-      '@agconnect/log': 1.3.2
-      '@agconnect/network-types': 1.3.2
-      axios: 0.21.4(debug@4.3.4)
-      ua-parser-js: 0.7.28
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@agconnect/storage-types@1.3.2:
-    resolution: {integrity: sha512-HCugEBmMPAFa4ZeyOooOtyaY9GlPt00HGZDFWV4o0ckmslQrLSEVHRozIoOxhBdRBH5VllK20eY9Ip4vxMv18Q==}
-    dev: false
-
-  /@agconnect/storage@1.3.2:
-    resolution: {integrity: sha512-COBUvtZR7MBItZ7Fc5lQBPQfe2rqMAbAB3hvfwcLDOUlvWm33QL3aa9Yfl9iiogLoV4GNmelS3M+Yb+IsX/7ow==}
-    dependencies:
-      '@agconnect/api': 1.3.2
-      '@agconnect/api-types': 1.3.2
-      '@agconnect/core': 1.3.2
-      '@agconnect/instance': 1.3.2
-      '@agconnect/instance-types': 1.3.2
-      '@agconnect/log': 1.3.2
-      '@agconnect/storage-types': 1.3.2
-    dev: false
-
-  /@agconnect/util@1.3.2:
-    resolution: {integrity: sha512-ud69EkUwDGrQ5fe/lp0hQWUWqxUjC0J+sDHtEBIKLYbWG0C1YSd/Uybc5TqJC7qN8rsGo9zOl0h71xeEGbdK4w==}
-    dependencies:
-      '@agconnect/api': 1.3.2
-      '@agconnect/api-types': 1.3.2
-      '@agconnect/core': 1.3.2
-      '@agconnect/instance': 1.3.2
-      '@agconnect/instance-types': 1.3.2
-      '@agconnect/log': 1.3.2
-      '@agconnect/storage': 1.3.2
-      '@agconnect/storage-types': 1.3.2
-    dev: false
 
   /@ampproject/remapping@2.3.0:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -3258,19 +3171,6 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     dev: true
 
-  /@hw-hmscore/analytics-web@6.9.9-301(debug@4.3.4):
-    resolution: {integrity: sha512-37hZGpGxSXpGRMDmU1zFxK5+woDkKXjyHq0IFLWUGa2ChnQwHs1OUuYKSOt1JOrasa2dfyHGpAImETc4AR/JPA==}
-    dependencies:
-      '@agconnect/api': 1.3.2
-      '@agconnect/core': 1.3.2
-      '@agconnect/instance': 1.3.2
-      '@agconnect/network': 1.3.2(debug@4.3.4)
-      '@agconnect/storage': 1.3.2
-      '@agconnect/util': 1.3.2
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /@isaacs/cliui@8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
@@ -4646,6 +4546,21 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
+  /@vercel/analytics@1.3.1(react@18.3.0):
+    resolution: {integrity: sha512-xhSlYgAuJ6Q4WQGkzYTLmXwhYl39sWjoMA3nHxfkvG+WdBT25c563a7QhwwKivEOZtPJXifYHR1m2ihoisbWyA==}
+    peerDependencies:
+      next: '>= 13'
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      next:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      react: 18.3.0
+      server-only: 0.0.1
+    dev: false
+
   /@webassemblyjs/ast@1.12.1:
     resolution: {integrity: sha512-EKfMUOPRRUTy5UII4qJDGPpqfwjOmZ5jeGFwid9mnoqIFK+e0vqoi1qH56JpmZSzEL53jKnNzScdmftJyG5xWg==}
     dependencies:
@@ -5369,14 +5284,6 @@ packages:
     resolution: {integrity: sha512-H5orY+M2Fr56DWmMFpMrq5Ge93qjNdPVqzBv5gWK3aD1OvjBEJlEzxf09z93dGVQeI0LiW+aCMIx1QtShC/zUw==}
     engines: {node: '>=4'}
     dev: true
-
-  /axios@0.21.4(debug@4.3.4):
-    resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
-    dependencies:
-      follow-redirects: 1.15.6(debug@4.3.4)
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /axios@1.6.8(debug@4.3.4):
     resolution: {integrity: sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==}
@@ -12420,6 +12327,10 @@ packages:
       use-sidecar: 1.1.2(@types/react@18.3.0)(react@18.3.0)
     dev: false
 
+  /react-ga4@2.1.0:
+    resolution: {integrity: sha512-ZKS7PGNFqqMd3PJ6+C2Jtz/o1iU9ggiy8Y8nUeksgVuvNISbmrQtJiZNvC/TjDsqD0QlU5Wkgs7i+w9+OjHhhQ==}
+    dev: false
+
   /react-hook-form@7.51.3(react@18.3.0):
     resolution: {integrity: sha512-cvJ/wbHdhYx8aviSWh28w9ImjmVsb5Y05n1+FW786vEZQJV5STNM0pW6ujS+oiBecb0ARBxJFyAnXj9+GHXACQ==}
     engines: {node: '>=12.22.0'}
@@ -13215,6 +13126,10 @@ packages:
       send: 0.18.0
     transitivePeerDependencies:
       - supports-color
+
+  /server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+    dev: false
 
   /set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
@@ -14325,10 +14240,6 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true
-
-  /ua-parser-js@0.7.28:
-    resolution: {integrity: sha512-6Gurc1n//gjp9eQNXjD9O3M/sMwVtN5S8Lv9bvOYBfKfDNiIIhqiyi01vMBO45u4zkDE420w/e0se7Vs+sIg+g==}
-    dev: false
 
   /unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}

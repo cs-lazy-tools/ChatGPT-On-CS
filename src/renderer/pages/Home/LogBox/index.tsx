@@ -12,8 +12,8 @@ import {
   Box,
   VStack,
 } from '@chakra-ui/react';
-import { useWebSocketContext } from '../../hooks/useBroadcastContext';
-import useGlobalStore from '../../stores/useGlobalStore';
+import { useWebSocketContext } from '../../../hooks/useBroadcastContext';
+import useGlobalStore from '../../../stores/useGlobalStore';
 
 const LogBox = () => {
   const { logs, clearLogs, addLog } = useGlobalStore();

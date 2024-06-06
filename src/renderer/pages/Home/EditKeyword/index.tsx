@@ -23,11 +23,11 @@ import {
   getPlatformList,
   addReplyKeyword,
   updateReplyKeyword,
-} from '../../services/platform/controller';
-import MyTextarea from '../../components/MyTextarea';
-import Markdown from '../../components/Markdown';
-import MyModal from '../../components/MyModal';
-import { Reply, Platform } from '../../services/platform/platform';
+} from '../../../services/platform/controller';
+import MyTextarea from '../../../components/MyTextarea';
+import Markdown from '../../../components/Markdown';
+import MyModal from '../../../components/MyModal';
+import { Reply, Platform } from '../../../services/platform/platform';
 
 interface EditKeywordProps {
   editKeyword: Reply | null;

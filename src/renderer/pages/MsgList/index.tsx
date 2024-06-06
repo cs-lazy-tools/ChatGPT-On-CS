@@ -16,16 +16,14 @@ import {
   getMessageList,
 } from '../../services/platform/controller';
 import SessionBox from './SessionBox';
-import analytics from '../../services/analytics';
+import { trackPageView } from '../../services/analytics';
 import { Message } from '../../services/platform/platform';
 
 // 假设数据通过 props.sessions 传递
 const MsgList = () => {
   useEffect(() => {
     // 页面访问埋点
-    analytics.onEvent('$PageView', {
-      $PageName: 'msg_list',
-    });
+    trackPageView('Message List');
   }, []);
 
   const [ptf, setPtf] = useState<string>('');
