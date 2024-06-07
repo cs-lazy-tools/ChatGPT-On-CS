@@ -4,6 +4,20 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 export class Config extends Model {
   declare id: number;
 
+  declare global: boolean;
+
+  declare active: boolean;
+
+  declare platform: string;
+
+  declare platform_id: string;
+
+  declare instance_id: string;
+
+  declare use_plugin: boolean;
+
+  declare plugin_id: number;
+
   declare extract_phone: boolean;
 
   declare extract_product: boolean;
@@ -24,48 +38,7 @@ export class Config extends Model {
 
   declare gpt_key: string;
 
-  declare use_dify: boolean;
-
-  declare gpt_model: string;
-
-  declare gpt_temperature: number;
-
-  declare gpt_top_p: number;
-
-  declare stream: boolean;
-}
-
-export async function checkAndAddFields(sequelize: Sequelize) {
-  const tableDescription = await Config.describe();
-
-  // @ts-ignore
-  if (!tableDescription.reply_random_speed) {
-    await sequelize
-      .getQueryInterface()
-      .addColumn('Config', 'reply_random_speed', {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      });
-  }
-
-  // @ts-ignore
-  if (!tableDescription.context_count) {
-    await sequelize.getQueryInterface().addColumn('Config', 'context_count', {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-    });
-  }
-
-  // @ts-ignore
-  if (!tableDescription.default_reply) {
-    await sequelize.getQueryInterface().addColumn('Config', 'default_reply', {
-      type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: '',
-    });
-  }
+  declare llm_type: string;
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -75,6 +48,37 @@ export function initConfig(sequelize: Sequelize) {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
+      },
+      global: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      platform: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      platform_id: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      instance_id: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      use_plugin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      plugin_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       extract_phone: {
         type: DataTypes.BOOLEAN,
@@ -110,43 +114,25 @@ export function initConfig(sequelize: Sequelize) {
         type: DataTypes.FLOAT,
         allowNull: true,
       },
-      gpt_base_url: {
+      base_url: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      gpt_key: {
+      key: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      use_dify: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: true,
-      },
-      gpt_model: {
+      llm_type: {
         type: DataTypes.STRING,
         allowNull: true,
-      },
-      gpt_temperature: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-      },
-      gpt_top_p: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-      },
-      stream: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
+        defaultValue: 'chatgpt',
       },
     },
     {
       sequelize,
       modelName: 'Config',
-      tableName: 'config',
+      tableName: 'n_config',
       timestamps: false,
     },
   );
-
-  checkAndAddFields(sequelize);
 }

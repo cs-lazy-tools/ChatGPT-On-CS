@@ -6,11 +6,10 @@ import * as path from 'path';
 import sqlite from 'sqlite3';
 import { Sequelize } from 'sequelize';
 import { initConfig } from './entities/config';
-import { initPlatformConfig } from './entities/platformConfig';
 import { initSession } from './entities/session';
 import { initMessage } from './entities/message';
-import { AutoReply, initAutoReply } from './entities/autoReply';
-import { initGlobalParam } from './entities/globalParam';
+import { initPlugin } from './entities/plugin';
+import { Keyword, initKeyword } from './entities/keyword';
 
 // Get user's documents directory path
 const DOCUMENTS_DIR = path.join(os.homedir(), 'Documents');
@@ -35,15 +34,14 @@ const sequelize = new Sequelize({
 
 // 初始化模型
 initConfig(sequelize);
-initPlatformConfig(sequelize);
 initSession(sequelize);
 initMessage(sequelize);
-initAutoReply(sequelize);
-initGlobalParam(sequelize);
+initKeyword(sequelize);
+initPlugin(sequelize);
 
 // 异步初始化和数据填充函数
 async function initDb(): Promise<void> {
-  const count = await AutoReply.count();
+  const count = await Keyword.count();
   if (count === 0) {
     const replies = [
       {
@@ -153,7 +151,7 @@ async function initDb(): Promise<void> {
       },
     ];
 
-    await AutoReply.bulkCreate(replies);
+    await Keyword.bulkCreate(replies);
   }
 }
 

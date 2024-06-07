@@ -17,7 +17,7 @@ import { BroadcastService } from './services/broadcastService';
 import { SystemService } from './services/systemService';
 import { ConfigService } from './services/configService';
 import { PlatformConfigController } from './controllers/platformConfigController';
-import { AutoReplyController } from './controllers/autoReplyController';
+import { AutoReplyController } from './controllers/keywordReplyController';
 
 const sessionController = new SessionController();
 const configController = new ConfigController();
@@ -93,7 +93,6 @@ class BKServer {
       console.log('Client connected registerHandlers');
       this.messageService.registerHandlers(socket);
       this.sessionService.registerHandlers(socket);
-      this.configService.registerHandlers(socket);
       this.broadcastService.registerHandlers(socket);
 
       socket.on('disconnect', () => {

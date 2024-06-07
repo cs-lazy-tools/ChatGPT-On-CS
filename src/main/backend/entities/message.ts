@@ -10,7 +10,7 @@ export class Message extends Model {
 
   declare content: string;
 
-  declare unique: string;
+  declare sender: string;
 
   declare msg_type: string;
 
@@ -31,19 +31,19 @@ export function initMessage(sequelize: Sequelize) {
       },
       role: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
+      },
+      sender: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
       },
       content: {
         type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      unique: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       msg_type: {
         type: DataTypes.STRING(55),
-        allowNull: false,
+        allowNull: true,
       },
       created_at: {
         type: DataTypes.DATE,
@@ -53,7 +53,7 @@ export function initMessage(sequelize: Sequelize) {
     {
       sequelize,
       modelName: 'Message',
-      tableName: 'messages',
+      tableName: 'n_messages',
       timestamps: false,
     },
   );

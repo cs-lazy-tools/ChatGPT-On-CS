@@ -30,6 +30,10 @@ module.exports = {
     'max-classes-per-file': 'off',
     'no-continue': 'off',
     'no-plusplus': 'off',
+    'no-underscore-dangle': 'off',
+    camelcase: 'off',
+    'no-use-before-define': 'off',
+    'no-dupe-class-members': 'off',
   },
   parserOptions: {
     ecmaVersion: 2022,

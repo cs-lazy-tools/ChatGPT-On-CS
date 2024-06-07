@@ -17,9 +17,22 @@ export class SessionCreate {
 }
 
 export class SessionController {
-  async create(sessionData: SessionCreate) {
-    // @ts-ignore
-    return Session.create(sessionData);
+  async createSession(
+    platformId: string,
+    platformName: string,
+    username?: string,
+    goodsName?: string,
+    goodsAvatar?: string,
+  ): Promise<Session> {
+    return Session.create({
+      platform_id: platformId,
+      platform: platformName,
+      username: username || '',
+      last_active: new Date(),
+      goods_name: goodsName || '',
+      goods_avatar: goodsAvatar || '',
+      created_at: new Date(),
+    });
   }
 
   async update(id: number, sessionData: Session) {

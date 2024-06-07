@@ -3,17 +3,13 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 export class Session extends Model {
   declare id: number;
 
-  declare username: string;
-
-  declare last_active: Date;
-
   declare platform: string;
 
   declare platform_id: string;
 
-  declare goods_name: string;
+  declare instance_id: string; // 可能是作用于单个实例的插件
 
-  declare goods_avatar: string;
+  declare context: string;
 
   declare created_at: Date;
 }
@@ -26,14 +22,6 @@ export function initSession(sequelize: Sequelize) {
         autoIncrement: true,
         primaryKey: true,
       },
-      username: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-      },
-      last_active: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
       platform: {
         type: DataTypes.STRING(255),
         allowNull: true,
@@ -42,12 +30,8 @@ export function initSession(sequelize: Sequelize) {
         type: DataTypes.STRING(255),
         allowNull: true,
       },
-      goods_name: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      goods_avatar: {
-        type: DataTypes.STRING(255),
+      context: {
+        type: DataTypes.JSON,
         allowNull: true,
       },
       created_at: {
@@ -58,7 +42,7 @@ export function initSession(sequelize: Sequelize) {
     {
       sequelize,
       modelName: 'Session',
-      tableName: 'sessions',
+      tableName: 'n_sessions',
       timestamps: false,
     },
   );
