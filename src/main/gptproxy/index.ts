@@ -7,6 +7,7 @@ import MinimaxAI, { MinimaxAIOptions } from './minimax';
 import QWenAI, { QWenAIOptions } from './qwen';
 import SparkAI, { SparkAIOptions } from './spark';
 import VYroAI, { VYroAIOptions } from './vyro';
+import DifyAI, { DifyAIOptions } from './dify';
 
 export {
   ErnieAI,
@@ -24,6 +25,8 @@ export {
   type SparkAIOptions,
   VYroAI,
   type VYroAIOptions,
+  DifyAI,
+  type DifyAIOptions,
 };
 
 export {

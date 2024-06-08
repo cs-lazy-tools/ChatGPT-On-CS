@@ -1,67 +1,61 @@
 import { Message } from '../entities/message';
-import { MessageDTO } from '../types';
+import { Session } from '../entities/session';
+import { MessageDTO, ReplyDTO, Context } from '../types';
+import { CTX_APP_ID, CTX_APP_NAME, CTX_INSTANCE_ID } from '../constants';
 
 export class MessageController {
-  async create(messageData: Message) {
-    // @ts-ignore
-    const data = await Message.create(messageData);
-    return data;
-  }
+  /**
+   * 保存消息
+   * @param ctx
+   * @param reply
+   * @param messages
+   */
+  public async saveMessages(
+    ctx: Context,
+    reply: ReplyDTO,
+    messages: MessageDTO[],
+  ) {
+    const appId = ctx.get(CTX_APP_ID);
+    const instanceId = ctx.get(CTX_INSTANCE_ID);
+    const appName = ctx.get(CTX_APP_NAME);
 
-  async update(id: number, messageData: Message) {
-    const message = await Message.findByPk(id);
-    if (!message) {
-      throw new Error('Message not found');
+    if (!appId || !instanceId) {
+      throw new Error('Invalid context');
     }
-    await message.update(messageData);
-  }
 
-  async delete(id: number) {
-    const message = await Message.findByPk(id);
-    if (!message) {
-      throw new Error('Message not found');
-    }
-    await message.destroy();
-  }
+    // 把 context 转成 JSON 字符串
+    const ctxStr = JSON.stringify(ctx);
 
-  async list({
-    page,
-    pageSize,
-    sessionId,
-  }: {
-    page: number;
-    pageSize: number;
-    sessionId: number;
-  }) {
-    const { rows: messages, count: total } = await Message.findAndCountAll({
-      where: {
-        session_id: sessionId,
-      },
-      offset: (page - 1) * pageSize,
-      limit: pageSize,
+    // 先创建 Session
+    const session = await Session.create({
+      platform: appName,
+      platform_id: appId,
+      instance_id: instanceId,
+      created_at: new Date(),
+      context: ctxStr,
     });
 
-    return {
-      total,
-      messages,
-    };
-  }
-
-  async checkExists(unique: string, sessionId: number) {
-    const message = await Message.findOne({
-      where: { session_id: sessionId, unique },
-    });
-    return !!message;
-  }
-
-  async batchCreateMsgs(sessionId: number, msgs: Message[] | MessageDTO[]) {
-    const messages = msgs.map((msg) => {
+    // 再创建 Message
+    const msgs = messages.map((msg) => {
       return {
-        ...msg,
-        session_id: sessionId,
+        session_id: session.id,
+        role: msg.role,
+        content: msg.content,
+        sender: msg.sender,
+        type: msg.type,
+        created_at: new Date(),
       };
     });
-    const data = await Message.bulkCreate(messages);
-    return data;
+
+    msgs.push({
+      session_id: session.id,
+      role: 'SELF',
+      content: reply.content,
+      type: reply.type,
+      sender: 'BOT',
+      created_at: new Date(),
+    });
+
+    await Message.bulkCreate(msgs);
   }
 }

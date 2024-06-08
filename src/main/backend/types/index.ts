@@ -15,6 +15,8 @@ export enum PlatformTypeEnum {
 export type RoleType = 'SELF' | 'OTHER' | 'SYSTEM';
 export type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE';
 
+export type Context = Map<string, string>;
+
 export interface MessageDTO {
   sender: string;
   content: string;

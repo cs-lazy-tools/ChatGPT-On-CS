@@ -34,11 +34,13 @@ export class Config extends Model {
 
   declare default_reply: string;
 
-  declare gpt_base_url: string;
+  declare base_url: string;
 
-  declare gpt_key: string;
+  declare key: string;
 
   declare llm_type: string;
+
+  declare model: string;
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -126,6 +128,11 @@ export function initConfig(sequelize: Sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: 'chatgpt',
+      },
+      model: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: 'gpt-3.5-turbo',
       },
     },
     {

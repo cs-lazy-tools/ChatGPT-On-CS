@@ -18,7 +18,7 @@ const preloadedModules: PreloadedModules = {
   axios,
 };
 
-class PluginSystem {
+export class PluginService {
   private configController: ConfigController;
 
   constructor(configController: ConfigController) {
@@ -123,4 +123,4 @@ class PluginSystem {
   }
 }
 
-export default PluginSystem;
+export default PluginService;

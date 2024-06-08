@@ -7,23 +7,16 @@ import { Server } from 'socket.io';
 import { BrowserWindow, shell } from 'electron';
 import './ormconfig';
 import { StrategyServiceStatusEnum } from './types';
-import { SessionController } from './controllers/sessionController';
 import { ConfigController } from './controllers/configController';
 import { MessageController } from './controllers/messageController';
-import { StrategyService } from './services/strategyService';
+import { KeywordReplyController } from './controllers/keywordReplyController';
 import { MessageService } from './services/messageService';
-import { SessionService } from './services/sessionService';
-import { BroadcastService } from './services/broadcastService';
-import { SystemService } from './services/systemService';
-import { ConfigService } from './services/configService';
-import { PlatformConfigController } from './controllers/platformConfigController';
-import { AutoReplyController } from './controllers/keywordReplyController';
+import { DispatchService } from './services/dispatchService';
+import { PluginService } from './services/pluginService';
 
-const sessionController = new SessionController();
 const configController = new ConfigController();
-const platformConfigController = new PlatformConfigController();
 const messageController = new MessageController();
-const autoReplyController = new AutoReplyController();
+const keywordReplyController = new KeywordReplyController();
 
 class BKServer {
   private app: express.Application;
@@ -34,17 +27,11 @@ class BKServer {
 
   private io: Server;
 
-  private strategyService: StrategyService;
-
   private messageService: MessageService;
 
-  private sessionService: SessionService;
+  private pluginService: PluginService;
 
-  private configService: ConfigService;
-
-  private broadcastService: BroadcastService;
-
-  private systemService: SystemService;
+  private dispatchService: DispatchService;
 
   constructor(port: number, mainWindow: BrowserWindow) {
     this.app = express();
@@ -66,24 +53,19 @@ class BKServer {
       transports: ['websocket'],
     });
 
-    this.configService = new ConfigService(
-      configController,
-      platformConfigController,
-    );
-
-    this.messageService = new MessageService(
-      this.configService,
+    this.pluginService = new PluginService(configController);
+    this.dispatchService = new DispatchService(
+      mainWindow,
+      this.io,
+      this.messageService,
       messageController,
-      autoReplyController,
+    );
+    this.messageService = new MessageService(
+      configController,
+      keywordReplyController,
+      this.pluginService,
     );
 
-    this.broadcastService = new BroadcastService(mainWindow);
-    this.strategyService = new StrategyService(this.io);
-    this.sessionService = new SessionService(
-      sessionController,
-      this.strategyService,
-    );
-    this.systemService = new SystemService(this.io);
     this.configureSocketIO();
     this.setupRoutes();
   }
@@ -91,9 +73,7 @@ class BKServer {
   private configureSocketIO(): void {
     this.io.on('connection', (socket) => {
       console.log('Client connected registerHandlers');
-      this.messageService.registerHandlers(socket);
-      this.sessionService.registerHandlers(socket);
-      this.broadcastService.registerHandlers(socket);
+      this.dispatchService.registerHandlers(socket);
 
       socket.on('disconnect', () => {
         console.log('user disconnected');
@@ -151,7 +131,7 @@ class BKServer {
     this.app.get(
       '/api/v1/base/platform/all',
       asyncHandler(async (req, res) => {
-        const data = await this.strategyService.getAllPlatforms();
+        const data = await this.dispatchService.getAllPlatforms();
         res.json({
           success: data && data.length > 0,
           data,
@@ -163,10 +143,11 @@ class BKServer {
     this.app.get(
       '/api/v1/base/platform/setting',
       asyncHandler(async (req, res) => {
-        const { platformId } = req.query;
-        // @ts-ignore
-        const obj = await platformConfigController.getByPlatformId(platformId);
-        res.json({ success: true, data: obj.settings });
+        // const { platformId } = req.query;
+        // // @ts-ignore
+        // const obj = await platformConfigController.getByPlatformId(platformId);
+        // res.json({ success: true, data: obj.settings });
+        res.json({ success: true, data: {} });
       }),
     );
 
@@ -174,7 +155,7 @@ class BKServer {
       '/api/v1/base/platform/setting',
       asyncHandler(async (req, res) => {
         const { platformId, settings } = req.body;
-        await platformConfigController.updateByPlatformId(platformId, settings);
+        // await platformConfigController.updateByPlatformId(platformId, settings);
         res.json({ success: true });
       }),
     );
@@ -188,11 +169,11 @@ class BKServer {
       } = req.body;
       try {
         if (isPaused) {
-          await this.strategyService.updateStatus(
+          await this.dispatchService.updateStatus(
             StrategyServiceStatusEnum.STOPPED,
           );
         } else {
-          await this.strategyService.updateStatus(
+          await this.dispatchService.updateStatus(
             StrategyServiceStatusEnum.RUNNING,
           );
         }
@@ -280,10 +261,10 @@ class BKServer {
       };
 
       // @ts-ignore
-      const { total, autoReplies } = await autoReplyController.list(query);
+      const { total, autoReplies } = await keywordReplyController.list(query);
 
       const data = autoReplies;
-      const ptfs = await this.strategyService.getAllPlatforms();
+      const ptfs = await this.dispatchService.getAllPlatforms();
 
       const ptfMap = new Map(ptfs.map((ptf) => [ptf.id, ptf]));
       const results: any[] = [];
@@ -314,7 +295,7 @@ class BKServer {
 
     this.app.post('/api/v1/reply/create', async (req, res) => {
       const { platform_id: platformId, keyword, reply, mode } = req.body;
-      await autoReplyController.create({
+      await keywordReplyController.create({
         mode,
         platform_id: platformId,
         keyword,
@@ -325,7 +306,7 @@ class BKServer {
 
     this.app.post('/api/v1/reply/update', async (req, res) => {
       const { id, platform_id: platformId, keyword, reply, mode } = req.body;
-      await autoReplyController.update(id, {
+      await keywordReplyController.update(id, {
         mode,
         platform_id: platformId,
         keyword,
@@ -336,14 +317,14 @@ class BKServer {
 
     this.app.post('/api/v1/reply/delete', async (req, res) => {
       const { id } = req.body;
-      await autoReplyController.delete(id);
+      await keywordReplyController.delete(id);
       res.json({ success: true });
     });
 
     this.app.post('/api/v1/reply/excel', async (req, res) => {
       const { path } = req.body;
       try {
-        await autoReplyController.importExcel(path);
+        await keywordReplyController.importExcel(path);
         res.json({ success: true });
       } catch (error) {
         // @ts-ignore
@@ -353,7 +334,7 @@ class BKServer {
 
     this.app.get('/api/v1/reply/excel', async (req, res) => {
       try {
-        const path = await autoReplyController.exportExcel();
+        const path = await keywordReplyController.exportExcel();
         shell.openPath(path);
         res.json({ success: true, data: path });
       } catch (error) {
@@ -366,7 +347,7 @@ class BKServer {
     // TODO: 后续需要根据通过 WS 去检查后端服务是否健康
     this.app.get('/api/v1/base/health', async (req, res) => {
       try {
-        const resp = await this.systemService.checkHealth();
+        const resp = await this.dispatchService.checkHealth();
         if (resp) {
           res.json({
             success: true,

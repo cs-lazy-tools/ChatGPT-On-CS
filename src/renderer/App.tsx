@@ -10,7 +10,7 @@ import SettingsPage from './pages/Settings';
 import AboutPage from './pages/About';
 import MsgList from './pages/MsgList';
 import FullScreenLoader from './pages/FullScreenLoader';
-import { SettingsProvider } from './pages/Settings/SettingsContext';
+import { SettingsProvider } from './components/Settings/SettingsContext';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
 import { BroadcastProvider } from './hooks/useBroadcastContext';

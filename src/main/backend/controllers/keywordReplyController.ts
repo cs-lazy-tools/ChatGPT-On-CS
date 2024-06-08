@@ -5,7 +5,7 @@ import { Keyword } from '../entities/keyword';
 import { ALL_PLATFORMS } from '../constants';
 import { getTempPath } from '../../utils';
 
-export class AutoReplyController {
+export class KeywordReplyController {
   async create(autoReplyData: any) {
     return Keyword.create(autoReplyData);
   }
@@ -171,8 +171,8 @@ export class AutoReplyController {
     platformId: string;
   }) {
     try {
-      const { rows: autoReplies, count: total } =
-        await Keyword.findAndCountAll({
+      const { rows: autoReplies, count: total } = await Keyword.findAndCountAll(
+        {
           where: platformId
             ? {
                 platform_id: platformId,
@@ -180,7 +180,8 @@ export class AutoReplyController {
             : {},
           offset: (page - 1) * pageSize,
           limit: pageSize,
-        });
+        },
+      );
 
       return {
         total,

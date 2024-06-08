@@ -233,12 +233,20 @@ const AppManagerComponent = () => {
                   />
                   <Badge colorScheme="gray">{instance.task_id}</Badge>
                 </HStack>
-                <IconButton
-                  color="red.500"
-                  aria-label="Delete instance"
-                  icon={<DeleteIcon />}
-                  onClick={() => handleDelete(instance.task_id)}
-                />
+                <HStack spacing={3}>
+                  <IconButton
+                    fontSize="15px"
+                    aria-label="Settings"
+                    icon={<SettingsIcon />}
+                    onClick={() => {}}
+                  />
+                  <IconButton
+                    color="red.500"
+                    aria-label="Delete instance"
+                    icon={<DeleteIcon />}
+                    onClick={() => handleDelete(instance.task_id)}
+                  />
+                </HStack>
               </Flex>
             ))
           ) : (

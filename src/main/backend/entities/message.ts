@@ -12,7 +12,7 @@ export class Message extends Model {
 
   declare sender: string;
 
-  declare msg_type: string;
+  declare type: string;
 
   declare created_at: Date;
 }
@@ -41,7 +41,7 @@ export function initMessage(sequelize: Sequelize) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      msg_type: {
+      type: {
         type: DataTypes.STRING(55),
         allowNull: true,
       },

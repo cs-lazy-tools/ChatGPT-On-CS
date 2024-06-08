@@ -2,15 +2,28 @@ import socketIo from 'socket.io';
 import { BrowserWindow } from 'electron';
 import { Platform, StrategyServiceStatusEnum } from '../types';
 import { emitAndWait } from '../../utils';
+import { MessageService } from './messageService';
+import { MessageController } from '../controllers/messageController';
 
 export class DispatchService {
   private mainWindow: BrowserWindow;
 
+  private messageService: MessageService;
+
+  private messageController: MessageController;
+
   private io: socketIo.Server;
 
-  constructor(mainWindow: BrowserWindow, io: socketIo.Server) {
-    this.mainWindow = mainWindow;
+  constructor(
+    mainWindow: BrowserWindow,
+    io: socketIo.Server,
+    messageService: MessageService,
+    messageController: MessageController,
+  ) {
     this.io = io;
+    this.mainWindow = mainWindow;
+    this.messageService = messageService;
+    this.messageController = messageController;
   }
 
   public registerHandlers(socket: socketIo.Socket): void {
@@ -25,6 +38,17 @@ export class DispatchService {
 
     socket.on('messageService-getMessages', async (data, callback) => {
       const { ctx, messages } = data;
+      const ctxMap = new Map<string, string>();
+      Object.keys(ctx).forEach((key) => {
+        ctxMap.set(key, ctx[key]);
+      });
+
+      const reply = await this.messageService.getReply(ctxMap, messages);
+
+      callback(reply);
+
+      // 回复后保存消息
+      await this.messageController.saveMessages(ctxMap, reply, messages);
     });
   }
 

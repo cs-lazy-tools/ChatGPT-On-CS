@@ -1,104 +1,92 @@
-import React, { useEffect } from 'react';
-import { Box, Button, Stack, useToast, Skeleton } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
-import GptSettings from './GptSettings';
-import CustomerServiceSettings from './CustomerServiceSettings';
-import { getConfig, updateConfig } from '../../services/platform/controller';
-import { useSettings } from './SettingsContext';
-import { trackPageView } from '../../services/analytics';
+import React, { useState } from 'react';
+import {
+  ChakraProvider,
+  Box,
+  Flex,
+  Text,
+  VStack,
+  HStack,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Container,
+  Button,
+} from '@chakra-ui/react';
 
 const SettingsPage = () => {
-  useEffect(() => {
-    // 页面访问埋点
-    trackPageView('Settings');
-  }, []);
-
-  const {
-    customerServiceSettings,
-    setCustomerServiceSettings,
-    gptSettings,
-    setGptSettings,
-  } = useSettings();
-  const toast = useToast();
-  const { data, isLoading } = useQuery(['config'], getConfig);
-
-  useEffect(() => {
-    if (data && !isLoading) {
-      setGptSettings({
-        useDify: data.data.use_dify || false,
-        gptAddress: data.data.gpt_base_url || '',
-        model: data.data.gpt_model || '',
-        temperature: data.data.gpt_temperature || 0.7,
-        apiKey: data.data.gpt_key || '',
-        topP: data.data.gpt_top_p || 0.75,
-        stream: data.data.stream || false,
-      });
-      setCustomerServiceSettings({
-        extractPhone: data.data.extract_phone || false,
-        extractProduct: data.data.extract_product || false,
-        folderPath: data.data.save_path || '',
-        replySpeed: data.data.reply_speed || [0, 0],
-        contextCount: data.data.context_count || 1,
-        manualInterventionInterval: data.data.wait_humans_time || 60,
-        defaultReply: data.data.default_reply || '',
-      });
-    }
-  }, [isLoading, data, setGptSettings, setCustomerServiceSettings]);
-
-  const handleSaveSettings = async () => {
-    try {
-      await updateConfig({
-        extract_phone: customerServiceSettings.extractPhone,
-        extract_product: customerServiceSettings.extractProduct,
-        save_path: customerServiceSettings.folderPath.trim(),
-        reply_speed: customerServiceSettings.replySpeed,
-        default_reply: customerServiceSettings.defaultReply.trim(),
-        context_count: customerServiceSettings.contextCount,
-        wait_humans_time: customerServiceSettings.manualInterventionInterval,
-        gpt_base_url: gptSettings.gptAddress.trim(),
-        gpt_key: gptSettings.apiKey.trim(),
-        gpt_model: gptSettings.model.trim(),
-        gpt_temperature: gptSettings.temperature,
-        gpt_top_p: gptSettings.topP,
-        stream: gptSettings.stream,
-        use_dify: gptSettings.useDify,
-      });
-      toast({
-        position: 'top',
-        title: '保存成功',
-        status: 'success',
-      });
-    } catch (error: any) {
-      toast({
-        position: 'top',
-        title: '保存失败',
-        description: error.message,
-        status: 'error',
-      });
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <Stack m={10}>
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-      </Stack>
-    );
-  }
-
   return (
-    <Box p={4}>
-      <Stack spacing={4}>
-        <CustomerServiceSettings />
-        <GptSettings />
-        <Button colorScheme="blue" onClick={handleSaveSettings}>
-          保存设置
-        </Button>
-      </Stack>
-    </Box>
+    <ChakraProvider>
+      <Flex direction="column" height="100vh">
+        {/* 顶部 Tab 栏 */}
+        <Tabs variant="enclosed" isFitted>
+          <TabList>
+            <Tab>通用设置</Tab>
+            <Tab>AI 配置</Tab>
+            <Tab>使用激活码</Tab>
+          </TabList>
+
+          <TabPanels>
+            <TabPanel>
+              <AccountSettings />
+            </TabPanel>
+            <TabPanel>
+              <NotificationsSettings />
+            </TabPanel>
+            <TabPanel>
+              <PrivacySettings />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+
+        {/* 设置项内容区域 */}
+        <Box flex="1" p="4">
+          <Container maxW="container.md">
+            <Text fontSize="2xl" mb="4">
+              Settings
+            </Text>
+          </Container>
+        </Box>
+
+        {/* 固定保存按钮 */}
+        <Box
+          position="fixed"
+          bottom="0"
+          left="0"
+          width="100%"
+          p="4"
+          bg="gray.100"
+          borderTop="1px solid #ccc"
+        >
+          <HStack justify="flex-end">
+            <Button colorScheme="teal">Save</Button>
+          </HStack>
+        </Box>
+      </Flex>
+    </ChakraProvider>
   );
 };
 
-export default SettingsPage;
+const AccountSettings = () => (
+  <VStack spacing="4" align="start">
+    <Text>Account Settings</Text>
+    {/* 添加具体的账户设置表单 */}
+  </VStack>
+);
+
+const NotificationsSettings = () => (
+  <VStack spacing="4" align="start">
+    <Text>Notifications Settings</Text>
+    {/* 添加具体的通知设置表单 */}
+  </VStack>
+);
+
+const PrivacySettings = () => (
+  <VStack spacing="4" align="start">
+    <Text>Privacy Settings</Text>
+    {/* 添加具体的隐私设置表单 */}
+  </VStack>
+);
+
+export default React.memo(SettingsPage);

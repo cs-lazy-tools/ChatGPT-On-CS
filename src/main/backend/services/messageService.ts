@@ -1,462 +1,338 @@
 import fs from 'fs/promises';
-import { DateTime } from 'luxon';
-import socketIo from 'socket.io';
-import { ConfigService } from './configService';
-import { MessageController } from '../controllers/messageController';
-import { AutoReplyController } from '../controllers/keywordReplyController';
-import { MessageDTO, ReplyDTO, MessageType } from '../types';
+import { ConfigController } from '../controllers/configController';
+import { KeywordReplyController } from '../controllers/keywordReplyController';
+import { MessageDTO, ReplyDTO, Context, MessageType } from '../types';
 import { Config } from '../entities/config';
-import { Keyword } from '../entities/keyword';
-import { TimeoutError, HumanTaskError } from '../errors/errors';
-import PluginSystem from './pluginSystem';
+import PluginService from './pluginService';
+import {
+  CTX_APP_ID,
+  CTX_CURRENT_GOODS,
+  CTX_CURRENT_GOODS_ID,
+  CTX_MEMBER_TAG,
+  CTX_FAN_TAG,
+  CTX_NEW_CUSTOMER_TAG,
+} from '../constants';
+import { rangeMatch, specialTokenReplace } from '../../utils/strings';
+import {
+  ErnieAI,
+  GeminiAI,
+  HunYuanAI,
+  MinimaxAI,
+  OpenAI,
+  QWenAI,
+  SparkAI,
+  VYroAI,
+  DifyAI,
+} from '../../gptproxy';
 
 export class MessageService {
   private isKeywordMatch: boolean;
 
   private isUseGptReply: boolean;
 
-  private configService: ConfigService;
+  private configController: ConfigController;
 
-  private messageController: MessageController;
+  private autoReplyController: KeywordReplyController;
 
-  private autoReplyController: AutoReplyController;
+  private pluginService: PluginService;
 
-  private pluginSystem: PluginSystem;
+  private llmClientMap: Map<string, any>;
 
   constructor(
-    configService: ConfigService,
-    messageController: MessageController,
-    autoReplyController: AutoReplyController,
-    pluginSystem: PluginSystem,
+    configService: ConfigController,
+    keywordReplyController: KeywordReplyController,
+    pluginService: PluginService,
   ) {
     this.isKeywordMatch = true;
     this.isUseGptReply = true;
-    this.configService = configService;
-    this.messageController = messageController;
-    this.autoReplyController = autoReplyController;
-    this.pluginSystem = pluginSystem;
+    this.configController = configService;
+    this.autoReplyController = keywordReplyController;
+    this.pluginService = pluginService;
+    this.llmClientMap = new Map();
   }
 
-  async getMessages(ctx: any, messages: MessageDTO[]) {
-    const cfg = await this.configService.get(ctx);
-    // 检查是否使用插件
-    if (cfg.use_plugin && cfg.plugin_id) {
-      return this.pluginSystem.executePlugin(cfg.plugin_id, ctx, messages);
-    }
-
-    
-  }
-
-  // // 提供一个方法用于注册事件处理器
-  // public registerHandlers(socket: socketIo.Socket): void {
-  //   socket.on('messageService-getMessages', async (data, callback) => {
-  //     const { sess, msgs } = data;
-  //     const session = {
-  //       id: sess.id,
-  //       username: sess.uname,
-  //       platform_id: sess.pid,
-  //       platform: sess.plat,
-  //       last_active: sess.last,
-  //     };
-
-  //     const messages = msgs.map((msg: any) => ({
-  //       session_id: msg.sid || session.id, // 处理默认值
-  //       platform_id: msg.pid || session.platform_id,
-  //       unique: msg.uniq,
-  //       content: msg.cnt,
-  //       role: msg.role,
-  //       msg_type: msg.type || 'text', // 处理默认值
-  //     }));
-
-  //     let reply = { msg_type: 'text', content: '' };
-  //     let config: Config;
-
-  //     try {
-  //       config = await this.configService.getConfigByPlatformId(
-  //         session.platform_id,
-  //       );
-  //     } catch (error) {
-  //       console.error(`Error in getMessages: ${error}`);
-
-  //       config = await this.configService.getConfig();
-  //       callback({ msg_type: 'text', content: config.default_reply });
-  //       return;
-  //     }
-
-  //     try {
-  //       // @ts-ignore
-  //       reply = await this.getMessages(config, session, messages);
-  //       callback(reply);
-  //     } catch (error) {
-  //       console.error(`Error in getMessages: ${error}`);
-  //       reply = { msg_type: 'text', content: config.default_reply };
-  //       callback(reply);
-  //     } finally {
-  //       messages.push({
-  //         session_id: session.id,
-  //         platform_id: session.platform_id,
-  //         unique: DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'),
-  //         content: reply.content,
-  //         role: 'assistant',
-  //         msg_type: reply.msg_type,
-  //       });
-
-  //       await this.messageController.batchCreateMsgs(session.id, messages);
-  //     }
-  //   });
-
-  //   socket.on('messageService-checkMessage', async (data, callback) => {
-  //     const { unique, sessionId } = data;
-  //     try {
-  //       const exists = await this.checkMessage(unique, sessionId);
-  //       callback(exists);
-  //     } catch (error) {
-  //       console.error(`Error in checkMessage: ${error}`);
-  //       callback(false);
-  //     }
-  //   });
-  // }
-
-  // public async checkApiHealth(data: {
-  //   baseUrl: string;
-  //   apiKey: string;
-  //   model: string;
-  //   useDify: boolean;
-  // }): Promise<{
-  //   status: boolean;
-  //   message: string;
-  // }> {
-  //   if (!data.baseUrl || !data.apiKey) {
-  //     return {
-  //       status: false,
-  //       message: '请输入正确的服务地址和 API Key',
-  //     };
-  //   }
-
-  //   if (data.useDify) {
-  //     try {
-  //       const reply = await this.difyRequest({
-  //         gpt_base_url: data.baseUrl,
-  //         gpt_key: data.apiKey,
-  //         query: 'Hello',
-  //       });
-
-  //       console.warn('Dify API response:', reply);
-
-  //       if (reply === '') {
-  //         return {
-  //           status: false,
-  //           message: '请检查 Dify API Key 和服务地址是否正确',
-  //         };
-  //       }
-
-  //       return {
-  //         status: true,
-  //         message: 'Dify API 正常',
-  //       };
-  //     } catch (error) {
-  //       console.error(`Error in checkApiHealth: ${error}`);
-  //       return {
-  //         status: false,
-  //         message:
-  //           error instanceof Error ? error.message : JSON.stringify(error),
-  //       };
-  //     }
-  //   }
-
-  //   const client = new OpenAI({
-  //     apiKey: data.apiKey,
-  //     baseURL: data.baseUrl,
-  //   });
-
-  //   try {
-  //     const response = await client.chat.completions.create({
-  //       model: data.model,
-  //       max_tokens: 100,
-  //       messages: [
-  //         {
-  //           role: 'user',
-  //           content: 'Tell me a message',
-  //         },
-  //       ],
-  //       stream: false,
-  //       temperature: 0.5,
-  //       top_p: 1,
-  //     });
-
-  //     console.warn('OpenAI API response:', response);
-
-  //     if (
-  //       !response.choices ||
-  //       !response.choices.length ||
-  //       !response.choices[0].message ||
-  //       !response.choices[0].message.content
-  //     ) {
-  //       return {
-  //         status: false,
-  //         message: '请检查 OpenAI API Key 和服务地址是否正确',
-  //       };
-  //     }
-
-  //     return {
-  //       status: true,
-  //       message: 'OpenAI API 正常',
-  //     };
-  //   } catch (error) {
-  //     console.error(`Error in checkApiHealth: ${error}`);
-  //     return {
-  //       status: false,
-  //       message: error instanceof Error ? error.message : JSON.stringify(error),
-  //     };
-  //   }
-  // }
-
-  updateKeywordMatch(isKeywordMatch: boolean, isUseGptReply: boolean) {
+  /**
+   * 更新关键词匹配和 GPT 回复的状态
+   * @param isKeywordMatch
+   * @param isUseGptReply
+   */
+  public updateKeywordMatch(isKeywordMatch: boolean, isUseGptReply: boolean) {
     this.isKeywordMatch = isKeywordMatch;
     this.isUseGptReply = isUseGptReply;
   }
 
-  // async getMessages(config: Config, session: Session, msgs: MessageDTO[]) {
-  //   let messages = [...msgs];
-  //   if (!messages.length) {
-  //     throw new Error('messages cannot be empty');
-  //   }
+  /**
+   * 获取回复消息
+   * @param ctx
+   * @param messages
+   * @returns
+   */
+  public async getReply(
+    ctx: Context,
+    messages: MessageDTO[],
+  ): Promise<ReplyDTO> {
+    const cfg = await this.configController.get(ctx);
 
-  //   // 再进行一次过滤，根据 config 中的 context_count
-  //   if (config.context_count > 0) {
-  //     messages = messages.slice(-config.context_count);
-  //   }
+    // 提取消息中的信息
+    await this.extractMsgInfo(cfg, ctx, messages);
 
-  //   // 检查如果不存在用户的消息，则补上一条
-  //   if (!messages.some((msg) => msg.role === 'user')) {
-  //     // 从 msgs 中找到最后一条 user 的消息
-  //     const lastUserMsg = messages
-  //       .slice()
-  //       .reverse()
-  //       .find((msg) => msg.role === 'user');
+    // 检查是否使用插件
+    if (cfg.use_plugin && cfg.plugin_id) {
+      return this.pluginService.executePlugin(cfg.plugin_id, ctx, messages);
+    }
 
-  //     if (lastUserMsg) {
-  //       messages.push(lastUserMsg);
-  //     } else {
-  //       return {
-  //         msg_type: 'text',
-  //         content: config.default_reply,
-  //       };
-  //     }
-  //   }
+    // 先检查是否存在用户的消息
+    const lastUserMsg = messages
+      .slice()
+      .reverse()
+      .find((msg) => msg.role === 'OTHER');
+    if (!lastUserMsg) {
+      return {
+        type: 'TEXT',
+        content: cfg.default_reply,
+      };
+    }
 
-  //   console.log('Starting to generate message content...');
-  //   const lastMessage = messages[messages.length - 1];
+    // 先等待随机时间
+    await new Promise((resolve) => {
+      const min = cfg.reply_speed; // 5 seconds
+      const max = cfg.reply_random_speed + cfg.reply_speed; // 10 seconds
+      const randomTime = min + Math.random() * (max - min);
+      setTimeout(resolve, randomTime * 1000);
+    });
 
-  //   if (lastMessage.role === 'user') {
-  //     await this.extractDataAsync(config, lastMessage);
-  //   }
+    // 再检查是否使用关键词匹配
+    if (this.isKeywordMatch) {
+      const data = await this.matchKeyword(ctx, lastUserMsg);
+      if (data) return data;
+    }
 
-  //   try {
-  //     const replyTask = this.getReplyTask(config, messages, session);
-  //     const reply = await this.waitWithTimeout(
-  //       replyTask,
-  //       config.wait_humans_time * 1000,
-  //     );
+    // 最后检查是否使用 GPT 生成回复
+    if (this.isUseGptReply) {
+      const data = await this.getLLMResponse(cfg, ctx, messages);
+      if (data) return data;
+    }
 
-  //     reply.msg_type = this.getMsgType(reply);
-  //     await new Promise((resolve) => {
-  //       const min = config.reply_speed; // 5 seconds
-  //       const max = config.reply_random_speed + config.reply_speed; // 10 seconds
-  //       const randomTime = min + Math.random() * (max - min);
-  //       setTimeout(resolve, randomTime * 1000);
-  //     });
+    return {
+      type: 'TEXT',
+      content: cfg.default_reply,
+    };
+  }
 
-  //     return reply;
-  //   } catch (error) {
-  //     if (error instanceof TimeoutError) {
-  //       throw new HumanTaskError('Reply timeout, please handle manually.');
-  //     }
-  //     console.error(`Error in getMessages: ${error}`);
-  //     return {
-  //       msg_type: 'text',
-  //       content: config.default_reply,
-  //     };
-  //   }
-  // }
+  /**
+   * 匹配关键词
+   * @param ctx
+   * @param message
+   * @returns
+   */
+  private async matchKeyword(
+    ctx: Context,
+    message: MessageDTO,
+  ): Promise<ReplyDTO | null> {
+    const appId = ctx.get(CTX_APP_ID);
+    if (!appId) return null;
 
-  // private async waitWithTimeout(
-  //   promise: Promise<ReplyDTO>,
-  //   time: number,
-  // ): Promise<ReplyDTO> {
-  //   // Create a new promise that rejects after a timeout
-  //   let timeoutHandle;
-  //   const timeoutPromise = new Promise<ReplyDTO>((resolve, reject) => {
-  //     timeoutHandle = setTimeout(() => {
-  //       reject(new TimeoutError('Operation timed out'));
-  //     }, time);
-  //   });
+    const keywords = await this.autoReplyController.getKeywords(appId);
 
-  //   try {
-  //     // Race the timeout against the original promise
-  //     const result = await Promise.race([promise, timeoutPromise]);
-  //     return result;
-  //   } finally {
-  //     // If the original promise or the timeout completes, we clear the timeout
-  //     clearTimeout(timeoutHandle);
-  //   }
-  // }
+    // 先找到匹配的关键词
+    const foundKeywordObj = keywords.find((keywordObj) => {
+      return keywordObj.keyword.split('|').some((pattern) => {
+        return rangeMatch(pattern, message.content);
+      });
+    });
 
-  // private async getReplyTask(config: Config, messages: MessageDTO[]) {
-  //   console.warn('getReplyTask', messages, session);
+    if (foundKeywordObj) {
+      const replies = foundKeywordObj.reply.split('[or]');
+      const chosenReply = specialTokenReplace(
+        replies[Math.floor(Math.random() * replies.length)],
+      );
 
-  //   // 提前定义好回复内容
-  //   let replyContent = null;
+      let msgType = 'TEXT';
+      if (chosenReply.includes('[@]') && chosenReply.includes('[/@]')) {
+        msgType = 'FILE';
+        const fileStart = chosenReply.indexOf('[@]') + 3;
+        const fileEnd = chosenReply.indexOf('[/@]');
+        const filePath = chosenReply.substring(fileStart, fileEnd);
+        return {
+          type: msgType as MessageType,
+          content: filePath,
+        };
+      }
 
-  //   // 使用关键词匹配尝试回复
-  //   if (this.isKeywordMatch) {
-  //     console.log('Attempting to use keyword matching...');
-  //     const { content, found } = await this.matchAndReply(
-  //       messages,
-  //       session.platform_id,
-  //     );
+      return {
+        type: msgType as MessageType,
+        content: chosenReply,
+      };
+    }
 
-  //     if (found && content) {
-  //       console.log('Keyword match successful, using keyword to reply...');
-  //       replyContent = content;
-  //     }
-  //   }
+    return null;
+  }
 
-  //   if (!replyContent) {
-  //     // 如果关键词匹配无效或未启用关键词匹配，调用 OpenAI 生成回复
-  //     if (this.isUseGptReply) {
-  //       console.log(
-  //         'Keyword matching failed or not used, using OpenAI to generate reply...',
-  //       );
-  //       if (config.use_dify) {
-  //         replyContent = await this.getDifyResponse(
-  //           config,
-  //           messages,
-  //           session.platform_id,
-  //         );
-  //       } else {
-  //         replyContent = await this.getOpenAIResponse(
-  //           config,
-  //           messages,
-  //           session.platform_id,
-  //         );
-  //       }
-  //     } else {
-  //       replyContent = {
-  //         content: config.default_reply,
-  //         msg_type: 'text' as MessageType,
-  //       };
-  //     }
-  //   }
+  /**
+   * 获取 GPT 回复
+   * @param cfg
+   * @param ctx
+   * @param messages
+   * @returns
+   */
+  private async getLLMResponse(
+    cfg: Config,
+    ctx: Context,
+    messages: MessageDTO[],
+  ): Promise<ReplyDTO | null> {
+    const llm_name = cfg.llm_type;
+    if (!llm_name) {
+      return null;
+    }
 
-  //   replyContent.msg_type = this.getMsgType(replyContent);
-  //   return replyContent;
-  // }
+    let llmClient = this.llmClientMap.get(llm_name);
+    if (!llmClient) {
+      llmClient = this.createLLMClient(cfg, llm_name);
+      this.llmClientMap.set(llm_name, llmClient);
+    }
 
-  // private async extractDataAsync(
-  //   cfg: Config,
-  //   message: MessageDTO,
-  // ): Promise<void> {
-  //   if (!cfg.extract_phone && !cfg.extract_product) return;
-  //   if (cfg.save_path === '') return;
+    // 使用 completions 方法生成回复
+    try {
+      const response = await llmClient.chat.completions.create({
+        model: cfg.model,
+        messages: this.toLLMMessages(ctx, messages),
+        stream: true,
+      });
 
-  //   console.log('开始提取用户消息中的数据....');
-  //   const dataExtracted: { [key: string]: string } = {};
-  //   const fileName = `${cfg.save_path}/${new Date().toISOString().split('T')[0]}.txt`;
+      const chunks = [];
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const chunk of response) {
+        chunks.push(chunk.choices[0]?.delta?.content || '');
+      }
 
-  //   if (cfg.extract_phone) {
-  //     const phoneNumbers = message.content.match(/\b1[3-9]\d{9}\b/g);
-  //     if (phoneNumbers) dataExtracted.phone_numbers = phoneNumbers.join(', ');
-  //   } else if (cfg.extract_product && message.msg_type === 'goods') {
-  //     dataExtracted.products = message.content;
-  //   }
+      return {
+        type: 'TEXT',
+        content: chunks.join(''),
+      };
+    } catch (error) {
+      console.error(`Error in getLLMResponse: ${error}`);
+    }
 
-  //   await fs.appendFile(
-  //     fileName,
-  //     `${Object.entries(dataExtracted)
-  //       .map(([key, value]) => `${key}: ${value}`)
-  //       .join('\n')}\n`,
-  //   );
-  // }
+    return null;
+  }
 
-  // private async matchAndReply(
-  //   messages: MessageDTO[],
-  //   platformId: string,
-  // ): Promise<{
-  //   content: ReplyDTO;
-  //   found: boolean;
-  // }> {
-  //   if (!messages.length) {
-  //     return {
-  //       content: { content: '', msg_type: 'text' },
-  //       found: false,
-  //     };
-  //   }
+  /**
+   * 创建 LLM 客户端
+   * @param cfg
+   * @param llmName
+   * @returns
+   */
+  private createLLMClient(cfg: Config, llmName: string) {
+    const { key: apiKey, base_url: baseURL } = cfg;
+    const options = { apiKey, baseURL };
 
-  //   const lastMessage = messages[messages.length - 1].content;
-  //   const keywords = await this.autoReplyController.getKeywords(platformId);
+    if (llmName === 'ernie') {
+      return new ErnieAI(options);
+    }
+    if (llmName === 'gemini') {
+      return new GeminiAI(options);
+    }
+    if (llmName === 'hunyuan') {
+      return new HunYuanAI(options);
+    }
+    if (llmName === 'minimax') {
+      return new MinimaxAI(options);
+    }
+    if (llmName === 'qwen') {
+      return new QWenAI(options);
+    }
+    if (llmName === 'spark') {
+      return new SparkAI(options);
+    }
+    if (llmName === 'vyro') {
+      return new VYroAI(options);
+    }
+    if (llmName === 'dify') {
+      return new DifyAI(options);
+    }
 
-  //   const foundKeywordObj = keywords.find((keywordObj) => {
-  //     return keywordObj.keyword.split('|').some((pattern) => {
-  //       return this.simpleWildcardMatch(pattern, lastMessage);
-  //     });
-  //   });
+    return new OpenAI(options);
+  }
 
-  //   if (foundKeywordObj) {
-  //     return {
-  //       content: this.chooseReply(foundKeywordObj),
-  //       found: true,
-  //     };
-  //   }
+  toLLMMessages(ctx: Context, messages: MessageDTO[]) {
+    // 先过滤 system 消息
+    const f_messages = messages.filter((msg) => msg.role !== 'SYSTEM');
+    return f_messages.map((msg) => ({
+      role: msg.role === 'SELF' ? 'user' : 'assistant',
+      content: msg.content,
+    }));
+  }
 
-  //   return {
-  //     content: { content: '', msg_type: 'text' },
-  //     found: false,
-  //   };
-  // }
+  /**
+   * 提取消息中的信息
+   * @param cfg
+   * @param ctx
+   * @param messages
+   * @returns
+   */
+  async extractMsgInfo(cfg: Config, ctx: Context, messages: MessageDTO[]) {
+    if (!cfg.extract_phone && !cfg.extract_product) return;
+    if (cfg.save_path === '') return;
 
-  // private chooseReply(keywordObj: AutoReply): ReplyDTO {
-  //   const replies = keywordObj.reply.split('[or]');
-  //   let chosenReply = this.replaceSpecialTokens(
-  //     replies[Math.floor(Math.random() * replies.length)],
-  //   );
+    console.log('开始提取用户消息中的数据....');
 
-  //   let msgType = 'text';
-  //   if (chosenReply.includes('[@]') && chosenReply.includes('[/@]')) {
-  //     msgType = 'file';
-  //     const fileStart = chosenReply.indexOf('[@]') + 3;
-  //     const fileEnd = chosenReply.indexOf('[/@]');
-  //     const filePath = chosenReply.substring(fileStart, fileEnd);
-  //     chosenReply = filePath;
-  //   }
+    const dataExtracted: { [key: string]: string } = {};
+    const fileName = `${cfg.save_path}/${new Date().toISOString().split('T')[0]}.txt`;
 
-  //   // @ts-ignore
-  //   return { content: chosenReply, msg_type: msgType };
-  // }
+    // 检查 save_path 是否存在
+    try {
+      await fs.access(cfg.save_path);
+    } catch (error) {
+      await fs.mkdir(cfg.save_path);
+    }
 
-  // private getMsgType(reply: ReplyDTO) {
-  //   if (reply.msg_type === 'text') {
-  //     return 'text';
-  //   }
+    if (cfg.extract_phone) {
+      const phoneNumbers = messages
+        .map((msg) => msg.content.match(/\b1[3-9]\d{9}\b/g))
+        .filter((pns) => pns)
+        .flat();
 
-  //   const { content } = reply;
-  //   if (
-  //     content.endsWith('.jpg') ||
-  //     content.endsWith('.png') ||
-  //     content.endsWith('.gif') ||
-  //     content.endsWith('.jpeg') ||
-  //     content.endsWith('.webp')
-  //   ) {
-  //     return 'image';
-  //   }
-  //   if (
-  //     content.endsWith('.mp4') ||
-  //     content.endsWith('.mov') ||
-  //     content.endsWith('.avi') ||
-  //     content.endsWith('.flv')
-  //   ) {
-  //     return 'video';
-  //   }
-  //   return 'file';
-  // }
+      if (phoneNumbers.length)
+        dataExtracted.phone_numbers = phoneNumbers.join(', ');
+    }
+
+    if (cfg.extract_product) {
+      // 从 ctx 中获取商品信息
+      const goods = ctx.get(CTX_CURRENT_GOODS);
+      if (goods) {
+        dataExtracted.goods = goods;
+      }
+
+      // 从 ctx 中获取商品 ID
+      const goodsId = ctx.get(CTX_CURRENT_GOODS_ID);
+      if (goodsId) {
+        dataExtracted.goods_id = goodsId;
+      }
+
+      // 从 ctx 中获取会员标签
+      const memberTag = ctx.get(CTX_MEMBER_TAG);
+      if (memberTag) {
+        dataExtracted.member_tag = memberTag;
+      }
+
+      // 从 ctx 中获取粉丝标签
+      const fanTag = ctx.get(CTX_FAN_TAG);
+      if (fanTag) {
+        dataExtracted.fan_tag = fanTag;
+      }
+
+      // 从 ctx 中获取新客标签
+      const newCustomerTag = ctx.get(CTX_NEW_CUSTOMER_TAG);
+      if (newCustomerTag) {
+        dataExtracted.new_customer_tag = newCustomerTag;
+      }
+    }
+
+    await fs.appendFile(
+      fileName,
+      `${Object.entries(dataExtracted)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('\n')}\n`,
+    );
+  }
 }

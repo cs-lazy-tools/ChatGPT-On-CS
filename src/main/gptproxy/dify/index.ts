@@ -46,7 +46,7 @@ export class DifyAI extends APIClient {
     this.apiKey = apiKey;
   }
 
-  chat = new API.Chat(this);
+  completions = new API.Completions(this);
 
   protected override defaultHeaders(opts: FinalRequestOptions): Headers {
     return {
@@ -62,3 +62,5 @@ export class DifyAI extends APIClient {
     };
   }
 }
+
+export default DifyAI;
