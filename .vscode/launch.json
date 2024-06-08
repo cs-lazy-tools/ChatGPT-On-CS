@@ -5,7 +5,6 @@
       "name": "Electron: Main",
       "type": "node",
       "request": "launch",
-      "protocol": "inspector",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start"],
       "env": {

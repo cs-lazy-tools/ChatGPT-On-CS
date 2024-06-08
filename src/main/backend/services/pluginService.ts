@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import axios from 'axios';
 import { ConfigController } from '../controllers/configController';
-import { MessageDTO, ReplyDTO } from '../types';
+import { MessageDTO, ReplyDTO, Context } from '../types';
 
 interface PreloadedModules {
   [key: string]: any;
@@ -23,6 +23,7 @@ export class PluginService {
 
   constructor(configController: ConfigController) {
     this.configController = configController;
+    preloadedModules.cc = configController;
   }
 
   /**
@@ -34,7 +35,7 @@ export class PluginService {
    */
   async executePlugin(
     plugin_id: number,
-    ctx: any,
+    ctx: Context,
     messages: MessageDTO[],
   ): Promise<ReplyDTO> {
     // 从配置控制器中获取插件配置
@@ -42,6 +43,12 @@ export class PluginService {
     if (!plugin) {
       throw new Error('Plugin not found');
     }
+
+    // ctx 转成对象
+    const ctxObj = Array.from(ctx).reduce((acc: any, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
 
     try {
       // 创建沙盒环境
@@ -57,39 +64,11 @@ export class PluginService {
         },
       };
 
-      // =================== 插件代码示例 ===================
-      // module.exports = function(ctx, messages) {
-      //   do something...
-      //   return {
-      //     content: 'Hello, world!',
-      //     type: 'TEXT',
-      //   };
-      // };
-      // =================== HTTP请求示例 ===================
-      // module.exports = async function(ctx, messages) {
-      //   const response = await axios.get('https://api.example.com');
-      //   return {
-      //     content: response.data,
-      //     type: 'TEXT',
-      //   };
-      // };
-      // =================== 文件读取示例 ===================
-      // module.exports = function(ctx, messages) {
-      //   const content = fs.readFileSync('example.txt', 'utf8');
-      //   return {
-      //     content,
-      //     type: 'TEXT',
-      //   };
-      // };
-      // ===================================================
-
       // 插件代码包装模板，确保插件函数存在并导出
+      // 取得里面的 main 函数
       const pluginCode = `
-        const pluginFunction = ${plugin.code};
-        if (typeof pluginFunction !== 'function') {
-          throw new Error('Plugin function is not defined or not a function');
-        }
-        module.exports = pluginFunction;
+      ${plugin.code}
+      module.exports = main;
       `;
 
       // 创建并运行沙盒上下文
@@ -101,8 +80,13 @@ export class PluginService {
         throw new Error('Plugin does not export a function');
       }
 
-      // 执行插件函数并传递 ctx 和 messages
-      const data = sandbox.module.exports(ctx, messages);
+      // 检查是否是异步函数，如果是异步函数则等待执行结果
+      let data;
+      if (sandbox.module.exports.constructor.name === 'AsyncFunction') {
+        data = await sandbox.module.exports(ctxObj, messages);
+      } else {
+        data = sandbox.module.exports(ctxObj, messages);
+      }
 
       // data 的返回类型应该是 ReplyDTO，这里做个数据校验
       if (
