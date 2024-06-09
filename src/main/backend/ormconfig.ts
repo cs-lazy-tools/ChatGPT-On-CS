@@ -5,7 +5,7 @@ import * as path from 'path';
 // https://github.com/sql-js/sql.js/issues/183
 import sqlite from 'sqlite3';
 import { Sequelize } from 'sequelize';
-import { initConfig } from './entities/config';
+import { Config, initConfig } from './entities/config';
 import { initSession } from './entities/session';
 import { initMessage } from './entities/message';
 import { initPlugin } from './entities/plugin';
@@ -41,6 +41,17 @@ initPlugin(sequelize);
 
 // 异步初始化和数据填充函数
 async function initDb(): Promise<void> {
+  const fcount = await Config.count();
+  if (fcount === 0) {
+    await Config.create({
+      platform_id: '',
+      instance_id: '',
+      global: true,
+      active: true,
+      context_count: 5,
+    });
+  }
+
   const count = await Keyword.count();
   if (count === 0) {
     const replies = [

@@ -33,9 +33,9 @@ Authorization: Bearer lazybox-YfJipx8QHYp8OpEKVjoHos88g
 
 ###
 
-POST https://api.nextapi.fun/v1/chat/completions
+POST https://gpt.visa-99.top/api/v1/chat/completions
 content-type: application/json
-Authorization: Bearer ak-yXdwt5NUBwxkPm1IMsnQasHHih3onYTIjJmnRZ7YtYv5vMjp
+Authorization: Bearer fastgpt-3xgXbDwBHcb7ii9gBDM583kDHxYKEbG6eaHWAWjNPaFc1vaQB0Tn9uQmXG
 
 {
     "model": "gpt-3.5-turbo",

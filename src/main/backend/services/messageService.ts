@@ -3,7 +3,7 @@ import { ConfigController } from '../controllers/configController';
 import { KeywordReplyController } from '../controllers/keywordReplyController';
 import { MessageDTO, ReplyDTO, Context, MessageType } from '../types';
 import { Config } from '../entities/config';
-import PluginService from './pluginService';
+
 import {
   CTX_APP_ID,
   CTX_CURRENT_GOODS,
@@ -34,20 +34,17 @@ export class MessageService {
 
   private autoReplyController: KeywordReplyController;
 
-  private pluginService: PluginService;
-
   private llmClientMap: Map<string, any>;
 
   constructor(
     configService: ConfigController,
     keywordReplyController: KeywordReplyController,
-    pluginService: PluginService,
   ) {
     this.isKeywordMatch = true;
     this.isUseGptReply = true;
     this.configController = configService;
     this.autoReplyController = keywordReplyController;
-    this.pluginService = pluginService;
+
     this.llmClientMap = new Map();
   }
 
@@ -75,11 +72,6 @@ export class MessageService {
 
     // 提取消息中的信息
     await this.extractMsgInfo(cfg, ctx, messages);
-
-    // 检查是否使用插件
-    if (cfg.use_plugin && cfg.plugin_id) {
-      return this.pluginService.executePlugin(cfg.plugin_id, ctx, messages);
-    }
 
     // 先检查是否存在用户的消息
     const lastUserMsg = messages

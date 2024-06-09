@@ -37,3 +37,36 @@ export interface Platform {
   desc?: string;
   env?: string;
 }
+
+export interface GenericConfig {
+  appId: string;
+  instanceId: string;
+  extractPhone: boolean;
+  extractProduct: boolean;
+  savePath: string;
+  replySpeed: number;
+  replyRandomSpeed: number;
+  contextCount: number;
+  waitHumansTime: number;
+  defaultReply: string;
+}
+
+export interface LLMConfig {
+  appId: string;
+  instanceId: string;
+  baseUrl: string;
+  key: string;
+  llmType: string;
+  model: string;
+}
+
+export interface AccountConfig {
+  activationCode: string;
+}
+
+export interface PluginConfig {
+  appId: string;
+  instanceId: string;
+  usePlugin: boolean;
+  pluginCode: string;
+}

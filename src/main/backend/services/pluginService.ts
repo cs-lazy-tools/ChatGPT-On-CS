@@ -6,6 +6,7 @@ import * as path from 'path';
 import axios from 'axios';
 import { ConfigController } from '../controllers/configController';
 import { MessageDTO, ReplyDTO, Context } from '../types';
+import { MessageService } from './messageService';
 
 interface PreloadedModules {
   [key: string]: any;
@@ -21,9 +22,16 @@ const preloadedModules: PreloadedModules = {
 export class PluginService {
   private configController: ConfigController;
 
-  constructor(configController: ConfigController) {
+  private messageService: MessageService;
+
+  constructor(
+    configController: ConfigController,
+    messageService: MessageService,
+  ) {
     this.configController = configController;
+    this.messageService = messageService;
     preloadedModules.cc = configController;
+    preloadedModules.ms = messageService;
   }
 
   /**

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -10,15 +10,103 @@ import {
   InputRightElement,
   Button,
   VStack,
-  Box,
+  useToast,
+  Stack,
+  Skeleton,
 } from '@chakra-ui/react';
+import { useQuery } from '@tanstack/react-query';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { getConfig, updateConfig } from '../../services/platform/controller';
+import { LLMConfig } from '../../services/platform/platform.d';
+import { ModelList, LLMTypeList } from '../../utils/constants';
 
-const LLMSettings = () => {
+const LLMSettings = ({
+  appId,
+  instanceId,
+}: {
+  appId?: string;
+  instanceId?: string;
+}) => {
+  const toast = useToast();
   const [show, setShow] = useState(false);
-  const [llmType, setLlmType] = useState('gpt');
-  const [model, setModel] = useState('model1');
-  const [customModel, setCustomModel] = useState('');
+
+  const { data, isLoading } = useQuery(
+    ['config', 'llm', appId, instanceId],
+    async () => {
+      try {
+        const resp = await getConfig({
+          appId,
+          instanceId,
+          type: 'llm',
+        });
+        return resp;
+      } catch (error) {
+        const errormsg =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        toast({
+          title: '获取配置失败',
+          description: errormsg,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+
+        return null;
+      }
+    },
+  );
+
+  const [config, setConfig] = useState<LLMConfig | null>(null);
+
+  useEffect(() => {
+    if (data) {
+      const obj = data.data as LLMConfig;
+      setConfig(obj);
+    }
+  }, [data]);
+
+  const handleUpdateConfig = async (newConfig: Partial<LLMConfig>) => {
+    if (!config) return;
+    const updatedConfig = { ...config, ...newConfig };
+    setConfig(updatedConfig);
+    try {
+      await updateConfig({
+        appId,
+        instanceId,
+        type: 'generic',
+        cfg: updatedConfig,
+      });
+    } catch (error) {
+      const errormsg =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      toast({
+        title: '更新配置失败',
+        description: errormsg,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleBaseURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let { value } = e.target;
+    if (!value.startsWith('http://') && !value.startsWith('https://')) {
+      value = `https://${value}`;
+    }
+
+    handleUpdateConfig({ baseUrl: value });
+  };
+
+  if (isLoading || !data || !config) {
+    return (
+      <Stack>
+        <Skeleton height="20px" />
+        <Skeleton height="20px" />
+        <Skeleton height="20px" />
+      </Stack>
+    );
+  }
 
   return (
     <VStack spacing="4" align="start">
@@ -28,37 +116,35 @@ const LLMSettings = () => {
           <Select
             id="llmType"
             placeholder="选择大模型类型"
-            value={llmType}
-            onChange={(e) => setLlmType(e.target.value)}
+            value={config.llmType}
+            onChange={(e) => handleUpdateConfig({ llmType: e.target.value })}
           >
-            <option value="gpt">GPT</option>
-            <option value="bert">BERT</option>
-            <option value="t5">T5</option>
+            {LLMTypeList.map((type) => (
+              <option key={type.key} value={type.key}>
+                {type.name}
+              </option>
+            ))}
           </Select>
         </FormControl>
 
         <FormControl>
           <FormLabel htmlFor="model">选择或输入模型</FormLabel>
-          <Select
-            id="model"
-            placeholder="选择模型"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-          >
-            <option value="model1">Model 1</option>
-            <option value="model2">Model 2</option>
-            <option value="model3">Model 3</option>
-            <option value="custom">自定义输入</option>
-          </Select>
-          {model === 'custom' && (
-            <Box mt="2">
-              <Input
-                placeholder="输入自定义模型名称"
-                value={customModel}
-                onChange={(e) => setCustomModel(e.target.value)}
-              />
-            </Box>
-          )}
+          <InputGroup>
+            <Input
+              id="model"
+              placeholder="选择或输入模型"
+              value={config.model}
+              onChange={(e) => handleUpdateConfig({ model: e.target.value })}
+              list="models"
+            />
+            <datalist id="models">
+              {ModelList.map((model) => (
+                <option key={model.key} value={model.key}>
+                  {model.name}
+                </option>
+              ))}
+            </datalist>
+          </InputGroup>
         </FormControl>
 
         <FormControl>
@@ -76,7 +162,11 @@ const LLMSettings = () => {
           </FormLabel>
           <InputGroup size="sm">
             <InputLeftAddon>http(s)://</InputLeftAddon>
-            <Input id="gptAddress" placeholder="输入站点地址" />
+            <Input
+              id="gptAddress"
+              placeholder="输入站点地址"
+              onChange={handleBaseURLChange}
+            />
           </InputGroup>
         </FormControl>
 
@@ -88,6 +178,7 @@ const LLMSettings = () => {
               pr="4.5rem"
               type={show ? 'text' : 'password'}
               placeholder="Enter password"
+              onChange={(e) => handleUpdateConfig({ key: e.target.value })}
             />
             <InputRightElement width="4.5rem">
               <Button

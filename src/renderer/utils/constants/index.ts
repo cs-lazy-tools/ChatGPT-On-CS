@@ -48,3 +48,125 @@ function main(ctx, messages) {
     type: 'TEXT',
   };
 }`;
+
+export const LLMTypeList = [
+  {
+    key: 'openai',
+    name: 'OpenAI',
+  },
+  {
+    key: 'ernie',
+    name: '文心大模型',
+  },
+  {
+    key: 'gemini',
+    name: 'Google Gemini',
+  },
+  {
+    key: 'hunyuan',
+    name: '腾讯混元',
+  },
+  {
+    key: 'minimax',
+    name: 'MiniMax',
+  },
+  {
+    key: 'qwen',
+    name: '通义千问',
+  },
+  {
+    key: 'spark',
+    name: 'Spark',
+  },
+  {
+    key: 'vyro',
+    name: 'Vyro AI',
+  },
+  {
+    key: 'dify',
+    name: 'Dify AI',
+  },
+  {
+    key: 'fastgpt',
+    name: 'FastGPT',
+  },
+];
+
+export const ModelList = [
+  {
+    key: 'gpt-4',
+    name: 'OpenAI GPT-4',
+  },
+  {
+    key: 'gpt-3.5-turbo',
+    name: 'OpenAI GPT-3.5 Turbo',
+  },
+  {
+    key: 'claude-3',
+    name: 'Anthropic Claude 3',
+  },
+  {
+    key: 'gemini-1.5-pro',
+    name: 'Google Gemini 1.5 Pro',
+  },
+  {
+    key: 'bard',
+    name: 'Google Bard',
+  },
+  {
+    key: 'vicuna-1.3',
+    name: 'Vicuna 1.3',
+  },
+  {
+    key: 'palm-2',
+    name: 'Google PaLM 2',
+  },
+  {
+    key: 'llama-2',
+    name: 'Meta LLaMA 2',
+  },
+  {
+    key: 'dolly',
+    name: 'Databricks Dolly',
+  },
+  {
+    key: 'open-assistant',
+    name: 'Open Assistant',
+  },
+  {
+    key: 'mixtral-8x7b',
+    name: 'Mistral Mixtral-8x7B',
+  },
+  {
+    key: 'falcon-180b',
+    name: 'Falcon 180B',
+  },
+  {
+    key: 'wenxin-3.0',
+    name: 'Baidu Wenxin 3.0 (Ernie)',
+  },
+  {
+    key: 'm6',
+    name: 'Alibaba M6',
+  },
+  {
+    key: 'pangubot',
+    name: 'Tencent PanguBot',
+  },
+  {
+    key: 'huaweilinxi',
+    name: 'Huawei Linxi AI',
+  },
+  {
+    key: 'ziya-1.0',
+    name: 'Ziya 1.0 (Zhipu AI)',
+  },
+  {
+    key: 'imagebind',
+    name: 'Meta ImageBind',
+  },
+  {
+    key: 'gen-2',
+    name: 'Runway Gen-2',
+  },
+];

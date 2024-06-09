@@ -5,8 +5,6 @@ export class Plugin extends Model {
 
   declare name: string;
 
-  declare enabled: boolean;
-
   declare code: string;
 
   declare platform: string;
@@ -28,10 +26,6 @@ export function initPlugin(sequelize: Sequelize) {
       },
       name: {
         type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      enabled: {
-        type: DataTypes.BOOLEAN,
         allowNull: true,
       },
       code: {

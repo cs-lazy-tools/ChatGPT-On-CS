@@ -1,4 +1,12 @@
-import { Platform, Reply, Config, Message } from './platform';
+import {
+  Platform,
+  Reply,
+  GenericConfig,
+  LLMConfig,
+  AccountConfig,
+  PluginConfig,
+  Message,
+} from './platform';
 import { GET, POST } from '../common/api/request';
 
 export async function getPlatformList() {
@@ -63,15 +71,42 @@ export async function exportReplyExcel() {
   return data;
 }
 
-export async function getConfig() {
+export async function getConfig({
+  type,
+  appId,
+  instanceId,
+}: {
+  type: string;
+  appId?: string;
+  instanceId?: string;
+}) {
   const data = await GET<{
-    data: Config;
-  }>('/api/v1/base/settings');
+    data: GenericConfig | LLMConfig | AccountConfig | PluginConfig;
+  }>('/api/v1/base/setting', {
+    app_id: appId,
+    instance_id: instanceId,
+    type,
+  });
   return data;
 }
 
-export async function updateConfig(config: Config) {
-  await POST('/api/v1/base/settings', config);
+export async function updateConfig({
+  type,
+  appId,
+  instanceId,
+  cfg,
+}: {
+  type: string;
+  appId?: string;
+  instanceId?: string;
+  cfg: GenericConfig | LLMConfig | AccountConfig | PluginConfig;
+}) {
+  await POST('/api/v1/base/setting', {
+    appId,
+    instanceId,
+    type,
+    cfg,
+  });
 }
 
 export async function getMessageList({
@@ -103,18 +138,6 @@ export async function getMessageList({
     end_time: endTime,
   });
   return data;
-}
-
-export async function getPlatformSetting(platformId: string) {
-  const data = await GET<any>('/api/v1/base/platform/setting', { platformId });
-  return data;
-}
-
-export async function updatePlatformSetting(data: {
-  platformId: string;
-  settings: any;
-}) {
-  await POST('/api/v1/base/platform/setting', data);
 }
 
 export async function checkGptHealth(data: {

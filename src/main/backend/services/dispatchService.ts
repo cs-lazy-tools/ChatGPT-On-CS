@@ -3,6 +3,8 @@ import { BrowserWindow } from 'electron';
 import { Platform, StrategyServiceStatusEnum } from '../types';
 import { emitAndWait } from '../../utils';
 import { MessageService } from './messageService';
+import PluginService from './pluginService';
+import { ConfigController } from '../controllers/configController';
 import { MessageController } from '../controllers/messageController';
 
 export class DispatchService {
@@ -14,16 +16,24 @@ export class DispatchService {
 
   private io: socketIo.Server;
 
+  private configController: ConfigController;
+
+  private pluginService: PluginService;
+
   constructor(
     mainWindow: BrowserWindow,
     io: socketIo.Server,
+    configService: ConfigController,
     messageService: MessageService,
     messageController: MessageController,
+    pluginService: PluginService,
   ) {
     this.io = io;
     this.mainWindow = mainWindow;
     this.messageService = messageService;
     this.messageController = messageController;
+    this.configController = configService;
+    this.pluginService = pluginService;
   }
 
   public registerHandlers(socket: socketIo.Socket): void {
@@ -43,7 +53,15 @@ export class DispatchService {
         ctxMap.set(key, ctx[key]);
       });
 
-      const reply = await this.messageService.getReply(ctxMap, messages);
+      let reply: any;
+
+      // 检查是否使用插件
+      const cfg = await this.configController.get(ctxMap);
+      if (cfg.use_plugin && cfg.plugin_id) {
+        reply = this.pluginService.executePlugin(cfg.plugin_id, ctx, messages);
+      } else {
+        reply = await this.messageService.getReply(ctxMap, messages);
+      }
 
       callback(reply);
 

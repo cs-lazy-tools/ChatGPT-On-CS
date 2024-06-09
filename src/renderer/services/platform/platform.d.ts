@@ -40,41 +40,35 @@ export interface Message {
   goods_name: string | null;
 }
 
-export interface Config {
-  extract_phone: boolean; // 提取手机号
-  extract_product: boolean; // 提取商品
-  save_path?: string; // 保存路径
-  reply_speed: number[]; // 回复速度
-  default_reply: string; // 默认回复
-  context_count: number; // 合并消息数量
-  wait_humans_time: number; // 等待人工时间
-
-  gpt_base_url?: string; // GPT服务地址
-  gpt_key?: string; // GPT服务key
-  gpt_model?: string; // GPT服务模型
-  gpt_temperature?: number; // GPT服务温度
-  gpt_top_p?: number; // GPT服务top_p
-  stream?: boolean; // 是否开启stream
-
-  use_dify?: boolean; // 是否使用 Dify 百宝箱
-}
-
-export interface CustomerServiceSettingsForm {
+export interface GenericConfig {
+  appId: string;
+  instanceId: string;
   extractPhone: boolean;
   extractProduct: boolean;
-  folderPath: string;
-  replySpeed: number[];
-  defaultReply: string;
+  savePath: string;
+  replySpeed: number;
+  replyRandomSpeed: number;
   contextCount: number;
-  manualInterventionInterval: number;
+  waitHumansTime: number;
+  defaultReply: string;
 }
 
-export interface GptSettingsForm {
-  useDify: boolean;
-  gptAddress: string;
-  apiKey: string;
+export interface LLMConfig {
+  appId: string;
+  instanceId: string;
+  baseUrl: string;
+  key: string;
+  llmType: string;
   model: string;
-  temperature: number;
-  topP: number;
-  stream: boolean;
+}
+
+export interface AccountConfig {
+  activationCode: string;
+}
+
+export interface PluginConfig {
+  appId: string;
+  instanceId: string;
+  usePlugin: boolean;
+  pluginCode: string;
 }

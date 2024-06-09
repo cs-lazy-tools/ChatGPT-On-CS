@@ -12,6 +12,7 @@ import {
 
 const AccountSettings = () => {
   const [activationCode, setActivationCode] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [expiryDate, setExpiryDate] = useState('2024-12-31'); // 你可以根据需要动态设置
   const [activationStatus, setActivationStatus] = useState('');
   const [isExpired, setIsExpired] = useState(false);

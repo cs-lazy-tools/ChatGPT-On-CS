@@ -41,6 +41,8 @@ export class Config extends Model {
   declare llm_type: string;
 
   declare model: string;
+
+  declare activation_code: string;
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -133,6 +135,10 @@ export function initConfig(sequelize: Sequelize) {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: 'gpt-3.5-turbo',
+      },
+      activation_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {
