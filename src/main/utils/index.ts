@@ -31,21 +31,36 @@ export async function emitAndWait<T>(
       return {} as T;
     }
 
-    if (response[0] === 'string') {
-      return {} as T;
-    }
-
     // 如果 response[0] 也是数组，那么直接返回
     if (Array.isArray(response[0])) {
       return response[0] as T;
     }
 
-    return JSON.parse(response[0]);
+    if (typeof response[0] === 'string') {
+      const obj = JSON.parse(response[0]);
+      if (obj.error) {
+        throw new Error(obj.error);
+      }
+
+      return obj;
+    }
+
+    const obj = response[0];
+    // 检查返回的对象是否包含 error
+    if (obj.error) {
+      throw new Error(obj.error);
+    }
+
+    return obj;
   }
 
   // 判断是否是字符串
   if (typeof response === 'string') {
-    return JSON.parse(response);
+    const obj = JSON.parse(response);
+    if (obj.error) {
+      throw new Error(obj.error);
+    }
+    return obj;
   }
 
   return response;

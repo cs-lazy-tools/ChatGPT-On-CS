@@ -1,12 +1,18 @@
 import { PlatformTypeEnum } from './constant';
 
-export interface Platform {
+export interface App {
   id: string;
   name: string;
   env: string;
   type?: PlatformTypeEnum;
   avatar?: string;
   desc?: string;
+}
+
+export interface Instance {
+  task_id: string;
+  app_id: string;
+  env_id: string;
 }
 
 export interface PlatformSettings {

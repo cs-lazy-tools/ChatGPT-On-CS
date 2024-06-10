@@ -1,5 +1,6 @@
 import {
-  Platform,
+  App,
+  Instance,
   Reply,
   GenericConfig,
   LLMConfig,
@@ -12,7 +13,7 @@ import { GET, POST } from '../common/api/request';
 export async function getPlatformList() {
   console.log('getPlatformList');
   const data = await GET<{
-    data: Platform[];
+    data: App[];
   }>('/api/v1/base/platform/all');
   return data;
 }
@@ -187,14 +188,10 @@ export async function checkGptHealth(data: {
   return resp;
 }
 
-export async function getTasks(appId: string) {
+export async function getTasks() {
   const data = await GET<{
-    data: {
-      [key: string]: any;
-    };
-  }>(`/api/v1/strategy/tasks`, {
-    appId,
-  });
+    data: Instance[];
+  }>(`/api/v1/strategy/tasks`);
   return data;
 }
 

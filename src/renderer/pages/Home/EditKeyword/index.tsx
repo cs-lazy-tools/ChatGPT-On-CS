@@ -27,7 +27,7 @@ import {
 import MyTextarea from '../../../components/MyTextarea';
 import Markdown from '../../../components/Markdown';
 import MyModal from '../../../components/MyModal';
-import { Reply, Platform } from '../../../services/platform/platform';
+import { Reply, App } from '../../../services/platform/platform';
 
 interface EditKeywordProps {
   editKeyword: Reply | null;
@@ -56,7 +56,7 @@ const EditKeyword = ({
   const [newReply, setNewReply] = useState<string>('');
   const [startKeyword, setStartKeyword] = useState<string>('');
   const [endKeyword, setEndKeyword] = useState<string>('');
-  const [currentPlatform, setCurrentPlatform] = useState<Platform | undefined>(
+  const [currentPlatform, setCurrentPlatform] = useState<App | undefined>(
     undefined,
   );
 

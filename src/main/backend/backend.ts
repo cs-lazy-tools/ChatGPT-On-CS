@@ -385,9 +385,8 @@ class BKServer {
 
     // 获取任务列表
     this.app.get('/api/v1/strategy/tasks', async (req, res) => {
-      const { appId } = req.query;
       try {
-        const tasks = await this.dispatchService.getTasks(String(appId));
+        const tasks = await this.dispatchService.getTasks();
         res.json({
           success: true,
           data: tasks,

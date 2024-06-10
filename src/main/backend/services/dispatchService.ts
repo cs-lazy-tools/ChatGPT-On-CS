@@ -83,11 +83,9 @@ export class DispatchService {
     }
   }
 
-  public async getTasks(appId: string): Promise<any> {
+  public async getTasks(): Promise<any> {
     try {
-      return await emitAndWait(this.io, 'strategyService-getTasks', {
-        app_id: appId,
-      });
+      return await emitAndWait(this.io, 'strategyService-getTasks', {});
     } catch (error) {
       console.error('Failed to get tasks', error);
       return null;

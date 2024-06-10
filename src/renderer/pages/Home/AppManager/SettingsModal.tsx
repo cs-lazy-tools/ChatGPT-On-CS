@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   ChakraProvider,
   Tabs,
@@ -25,6 +25,7 @@ import {
   activeConfig,
   checkConfigActive,
 } from '../../../services/platform/controller';
+import { useAppManager } from './AppManagerContext';
 
 const SettingsModal = ({
   isOpen,
@@ -37,13 +38,16 @@ const SettingsModal = ({
   appId?: string;
   instanceId?: string;
 }) => {
+  const { data: appInfo } = useAppManager();
+  const [appName, setAppName] = useState<string | undefined>(undefined);
+
   const toast = useToast();
   const [isActive, setIsActive] = useState(false);
   const [data, setData] = useState<{
     active: boolean;
   } | null>(null);
 
-  const fetchConfigActive = async () => {
+  const fetchConfigActive = useCallback(async () => {
     try {
       const resp = await checkConfigActive({ appId, instanceId });
       // @ts-ignore
@@ -60,9 +64,11 @@ const SettingsModal = ({
       });
       setData(null);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appId, instanceId]);
 
   useEffect(() => {
+    setAppName(appInfo?.data.find((app) => app.id === appId)?.name);
     fetchConfigActive();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appId, instanceId]);
@@ -73,39 +79,41 @@ const SettingsModal = ({
     }
   }, [data]);
 
-  const handleCheckboxChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (!data) {
-      return;
-    }
+  const handleCheckboxChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!data) {
+        return;
+      }
 
-    try {
-      setIsActive(event.target.checked);
-      await activeConfig({
-        active: event.target.checked,
-        appId,
-        instanceId,
-      });
-      toast({
-        title: '更新配置成功',
-        position: 'top',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (error) {
-      const errormsg =
-        error instanceof Error ? error.message : JSON.stringify(error);
-      toast({
-        title: '更新配置失败',
-        description: errormsg,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
+      try {
+        setIsActive(event.target.checked);
+        await activeConfig({
+          active: event.target.checked,
+          appId,
+          instanceId,
+        });
+        toast({
+          title: '更新配置成功',
+          position: 'top',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+      } catch (error) {
+        const errormsg =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        toast({
+          title: '更新配置失败',
+          description: errormsg,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [appId, instanceId],
+  );
 
   return (
     <ChakraProvider>
@@ -120,7 +128,7 @@ const SettingsModal = ({
               onChange={handleCheckboxChange}
             >
               激活{' '}
-              {instanceId ? `客服 ${instanceId} 设置` : `应用 ${appId} 设置`}
+              {instanceId ? `客服 ${instanceId} 设置` : `应用 ${appName} 设置`}
             </Checkbox>
             <Text color="gray.500" fontSize="sm">
               请注意：激活设置后，设置才会生效

@@ -11,7 +11,7 @@ import {
 import PageContainer from '../../components/PageContainer';
 import ReplyKeyword from './ReplyKeyword';
 import { trackPageView } from '../../services/analytics';
-import AppManager from './AppManager';
+import AppManager from './AppManager/index';
 import Panels from './Panels';
 import LogBox from './LogBox';
 
