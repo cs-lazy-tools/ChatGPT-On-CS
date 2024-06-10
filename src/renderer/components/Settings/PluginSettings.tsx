@@ -21,8 +21,14 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import Editor, { Monaco } from '@monaco-editor/react';
 import { PluginExtraLib, PluginExampleCode } from '../../utils/constants';
-import { getConfig, updateConfig } from '../../services/platform/controller';
+import {
+  getConfig,
+  updateConfig,
+  checkPluginAvailability,
+} from '../../services/platform/controller';
 import { PluginConfig } from '../../services/platform/platform.d';
+import MessageModal from '../MessageModal';
+import { useSystemStore } from '../../stores/useSystemStore';
 
 const PluginSettings = ({
   appId,
@@ -35,8 +41,10 @@ const PluginSettings = ({
 
   const [code, setCode] = useState<string | undefined>(PluginExampleCode);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpenMessageModal, setIsOpenMessageModal] = useState(false);
   const cancelRef = React.useRef<any>();
   const toast = useToast();
+  const { context, messages } = useSystemStore();
 
   const { data, isLoading } = useQuery(
     ['config', 'plugin', appId, instanceId],
@@ -158,6 +166,56 @@ const PluginSettings = ({
       PluginExtraLib,
       'ts:filename/types.d.ts',
     );
+
+    // Add the save command
+    monaco.editor.addEditorAction({
+      id: 'save',
+      label: 'Save',
+      // eslint-disable-next-line no-bitwise
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+      run: () => {
+        handleSaveCode();
+      },
+    });
+  };
+
+  const handleCheckPlugin = async () => {
+    try {
+      const resp = await checkPluginAvailability({
+        code: code || '',
+        ctx: context,
+        messages,
+      });
+
+      if (resp.status) {
+        toast({
+          title: '插件测试通过',
+          position: 'top',
+          description: resp.message,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: '插件测试失败',
+          position: 'top',
+          description: resp.error,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: '检查插件失败',
+        description: error instanceof Error ? error.message : '未知错误',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const handleExportCode = () => {
@@ -168,6 +226,7 @@ const PluginSettings = ({
     link.click();
     toast({
       title: '代码已导出',
+      position: 'top',
       description: '代码文件已下载',
       status: 'success',
       duration: 3000,
@@ -195,14 +254,25 @@ const PluginSettings = ({
         通过 JavaScript
         代码来实现自定义的回复逻辑，当使用了自定义插件后，系统将不再使用默认的回复逻辑。全部的回复逻辑将由您的代码来实现。
       </Text>
-      <Switch
-        isChecked={config.usePlugin}
-        onChange={() => {
-          handleUpdateConfig({ usePlugin: !config.usePlugin });
-        }}
-      >
-        启用自定义代码
-      </Switch>
+
+      <HStack>
+        <Switch
+          isChecked={config.usePlugin}
+          onChange={() => {
+            handleUpdateConfig({ usePlugin: !config.usePlugin });
+          }}
+        >
+          启用自定义代码
+        </Switch>
+        <Button
+          onClick={handleCheckPlugin}
+          colorScheme="green"
+          size="sm"
+          ml={4}
+        >
+          测试插件
+        </Button>
+      </HStack>
       {config.usePlugin && (
         <>
           <Box width="100%" height="400px">
@@ -230,8 +300,13 @@ const PluginSettings = ({
               重置代码
             </Button>
 
-            <Button onClick={handleExportCode} colorScheme="teal">
-              校验代码
+            <Button
+              onClick={() => {
+                setIsOpenMessageModal(true);
+              }}
+              colorScheme="teal"
+            >
+              配置测试用例
             </Button>
 
             <Button onClick={handleExportCode} colorScheme="blue">
@@ -275,6 +350,11 @@ const PluginSettings = ({
           </AlertDialog>
         </>
       )}
+
+      <MessageModal
+        isOpen={isOpenMessageModal}
+        onClose={() => setIsOpenMessageModal(false)}
+      />
     </VStack>
   );
 };

@@ -6,6 +6,7 @@ import { MessageService } from './messageService';
 import PluginService from './pluginService';
 import { ConfigController } from '../controllers/configController';
 import { MessageController } from '../controllers/messageController';
+import { Instance } from '../entities/instance';
 
 export class DispatchService {
   private mainWindow: BrowserWindow;
@@ -83,33 +84,23 @@ export class DispatchService {
     }
   }
 
-  public async getTasks(): Promise<any> {
+  public async updateTasks(tasks: Instance[]): Promise<
+    | {
+        task_id: string;
+        env_id: string;
+      }[]
+    | null
+  > {
     try {
-      return await emitAndWait(this.io, 'strategyService-getTasks', {});
-    } catch (error) {
-      console.error('Failed to get tasks', error);
-      return null;
-    }
-  }
-
-  public async addTask(appId: string): Promise<any> {
-    try {
-      return await emitAndWait(this.io, 'strategyService-addTask', {
-        app_id: appId,
+      return await emitAndWait(this.io, 'strategyService-updateTasks', {
+        tasks: tasks.map((task) => ({
+          task_id: task.id,
+          app_id: task.app_id,
+          env_id: task.env_id,
+        })),
       });
     } catch (error) {
       console.error('Failed to add task', error);
-      return null;
-    }
-  }
-
-  public async removeTask(taskId: string): Promise<any> {
-    try {
-      return await emitAndWait(this.io, 'strategyService-removeTask', {
-        task_id: taskId,
-      });
-    } catch (error) {
-      console.error('Failed to remove task', error);
       return null;
     }
   }

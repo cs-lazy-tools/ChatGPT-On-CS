@@ -6,8 +6,7 @@ import { useToast } from '../../../hooks/useToast';
 
 const Panels = () => {
   const { toast } = useToast();
-  const { driverSettings, setDriverSettings, selectedPlatforms } =
-    useSystemStore();
+  const { driverSettings, setDriverSettings } = useSystemStore();
 
   useEffect(() => {
     window.electron.ipcRenderer.on('refresh-config', () => {
@@ -16,7 +15,6 @@ const Panels = () => {
       (async () => {
         try {
           await updateRunner({
-            ids: selectedPlatforms,
             is_paused: isPaused,
             is_keyword_match: isKeywordMatch,
             is_use_gpt: isUseGpt,
@@ -61,21 +59,18 @@ const Panels = () => {
       updateRunner({
         is_paused: checked,
         is_keyword_match: driverSettings.isKeywordMatch,
-        ids: selectedPlatforms,
         is_use_gpt: driverSettings.isUseGpt,
       });
     } else if (field === 'isKeywordMatch') {
       updateRunner({
         is_paused: driverSettings.isPaused,
         is_keyword_match: checked,
-        ids: selectedPlatforms,
         is_use_gpt: driverSettings.isUseGpt,
       });
     } else if (field === 'isUseGpt') {
       updateRunner({
         is_paused: driverSettings.isPaused,
         is_keyword_match: driverSettings.isKeywordMatch,
-        ids: selectedPlatforms,
         is_use_gpt: checked,
       });
     }

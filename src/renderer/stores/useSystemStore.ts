@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { Message } from '../services/platform/platform.d';
 
 const electronStore = {
   getItem: (key: string) => {
@@ -19,9 +20,16 @@ const electronStore = {
   },
 };
 
-type State = {
-  selectedPlatforms: string[];
-  setSelectedPlatforms: (ids: string[]) => void;
+// Define message and driver state types
+type MessageState = {
+  context: Record<string, string>;
+  messages: Message[];
+  setContext: (key: string, value: string) => void;
+  addMessage: (message: Message) => void;
+  removeMessage: (index: number) => void;
+};
+
+type DriverState = {
   driverSettings: {
     isPaused: boolean;
     isKeywordMatch: boolean;
@@ -34,16 +42,13 @@ type State = {
   }) => void;
 };
 
+type State = MessageState & DriverState;
+
+// Create Zustand store
 export const useSystemStore = create<State>()(
   devtools(
     persist(
       immer((set) => ({
-        selectedPlatforms: [],
-        setSelectedPlatforms: (ids: string[]) => {
-          set((state) => {
-            state.selectedPlatforms = ids;
-          });
-        },
         driverSettings: {
           isPaused: true,
           isUseGpt: true,
@@ -54,13 +59,28 @@ export const useSystemStore = create<State>()(
             state.driverSettings = settings;
           });
         },
+        context: {},
+        setContext: (key, value) =>
+          set((state) => {
+            state.context[key] = value;
+          }),
+        messages: [],
+        addMessage: (message) =>
+          set((state) => {
+            state.messages.push(message);
+          }),
+        removeMessage: (index) =>
+          set((state) => {
+            state.messages.splice(index, 1);
+          }),
       })),
       {
         name: 'globalStore',
         storage: createJSONStorage(() => electronStore),
         partialize: (state) => ({
-          selectedPlatforms: state.selectedPlatforms,
+          context: state.context,
           driverSettings: state.driverSettings,
+          messages: state.messages,
         }),
       },
     ),

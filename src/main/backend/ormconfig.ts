@@ -9,6 +9,7 @@ import { Config, initConfig } from './entities/config';
 import { initSession } from './entities/session';
 import { initMessage } from './entities/message';
 import { initPlugin } from './entities/plugin';
+import { initInstance } from './entities/instance';
 import { Keyword, initKeyword } from './entities/keyword';
 
 // Get user's documents directory path
@@ -25,7 +26,7 @@ const DB_FILE_PATH = path.join(APP_DIR, 'msg.db');
 
 console.log('DB_FILE_PATH:', DB_FILE_PATH);
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
   dialect: 'sqlite',
   dialectModule: sqlite,
   storage: DB_FILE_PATH,
@@ -38,6 +39,7 @@ initSession(sequelize);
 initMessage(sequelize);
 initKeyword(sequelize);
 initPlugin(sequelize);
+initInstance(sequelize);
 
 // 异步初始化和数据填充函数
 async function initDb(): Promise<void> {

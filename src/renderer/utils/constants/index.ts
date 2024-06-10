@@ -170,3 +170,62 @@ export const ModelList = [
     name: 'Runway Gen-2',
   },
 ];
+
+// 固定会传递的上下文参数
+export const CTX_APP_NAME = 'app_name';
+export const CTX_APP_ID = 'app_id';
+export const CTX_INSTANCE_ID = 'instance_id';
+
+export const CTX_USERNAME = 'username'; // 当前操作的用户名
+export const CTX_PLATFORM = 'platform'; // 当前所在平台
+export const CTX_HAS_NEW_MESSAGE = 'has_new_message'; // 是否有新消息
+export const CTX_HAS_GROUP_MESSAGE = 'has_group_message'; // 是否有群消息
+
+// 电商平台
+export const CTX_CURRENT_GOODS = 'CTX_CURRENT_GOODS'; // 当前商品
+export const CTX_CURRENT_GOODS_ID = 'CTX_CURRENT_GOODS_ID'; // 当前商品 ID
+export const CTX_MEMBER_TAG = 'CTX_MEMBER_TAG'; // 会员标签
+export const CTX_FAN_TAG = 'CTX_FAN_TAG'; // 粉丝标签
+export const CTX_NEW_CUSTOMER_TAG = 'CTX_NEW_CUSTOMER_TAG'; // 新客标签
+
+export const ContextKeys = [
+  CTX_APP_NAME,
+  CTX_APP_ID,
+  CTX_INSTANCE_ID,
+  CTX_USERNAME,
+  CTX_PLATFORM,
+  CTX_HAS_NEW_MESSAGE,
+  CTX_HAS_GROUP_MESSAGE,
+  CTX_CURRENT_GOODS,
+  CTX_CURRENT_GOODS_ID,
+  CTX_MEMBER_TAG,
+  CTX_FAN_TAG,
+  CTX_NEW_CUSTOMER_TAG,
+];
+
+export const MockCtx = new Map<string, string>([
+  [CTX_APP_NAME, 'mock'],
+  [CTX_APP_ID, 'mock_app_id'],
+  [CTX_INSTANCE_ID, 'mock_instance_id'],
+]);
+
+export const MockMessages = [
+  {
+    sender: 'SELF用户',
+    content: '这是一条测试消息',
+    role: 'SELF',
+    type: 'TEXT',
+  },
+  {
+    sender: 'SYSTEM通知',
+    content: '这是一条系统消息',
+    role: 'SYSTEM',
+    type: 'TEXT',
+  },
+  {
+    sender: 'OTHER用户',
+    content: '这是一条测试消息',
+    role: 'OTHER',
+    type: 'TEXT',
+  },
+];

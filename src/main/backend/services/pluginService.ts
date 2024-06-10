@@ -34,6 +34,31 @@ export class PluginService {
     preloadedModules.ms = messageService;
   }
 
+  async checkPlugin(
+    code: string,
+    mockCtx: Context,
+    mockMessages: MessageDTO[],
+  ): Promise<{
+    status: boolean;
+    error: string;
+    message: string;
+  }> {
+    try {
+      const data = await this.executePluginCode(code, mockCtx, mockMessages);
+      return {
+        status: true,
+        error: '',
+        message: data.content,
+      };
+    } catch (error) {
+      return {
+        status: false,
+        error: error instanceof Error ? error.message : String(error),
+        message: 'Plugin execution failed',
+      };
+    }
+  }
+
   /**
    * 执行插件函数
    * @param plugin_id 插件的ID
@@ -52,12 +77,31 @@ export class PluginService {
       throw new Error('Plugin not found');
     }
 
+    const cfg = await this.configController.get(ctx);
+
     // ctx 转成对象
     const ctxObj = Array.from(ctx).reduce((acc: any, [key, value]) => {
       acc[key] = value;
       return acc;
     }, {});
 
+    // 执行插件代码
+    try {
+      return await this.executePluginCode(plugin.code, ctxObj, messages);
+    } catch (error) {
+      return {
+        type: 'TEXT',
+        content:
+          cfg.default_reply || 'An error occurred while executing the plugin',
+      };
+    }
+  }
+
+  private async executePluginCode(
+    code: string,
+    ctx: Context,
+    messages: MessageDTO[],
+  ): Promise<ReplyDTO> {
     try {
       // 创建沙盒环境
       const sandbox = {
@@ -73,9 +117,8 @@ export class PluginService {
       };
 
       // 插件代码包装模板，确保插件函数存在并导出
-      // 取得里面的 main 函数
       const pluginCode = `
-      ${plugin.code}
+      ${code}
       module.exports = main;
       `;
 
@@ -91,9 +134,9 @@ export class PluginService {
       // 检查是否是异步函数，如果是异步函数则等待执行结果
       let data;
       if (sandbox.module.exports.constructor.name === 'AsyncFunction') {
-        data = await sandbox.module.exports(ctxObj, messages);
+        data = await sandbox.module.exports(ctx, messages);
       } else {
-        data = sandbox.module.exports(ctxObj, messages);
+        data = sandbox.module.exports(ctx, messages);
       }
 
       // data 的返回类型应该是 ReplyDTO，这里做个数据校验

@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import http from 'http';
 import { Server } from 'socket.io';
 import { BrowserWindow, shell } from 'electron';
-import './ormconfig';
+import { sequelize } from './ormconfig';
 import { StrategyServiceStatusEnum } from './types';
 import { ConfigController } from './controllers/configController';
 import { MessageController } from './controllers/messageController';
@@ -13,6 +13,7 @@ import { KeywordReplyController } from './controllers/keywordReplyController';
 import { MessageService } from './services/messageService';
 import { DispatchService } from './services/dispatchService';
 import { PluginService } from './services/pluginService';
+import { AppService } from './services/appService';
 
 const configController = new ConfigController();
 const messageController = new MessageController();
@@ -32,6 +33,8 @@ class BKServer {
   private pluginService: PluginService;
 
   private dispatchService: DispatchService;
+
+  private appService: AppService;
 
   constructor(port: number, mainWindow: BrowserWindow) {
     this.app = express();
@@ -72,8 +75,14 @@ class BKServer {
       this.pluginService,
     );
 
+    this.appService = new AppService(this.dispatchService, sequelize);
+
     this.configureSocketIO();
     this.setupRoutes();
+    // 开启定时任务
+    setInterval(() => {
+      this.appService.initTasks();
+    }, 5 * 1000);
   }
 
   private configureSocketIO(): void {
@@ -383,10 +392,31 @@ class BKServer {
       // }
     });
 
+    // 检查插件是否正常工作
+    this.app.post('/api/v1/base/plugin/check', async (req, res) => {
+      try {
+        const { code, message, ctx } = req.body;
+        const ctxMap = new Map(Object.entries(ctx));
+        const resp = await this.pluginService.checkPlugin(
+          code,
+          // @ts-ignore
+          ctxMap,
+          message,
+        );
+        res.json(resp);
+      } catch (error) {
+        res.json({
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
+
     // 获取任务列表
     this.app.get('/api/v1/strategy/tasks', async (req, res) => {
       try {
-        const tasks = await this.dispatchService.getTasks();
+        const tasks = await this.appService.getTasks();
         res.json({
           success: true,
           data: tasks,
@@ -404,7 +434,7 @@ class BKServer {
     this.app.post('/api/v1/strategy/tasks', async (req, res) => {
       const { appId } = req.body;
       try {
-        const task = await this.dispatchService.addTask(String(appId));
+        const task = await this.appService.addTask(String(appId));
         res.json({
           success: true,
           data: task,
@@ -422,7 +452,7 @@ class BKServer {
     this.app.post('/api/v1/strategy/task/remove', async (req, res) => {
       const { taskId } = req.body;
       try {
-        await this.dispatchService.removeTask(String(taskId));
+        await this.appService.removeTask(String(taskId));
         res.json({
           success: true,
         });

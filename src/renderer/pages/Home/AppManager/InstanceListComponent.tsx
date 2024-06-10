@@ -46,7 +46,6 @@ const InstanceListComponent = () => {
   }
 
   if (filteredInstances.length > 0) {
-    console.log('filteredInstances', filteredInstances);
     content = filteredInstances.map((instance, i) => (
       <InstanceCardComponent
         key={i}

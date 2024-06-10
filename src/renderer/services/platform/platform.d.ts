@@ -23,27 +23,19 @@ export interface PlatformSettings {
   active: boolean;
 }
 
+export type RoleType = 'SELF' | 'OTHER' | 'SYSTEM';
+export type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE';
+
 export interface Reply {
-  id?: number;
-  platform_id?: string;
-  keyword: string;
-  reply: string;
-  mode?: 'fuzzy' | 'exact';
-  ptf_name?: string;
+  content: string;
+  type: MessageType;
 }
 
 export interface Message {
-  id: number;
-  username: string;
-  session_id: number;
-  role: string;
-  created_at: string;
+  sender: string;
   content: string;
-  msg_type: string;
-  platform_id: string;
-  platform: string;
-  goods_avatar: string | null;
-  goods_name: string | null;
+  role: RoleType; // assistant, user
+  type: MessageType;
 }
 
 export interface GenericConfig {

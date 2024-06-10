@@ -23,7 +23,6 @@ export async function updatePlatform(ids: string[]) {
 }
 
 export async function updateRunner(data: {
-  ids: string[];
   is_paused: boolean;
   is_keyword_match: boolean;
   is_use_gpt: boolean;
@@ -184,6 +183,27 @@ export async function checkGptHealth(data: {
     message: string;
   }>('/api/v1/base/gpt/health', data, {
     timeout: 5000,
+  });
+  return resp;
+}
+
+export async function checkPluginAvailability({
+  code,
+  ctx,
+  messages,
+}: {
+  code: string;
+  ctx: Record<string, string>;
+  messages: Message[];
+}) {
+  const resp = await POST<{
+    status: boolean;
+    message: string;
+    error: string;
+  }>('/api/v1/base/plugin/check', {
+    code,
+    ctx,
+    messages,
   });
   return resp;
 }

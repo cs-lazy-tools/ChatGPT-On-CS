@@ -21,12 +21,10 @@ interface AppManagerContextType {
   data: { data: App[] } | undefined;
   isLoading: boolean;
   isTasksLoading: boolean;
-
   setSelectedAppId: React.Dispatch<React.SetStateAction<string | null>>;
   selectedAppId: string | null;
   setSelectedInstanceId: React.Dispatch<React.SetStateAction<string | null>>;
   selectedInstanceId: string | null;
-
   filteredInstances: Instance[];
   isSettingsOpen: boolean;
   setIsSettingsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -52,43 +50,33 @@ export const useAppManager = (): AppManagerContextType => {
   return context;
 };
 
-export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
-  const { data, isLoading } = useQuery(['platformList'], getPlatformList);
-  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
-  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(
-    null,
-  );
-  const [isTasksLoading, setIsTasksLoading] = useState(false);
-  const [filteredInstances, setFilteredInstances] = useState<Instance[]>([]);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+const usePlatformList = () => {
+  return useQuery(['platformList'], getPlatformList);
+};
 
-  const {
-    data: taskData,
-    refetch: refetchTasks,
-    isLoading: isTasksLoadingQuery,
-  } = useQuery(['tasks', selectedAppId], () => getTasks(), {
-    enabled: !!selectedAppId,
-  });
+const useTaskList = () => {
+  return useQuery(['tasks'], () => getTasks());
+};
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+/**
+ * 返回全部应用的全部实例
+ */
+const useInstances = () => {
+  const { data: taskData, refetch: refetchTasks } = useTaskList();
   const instances = taskData?.data || [];
 
-  useEffect(() => {
-    window.electron.ipcRenderer.on('refresh-config', () => {
-      (async () => {
-        try {
-          await refetchTasks();
-        } catch (error: any) {
-          console.error(error);
-        }
-      })();
-    });
+  return { instances, refetchTasks };
+};
 
-    return () => {
-      window.electron.ipcRenderer.remove('refresh-config');
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+/**
+ * 返回当前选择的应用下的实例
+ */
+const useFilteredInstances = (
+  data: { data: App[] } | undefined,
+  instances: Instance[],
+  selectedAppId: string | null,
+) => {
+  const [filteredInstances, setFilteredInstances] = useState<Instance[]>([]);
 
   useEffect(() => {
     if (selectedAppId && data) {
@@ -105,9 +93,53 @@ export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
     } else {
       setFilteredInstances([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAppId, instances]);
+  }, [selectedAppId, instances, data]);
 
+  return { filteredInstances, setFilteredInstances };
+};
+
+/**
+ * 监听刷新配置事件，避免因为重启导致的配置不同步
+ */
+const useRefreshConfigListener = (refetchTasks: () => void) => {
+  useEffect(() => {
+    const refreshConfigListener = async () => {
+      try {
+        await refetchTasks();
+      } catch (error: any) {
+        console.error(error);
+      }
+    };
+
+    window.electron.ipcRenderer.on('refresh-config', refreshConfigListener);
+    return () => {
+      window.electron.ipcRenderer.remove('refresh-config');
+    };
+  }, [refetchTasks]);
+};
+
+export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
+  const { data, isLoading } = usePlatformList();
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(
+    null,
+  );
+  const [isTasksLoading, setIsTasksLoading] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const { instances, refetchTasks } = useInstances();
+
+  useRefreshConfigListener(refetchTasks);
+
+  const { filteredInstances, setFilteredInstances } = useFilteredInstances(
+    data,
+    instances,
+    selectedAppId,
+  );
+
+  /**
+   * 根据应用名称搜索实例
+   */
   const handleSearch = useCallback(
     (searchTerm: string) => {
       if (data) {
@@ -124,10 +156,12 @@ export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
         setFilteredInstances(updatedInstances);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [instances],
+    [data, instances, setFilteredInstances],
   );
 
+  /**
+   * 删除任务
+   */
   const handleDelete = useCallback(
     async (taskId: string) => {
       try {
@@ -140,13 +174,18 @@ export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
     [refetchTasks],
   );
 
+  /**
+   * 添加任务
+   */
   const handleAddTask = useCallback(async () => {
     if (selectedAppId) {
       setIsTasksLoading(true);
-      const resp = await addTask(selectedAppId);
-      console.log('resp', resp);
-      await refetchTasks();
-      setIsTasksLoading(false);
+      try {
+        await addTask(selectedAppId);
+        await refetchTasks();
+      } finally {
+        setIsTasksLoading(false);
+      }
     }
   }, [selectedAppId, refetchTasks]);
 
@@ -154,7 +193,7 @@ export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
     () => ({
       data,
       isLoading,
-      isTasksLoading: isTasksLoading || isTasksLoadingQuery,
+      isTasksLoading,
       selectedAppId,
       setSelectedAppId,
       selectedInstanceId,
@@ -171,7 +210,6 @@ export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
       data,
       isLoading,
       isTasksLoading,
-      isTasksLoadingQuery,
       selectedAppId,
       selectedInstanceId,
       filteredInstances,
