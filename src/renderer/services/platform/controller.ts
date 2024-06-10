@@ -71,6 +71,38 @@ export async function exportReplyExcel() {
   return data;
 }
 
+export async function activeConfig({
+  active,
+  appId,
+  instanceId,
+}: {
+  active: boolean;
+  appId?: string;
+  instanceId?: string;
+}) {
+  await POST('/api/v1/base/platform/active', {
+    active,
+    appId,
+    instanceId,
+  });
+}
+
+export async function checkConfigActive({
+  appId,
+  instanceId,
+}: {
+  appId?: string;
+  instanceId?: string;
+}) {
+  const data = await GET<{
+    active: boolean;
+  }>('/api/v1/base/platform/active', {
+    appId,
+    instanceId,
+  });
+  return data;
+}
+
 export async function getConfig({
   type,
   appId,
@@ -83,8 +115,8 @@ export async function getConfig({
   const data = await GET<{
     data: GenericConfig | LLMConfig | AccountConfig | PluginConfig;
   }>('/api/v1/base/setting', {
-    app_id: appId,
-    instance_id: instanceId,
+    appId,
+    instanceId,
     type,
   });
   return data;
@@ -153,4 +185,29 @@ export async function checkGptHealth(data: {
     timeout: 5000,
   });
   return resp;
+}
+
+export async function getTasks(appId: string) {
+  const data = await GET<{
+    data: {
+      [key: string]: any;
+    };
+  }>(`/api/v1/strategy/tasks`, {
+    appId,
+  });
+  return data;
+}
+
+export async function addTask(appId: string) {
+  const data = await POST(`/api/v1/strategy/tasks`, {
+    appId,
+  });
+  return data;
+}
+
+export async function removeTask(taskId: string) {
+  const data = await POST(`/api/v1/strategy/task/remove`, {
+    taskId,
+  });
+  return data;
 }

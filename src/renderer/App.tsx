@@ -11,7 +11,6 @@ import SettingsPage from './pages/Settings';
 import AboutPage from './pages/About';
 import MsgList from './pages/MsgList';
 import FullScreenLoader from './pages/FullScreenLoader';
-import { SettingsProvider } from './components/Settings/SettingsContext';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
 import { BroadcastProvider } from './hooks/useBroadcastContext';
@@ -61,14 +60,7 @@ function App() {
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/msg" element={<MsgList />} />
-                      <Route
-                        path="/settings"
-                        element={
-                          <SettingsProvider>
-                            <SettingsPage />
-                          </SettingsProvider>
-                        }
-                      />
+                      <Route path="/settings" element={<SettingsPage />} />
                       <Route path="/about" element={<AboutPage />} />
                     </Routes>
                   </Box>

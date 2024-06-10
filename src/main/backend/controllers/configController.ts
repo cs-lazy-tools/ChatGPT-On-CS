@@ -75,12 +75,23 @@ export class ConfigController {
       config = await Config.findOne({
         where: { instance_id: instanceId },
       });
+      if (!config) {
+        config = await Config.create({
+          platform_id: appId,
+          instance_id: instanceId,
+        });
+      }
     }
 
     if (!config && appId) {
       config = await Config.findOne({
         where: { platform_id: appId },
       });
+      if (!config) {
+        config = await Config.create({
+          platform_id: appId,
+        });
+      }
     }
 
     if (!config) {
@@ -112,19 +123,21 @@ export class ConfigController {
       config = await Config.findOne({
         where: { instance_id: instanceId },
       });
+
+      return config?.active || false;
     }
 
-    if (!config && appId) {
+    if (appId) {
       config = await Config.findOne({
         where: { platform_id: appId },
       });
+
+      return config?.active || false;
     }
 
-    if (!config) {
-      config = await Config.findOne({
-        where: { global: true },
-      });
-    }
+    config = await Config.findOne({
+      where: { global: true },
+    });
 
     return config?.active || false;
   }
@@ -152,12 +165,25 @@ export class ConfigController {
       config = await Config.findOne({
         where: { instance_id: instanceId },
       });
+
+      if (!config) {
+        config = await Config.create({
+          platform_id: appId,
+          instance_id: instanceId,
+        });
+      }
     }
 
     if (!config && appId) {
       config = await Config.findOne({
         where: { platform_id: appId },
       });
+
+      if (!config) {
+        config = await Config.create({
+          platform_id: appId,
+        });
+      }
     }
 
     if (!config) {
@@ -284,10 +310,7 @@ export class ConfigController {
       let pluginId = null;
       const config = cfg as PluginConfig;
       if (dbConfig.use_plugin) {
-        let plugin = await Plugin.findOne({
-          where: { code: config.pluginCode },
-        });
-
+        let plugin = await Plugin.findByPk(dbConfig.plugin_id);
         if (!plugin) {
           plugin = await Plugin.create({
             code: config.pluginCode,

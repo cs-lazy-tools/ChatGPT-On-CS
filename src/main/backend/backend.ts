@@ -145,6 +145,40 @@ class BKServer {
       }),
     );
 
+    // 取得平台是否激活
+    this.app.get(
+      '/api/v1/base/platform/active',
+      asyncHandler(async (req, res) => {
+        const { appId, instanceId } = req.query;
+        const active = await configController.checkConfigActive({
+          appId: appId ? String(appId) : undefined,
+          instanceId: instanceId ? String(instanceId) : undefined,
+        });
+        res.json({
+          success: true,
+          data: {
+            active,
+          },
+        });
+      }),
+    );
+
+    // 更新平台激活状态
+    this.app.post(
+      '/api/v1/base/platform/active',
+      asyncHandler(async (req, res) => {
+        const { appId, instanceId, active } = req.body;
+        await configController.activeConfig({
+          appId: appId ? String(appId) : undefined,
+          instanceId: instanceId ? String(instanceId) : undefined,
+          active,
+        });
+        res.json({
+          success: true,
+        });
+      }),
+    );
+
     // 获取配置
     this.app.get(
       '/api/v1/base/setting',
@@ -213,69 +247,6 @@ class BKServer {
         }
       }
     });
-
-    // // Endpoint to retrieve configuration settings
-    // this.app.get('/api/v1/base/settings', async (req, res) => {
-    //   try {
-    //     const config = await configController.getConfig();
-    //     // @ts-ignore 兼容性处理
-    //     config.reply_speed = [config.reply_speed, config.reply_random_speed];
-    //     res.json({ success: true, data: config });
-    //   } catch (error) {
-    //     if (error instanceof Error) {
-    //       res.status(500).json({ success: false, message: error.message });
-    //     }
-    //   }
-    // });
-
-    // // Endpoint to update configuration settings
-    // this.app.post('/api/v1/base/settings', async (req, res) => {
-    //   try {
-    //     const cfg = req.body as {
-    //       extract_phone: boolean; // 提取手机号
-    //       extract_product: boolean; // 提取商品
-    //       save_path?: string; // 保存路径
-    //       default_reply?: string; // 默认回复
-    //       reply_speed: number[]; // 回复速度
-    //       context_count: number; // 合并消息数量
-    //       wait_humans_time: number; // 等待人工时间
-    //       gpt_base_url?: string; // GPT服务地址
-    //       gpt_key?: string; // GPT服务key
-    //       gpt_model?: string; // GPT服务模型
-    //       gpt_temperature?: number; // GPT服务温度
-    //       gpt_top_p?: number; // GPT服务top_p
-    //       stream?: boolean; // 是否开启stream
-    //       use_dify?: boolean; // 是否使用 Dify 百宝箱
-    //     };
-
-    //     if (!cfg.reply_speed || cfg.reply_speed.length !== 2) {
-    //       cfg.reply_speed = [0, 0];
-    //     }
-
-    //     await configController.updateConfig(1, {
-    //       extract_phone: cfg.extract_phone,
-    //       extract_product: cfg.extract_product,
-    //       default_reply: cfg.default_reply,
-    //       save_path: cfg.save_path,
-    //       reply_speed: cfg.reply_speed[0],
-    //       reply_random_speed: cfg.reply_speed[1],
-    //       context_count: cfg.context_count,
-    //       wait_humans_time: cfg.wait_humans_time,
-    //       gpt_base_url: cfg.gpt_base_url,
-    //       gpt_key: cfg.gpt_key,
-    //       gpt_model: cfg.gpt_model,
-    //       gpt_temperature: cfg.gpt_temperature,
-    //       gpt_top_p: cfg.gpt_top_p,
-    //       stream: cfg.stream,
-    //       use_dify: cfg.use_dify,
-    //     });
-    //     res.json({ success: true });
-    //   } catch (error) {
-    //     if (error instanceof Error) {
-    //       res.status(500).json({ success: false, message: error.message });
-    //     }
-    //   }
-    // });
 
     this.app.get('/api/v1/reply/list', async (req, res) => {
       const { page = 1, page_size: pageSize, ptf_id: platformId } = req.query;
@@ -391,8 +362,7 @@ class BKServer {
 
     // 检查 GPT 链接是否正常
     this.app.get('/api/v1/base/gpt/health', async (req, res) => {
-      const { base_url: gptBaseUrl, key, use_dify: useDify, model } = req.query;
-
+      // const { base_url: gptBaseUrl, key, use_dify: useDify, model } = req.query;
       // try {
       //   const { status, message } = await this.messageService.checkApiHealth({
       //     baseUrl: String(gptBaseUrl),
@@ -411,6 +381,58 @@ class BKServer {
       //     message: error instanceof Error ? error.message : 'Unknown error',
       //   });
       // }
+    });
+
+    // 获取任务列表
+    this.app.get('/api/v1/strategy/tasks', async (req, res) => {
+      const { appId } = req.query;
+      try {
+        const tasks = await this.dispatchService.getTasks(String(appId));
+        res.json({
+          success: true,
+          data: tasks,
+        });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          success: false,
+          data: null,
+        });
+      }
+    });
+
+    // 添加任务
+    this.app.post('/api/v1/strategy/tasks', async (req, res) => {
+      const { appId } = req.body;
+      try {
+        const task = await this.dispatchService.addTask(String(appId));
+        res.json({
+          success: true,
+          data: task,
+        });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          success: false,
+          data: null,
+        });
+      }
+    });
+
+    // 删除任务
+    this.app.post('/api/v1/strategy/task/remove', async (req, res) => {
+      const { taskId } = req.body;
+      try {
+        await this.dispatchService.removeTask(String(taskId));
+        res.json({
+          success: true,
+        });
+      } catch (error) {
+        console.error(error);
+        res.json({
+          success: false,
+        });
+      }
     });
   }
 

@@ -83,6 +83,39 @@ export class DispatchService {
     }
   }
 
+  public async getTasks(appId: string): Promise<any> {
+    try {
+      return await emitAndWait(this.io, 'strategyService-getTasks', {
+        app_id: appId,
+      });
+    } catch (error) {
+      console.error('Failed to get tasks', error);
+      return null;
+    }
+  }
+
+  public async addTask(appId: string): Promise<any> {
+    try {
+      return await emitAndWait(this.io, 'strategyService-addTask', {
+        app_id: appId,
+      });
+    } catch (error) {
+      console.error('Failed to add task', error);
+      return null;
+    }
+  }
+
+  public async removeTask(taskId: string): Promise<any> {
+    try {
+      return await emitAndWait(this.io, 'strategyService-removeTask', {
+        task_id: taskId,
+      });
+    } catch (error) {
+      console.error('Failed to remove task', error);
+      return null;
+    }
+  }
+
   public async updateStatus(status: StrategyServiceStatusEnum): Promise<any> {
     try {
       return await emitAndWait(this.io, 'strategyService-updateStatus', {

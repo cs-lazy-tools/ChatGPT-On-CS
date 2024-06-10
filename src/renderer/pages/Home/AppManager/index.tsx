@@ -14,6 +14,7 @@ import {
   IconButton,
   Stack,
   Skeleton,
+  useToast,
 } from '@chakra-ui/react';
 import {
   SearchIcon,
@@ -24,12 +25,24 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import defaultPlatformIcon from '../../../../../assets/base/default-platform-icon.png';
 import windowsIcon from '../../../../../assets/base/windows.png';
-import { getPlatformList } from '../../../services/platform/controller';
+import {
+  getPlatformList,
+  getTasks,
+  removeTask,
+  addTask,
+} from '../../../services/platform/controller';
+import SettingsModal from './SettingsModal';
 
 const AppManagerComponent = () => {
+  const toast = useToast();
   const { data, isLoading } = useQuery(['platformList'], getPlatformList);
   const [selectedApp, setSelectedApp] = useState<number | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<number | null>(null);
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(
+    null,
+  );
+
   const [filteredInstances, setFilteredInstances] = useState<
     {
       task_id: string;
@@ -38,6 +51,10 @@ const AppManagerComponent = () => {
       avatar: string;
     }[]
   >([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const openSettings = () => setIsSettingsOpen(true);
+  const closeSettings = () => setIsSettingsOpen(false);
+
   const high = '42vh'; // 调整为合适的全局高度
 
   const instances = [
@@ -59,11 +76,19 @@ const AppManagerComponent = () => {
     { task_id: '3136613131', app_id: 'zhihu', env_id: '2' },
   ];
 
+  const getTasksQuery = useQuery(
+    ['tasks', selectedAppId],
+    () => getTasks(selectedAppId || ''),
+    {
+      enabled: selectedAppId !== null,
+    },
+  );
+
   useEffect(() => {
     if (selectedApp !== null && data && data.data) {
-      const selectedAppId = data.data[selectedApp]?.id;
+      const said = data.data[selectedApp]?.id;
       const matchedInstances = instances.filter(
-        (instance) => instance.app_id === selectedAppId,
+        (instance) => instance.app_id === said,
       );
       setFilteredInstances(
         matchedInstances.map((x) => {
@@ -73,11 +98,35 @@ const AppManagerComponent = () => {
           };
         }),
       );
+
+      const appId = data.data[selectedApp]?.id;
+      setSelectedAppId(appId || null);
+      if (appId) {
+        getTasksQuery.refetch();
+      }
     } else {
       setFilteredInstances([]);
+      setSelectedAppId(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedApp, data]);
+
+  useEffect(() => {
+    if (selectedInstance !== null) {
+      setSelectedInstanceId(
+        filteredInstances[selectedInstance]?.task_id || null,
+      );
+    } else {
+      setSelectedInstanceId(null);
+    }
+  }, [selectedInstance, filteredInstances]);
+
+  useEffect(() => {
+    if (getTasksQuery.data) {
+      console.log('getTasksQuery.data', getTasksQuery.data);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getTasksQuery.data]);
 
   if (isLoading || !data || !data.data) {
     return (
@@ -89,10 +138,32 @@ const AppManagerComponent = () => {
     );
   }
 
-  const handleDelete = (taskId: string) => {
-    setFilteredInstances(
-      filteredInstances.filter((instance) => instance.task_id !== taskId),
-    );
+  const handleDelete = async (taskId: string) => {
+    try {
+      await removeTask(taskId);
+      setFilteredInstances(
+        filteredInstances.filter((instance) => instance.task_id !== taskId),
+      );
+    } catch (error) {
+      const errormsg = error instanceof Error ? error.message : '未知错误';
+      toast({
+        title: '删除失败',
+        position: 'top',
+        description: errormsg,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleAddTask = async () => {
+    if (!selectedAppId) {
+      return;
+    }
+
+    await addTask(selectedAppId);
+    getTasksQuery.refetch();
   };
 
   return (
@@ -194,7 +265,7 @@ const AppManagerComponent = () => {
                       w={4}
                       h={4}
                       icon={<SettingsIcon />}
-                      onClick={() => {}}
+                      onClick={openSettings}
                     />
                   </Tooltip>
                 </Box>
@@ -238,7 +309,7 @@ const AppManagerComponent = () => {
                     fontSize="15px"
                     aria-label="Settings"
                     icon={<SettingsIcon />}
-                    onClick={() => {}}
+                    onClick={openSettings}
                   />
                   <IconButton
                     color="red.500"
@@ -274,11 +345,19 @@ const AppManagerComponent = () => {
                 aria-label="Add instance"
                 variant="unstyled"
                 icon={<AddIcon />}
+                onClick={handleAddTask}
               />
             </Flex>
           </Tooltip>
         </VStack>
       </Box>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+        appId={selectedAppId || undefined}
+        instanceId={selectedInstanceId || undefined}
+      />
     </Flex>
   );
 };
