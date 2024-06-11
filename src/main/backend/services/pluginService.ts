@@ -1,6 +1,4 @@
 import * as vm from 'vm';
-
-// 静态导入预加载模块
 import * as fs from 'fs';
 import * as path from 'path';
 import axios from 'axios';
@@ -12,26 +10,37 @@ interface PreloadedModules {
   [key: string]: any;
 }
 
-// 创建一个包含所有预加载模块的对象
 const preloadedModules: PreloadedModules = {
   fs,
   path,
   axios,
 };
 
+const createSandbox = (contextOverrides: Record<string, any> = {}) => {
+  const baseSandbox = {
+    setTimeout,
+    setInterval,
+    clearTimeout,
+    clearInterval,
+    console,
+    module,
+    exports,
+    ...contextOverrides,
+  };
+
+  return baseSandbox;
+};
+
 export class PluginService {
   private configController: ConfigController;
-
-  private messageService: MessageService;
 
   constructor(
     configController: ConfigController,
     messageService: MessageService,
   ) {
     this.configController = configController;
-    this.messageService = messageService;
-    preloadedModules.cc = configController;
-    preloadedModules.ms = messageService;
+    preloadedModules.config_srv = configController;
+    preloadedModules.reply_srv = messageService;
   }
 
   async checkPlugin(
@@ -42,36 +51,35 @@ export class PluginService {
     status: boolean;
     error: string;
     message: string;
+    consoleOutput: { level: string; time: string; message: string }[];
   }> {
     try {
-      const data = await this.executePluginCode(code, mockCtx, mockMessages);
+      const { data, consoleOutput } = await this.executePluginCode(
+        code,
+        mockCtx,
+        mockMessages,
+      );
       return {
         status: true,
         error: '',
         message: data.content,
+        consoleOutput,
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         status: false,
         error: error instanceof Error ? error.message : String(error),
         message: 'Plugin execution failed',
+        consoleOutput: error.consoleOutput || [],
       };
     }
   }
 
-  /**
-   * 执行插件函数
-   * @param plugin_id 插件的ID
-   * @param ctx 上下文信息
-   * @param messages 消息数组
-   * @returns 插件函数的执行结果
-   */
   async executePlugin(
     plugin_id: number,
     ctx: Context,
     messages: MessageDTO[],
   ): Promise<ReplyDTO> {
-    // 从配置控制器中获取插件配置
     const plugin = await this.configController.getPluginConfig(plugin_id);
     if (!plugin) {
       throw new Error('Plugin not found');
@@ -85,10 +93,15 @@ export class PluginService {
       return acc;
     }, {});
 
-    // 执行插件代码
     try {
-      return await this.executePluginCode(plugin.code, ctxObj, messages);
+      const { data } = await this.executePluginCode(
+        plugin.code,
+        ctxObj,
+        messages,
+      );
+      return { ...data };
     } catch (error) {
+      console.error('Plugin execution error:', error);
       return {
         type: 'TEXT',
         content:
@@ -97,62 +110,101 @@ export class PluginService {
     }
   }
 
-  private async executePluginCode(
+  async executePluginCode(
     code: string,
     ctx: Context,
     messages: MessageDTO[],
-  ): Promise<ReplyDTO> {
+  ): Promise<{
+    data: ReplyDTO;
+    consoleOutput: { level: string; time: string; message: string }[];
+  }> {
+    const consoleOutput: { level: string; time: string; message: string }[] =
+      [];
+
+    const logMessage = (level: string, ...args: any[]) => {
+      const serialize = (obj: any): string => {
+        if (typeof obj === 'object' && obj !== null) {
+          if (obj instanceof Map) {
+            return `Map(${JSON.stringify(Array.from(obj.entries()))})`;
+          }
+          if (obj instanceof Set) {
+            return `Set(${JSON.stringify(Array.from(obj.values()))})`;
+          }
+          if (obj instanceof Error) {
+            return `Error(${obj.name}: ${obj.message})`;
+          }
+          try {
+            return JSON.stringify(obj);
+          } catch (error) {
+            return '[Unserializable Object]';
+          }
+        }
+        return String(obj);
+      };
+
+      const message = args.map((arg) => serialize(arg)).join(' ');
+
+      consoleOutput.push({
+        level,
+        time: new Date().toISOString(),
+        message,
+      });
+    };
+
+    const customConsole = {
+      log: (...args: any[]) => logMessage('log', ...args),
+      error: (...args: any[]) => logMessage('error', ...args),
+      warn: (...args: any[]) => logMessage('warn', ...args),
+      info: (...args: any[]) => logMessage('info', ...args),
+    };
+
     try {
-      // 创建沙盒环境
-      const sandbox = {
+      const sandbox = createSandbox({
         module: {} as any,
         exports: {},
+        ctx,
+        console: customConsole,
+        messages,
         require: (module: string) => {
-          // 只允许加载预加载的模块
           if (preloadedModules[module]) {
             return preloadedModules[module];
           }
           throw new Error(`Module ${module} is not available`);
         },
-      };
+      });
 
-      // 插件代码包装模板，确保插件函数存在并导出
       const pluginCode = `
       ${code}
       module.exports = main;
       `;
 
-      // 创建并运行沙盒上下文
       vm.createContext(sandbox);
       vm.runInContext(pluginCode, sandbox);
 
-      // 检查导出的是否为函数
       if (typeof sandbox.module.exports !== 'function') {
         throw new Error('Plugin does not export a function');
       }
 
-      // 检查是否是异步函数，如果是异步函数则等待执行结果
       let data;
-      if (sandbox.module.exports.constructor.name === 'AsyncFunction') {
+      if (sandbox.module.exports[Symbol.toStringTag] === 'AsyncFunction') {
         data = await sandbox.module.exports(ctx, messages);
       } else {
         data = sandbox.module.exports(ctx, messages);
       }
 
-      // data 的返回类型应该是 ReplyDTO，这里做个数据校验
       if (
         data &&
         typeof data === 'object' &&
         'content' in data &&
         'type' in data
       ) {
-        return data as ReplyDTO;
+        return { data: data as ReplyDTO, consoleOutput };
       }
 
       throw new Error('Plugin function did not return a valid response');
-    } catch (error) {
-      // 捕获并返回错误信息
+    } catch (error: any) {
       console.error('Plugin execution error:', error);
+      error.consoleOutput = consoleOutput;
       throw error;
     }
   }

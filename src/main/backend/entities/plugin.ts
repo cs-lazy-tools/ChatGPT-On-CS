@@ -14,6 +14,8 @@ export class Plugin extends Model {
   declare instance_id: string; // 可能是作用于单个实例的插件
 
   declare created_at: Date;
+
+  declare version: string;
 }
 
 export function initPlugin(sequelize: Sequelize) {
@@ -46,6 +48,11 @@ export function initPlugin(sequelize: Sequelize) {
       },
       created_at: {
         type: DataTypes.DATE,
+        allowNull: true,
+      },
+      version: {
+        type: DataTypes.STRING(255),
+        defaultValue: '1.0.0',
         allowNull: true,
       },
     },

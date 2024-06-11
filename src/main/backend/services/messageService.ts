@@ -59,65 +59,12 @@ export class MessageService {
   }
 
   /**
-   * 获取回复消息
-   * @param ctx
-   * @param messages
-   * @returns
-   */
-  public async getReply(
-    ctx: Context,
-    messages: MessageDTO[],
-  ): Promise<ReplyDTO> {
-    const cfg = await this.configController.get(ctx);
-
-    // 提取消息中的信息
-    await this.extractMsgInfo(cfg, ctx, messages);
-
-    // 先检查是否存在用户的消息
-    const lastUserMsg = messages
-      .slice()
-      .reverse()
-      .find((msg) => msg.role === 'OTHER');
-    if (!lastUserMsg) {
-      return {
-        type: 'TEXT',
-        content: cfg.default_reply,
-      };
-    }
-
-    // 先等待随机时间
-    await new Promise((resolve) => {
-      const min = cfg.reply_speed; // 5 seconds
-      const max = cfg.reply_random_speed + cfg.reply_speed; // 10 seconds
-      const randomTime = min + Math.random() * (max - min);
-      setTimeout(resolve, randomTime * 1000);
-    });
-
-    // 再检查是否使用关键词匹配
-    if (this.isKeywordMatch) {
-      const data = await this.matchKeyword(ctx, lastUserMsg);
-      if (data) return data;
-    }
-
-    // 最后检查是否使用 GPT 生成回复
-    if (this.isUseGptReply) {
-      const data = await this.getLLMResponse(cfg, ctx, messages);
-      if (data) return data;
-    }
-
-    return {
-      type: 'TEXT',
-      content: cfg.default_reply,
-    };
-  }
-
-  /**
    * 匹配关键词
    * @param ctx
    * @param message
    * @returns
    */
-  private async matchKeyword(
+  public async matchKeyword(
     ctx: Context,
     message: MessageDTO,
   ): Promise<ReplyDTO | null> {
@@ -167,7 +114,7 @@ export class MessageService {
    * @param messages
    * @returns
    */
-  private async getLLMResponse(
+  public async getLLMResponse(
     cfg: Config,
     ctx: Context,
     messages: MessageDTO[],
@@ -262,7 +209,11 @@ export class MessageService {
    * @param messages
    * @returns
    */
-  async extractMsgInfo(cfg: Config, ctx: Context, messages: MessageDTO[]) {
+  public async extractMsgInfo(
+    cfg: Config,
+    ctx: Context,
+    messages: MessageDTO[],
+  ) {
     if (!cfg.extract_phone && !cfg.extract_product) return;
     if (cfg.save_path === '') return;
 

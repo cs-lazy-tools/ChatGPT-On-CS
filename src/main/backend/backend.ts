@@ -395,13 +395,13 @@ class BKServer {
     // 检查插件是否正常工作
     this.app.post('/api/v1/base/plugin/check', async (req, res) => {
       try {
-        const { code, message, ctx } = req.body;
+        const { code, messages, ctx } = req.body;
         const ctxMap = new Map(Object.entries(ctx));
         const resp = await this.pluginService.checkPlugin(
           code,
           // @ts-ignore
           ctxMap,
-          message,
+          messages,
         );
         res.json(resp);
       } catch (error) {

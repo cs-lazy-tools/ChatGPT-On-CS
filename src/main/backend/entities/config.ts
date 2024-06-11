@@ -43,6 +43,8 @@ export class Config extends Model {
   declare model: string;
 
   declare activation_code: string;
+
+  declare version: string;
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -138,6 +140,11 @@ export function initConfig(sequelize: Sequelize) {
       },
       activation_code: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      version: {
+        type: DataTypes.STRING(255),
+        defaultValue: '1.0.0',
         allowNull: true,
       },
     },

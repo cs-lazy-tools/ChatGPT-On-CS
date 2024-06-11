@@ -7,6 +7,7 @@ import PluginService from './pluginService';
 import { ConfigController } from '../controllers/configController';
 import { MessageController } from '../controllers/messageController';
 import { Instance } from '../entities/instance';
+import { PluginDefaultRunCode } from '../constants';
 
 export class DispatchService {
   private mainWindow: BrowserWindow;
@@ -58,10 +59,19 @@ export class DispatchService {
 
       // 检查是否使用插件
       const cfg = await this.configController.get(ctxMap);
+      await this.messageService.extractMsgInfo(cfg, ctxMap, messages);
       if (cfg.use_plugin && cfg.plugin_id) {
-        reply = this.pluginService.executePlugin(cfg.plugin_id, ctx, messages);
+        reply = await this.pluginService.executePlugin(
+          cfg.plugin_id,
+          ctx,
+          messages,
+        );
       } else {
-        reply = await this.messageService.getReply(ctxMap, messages);
+        reply = await this.pluginService.executePluginCode(
+          PluginDefaultRunCode,
+          ctxMap,
+          messages,
+        );
       }
 
       callback(reply);
