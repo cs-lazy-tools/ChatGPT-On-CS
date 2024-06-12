@@ -5,3 +5,4 @@ export {
   type ChatCompletionCreateParamsStreaming,
   Completions,
 } from './completions';
+export { Chat } from './chat';

@@ -4,7 +4,6 @@ import {
   FormLabel,
   Select,
   Input,
-  InputLeftAddon,
   Highlight,
   InputGroup,
   InputRightElement,
@@ -16,7 +15,11 @@ import {
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { getConfig, updateConfig } from '../../services/platform/controller';
+import {
+  getConfig,
+  updateConfig,
+  checkGptHealth,
+} from '../../services/platform/controller';
 import { LLMConfig } from '../../services/platform/platform.d';
 import { ModelList, LLMTypeList } from '../../utils/constants';
 
@@ -56,7 +59,14 @@ const LLMSettings = ({
     },
   );
 
-  const [config, setConfig] = useState<LLMConfig | null>(null);
+  const [config, setConfig] = useState<LLMConfig>({
+    appId: '',
+    instanceId: '',
+    llmType: '',
+    model: '',
+    baseUrl: '',
+    key: '',
+  });
 
   useEffect(() => {
     if (data) {
@@ -66,14 +76,13 @@ const LLMSettings = ({
   }, [data]);
 
   const handleUpdateConfig = async (newConfig: Partial<LLMConfig>) => {
-    if (!config) return;
     const updatedConfig = { ...config, ...newConfig };
     setConfig(updatedConfig);
     try {
       await updateConfig({
         appId,
         instanceId,
-        type: 'generic',
+        type: 'llm',
         cfg: updatedConfig,
       });
     } catch (error) {
@@ -98,7 +107,37 @@ const LLMSettings = ({
     handleUpdateConfig({ baseUrl: value });
   };
 
-  if (isLoading || !data || !config) {
+  const handleCheckHealth = async () => {
+    try {
+      if (!config) return;
+      const resp = await checkGptHealth(config);
+      if (!resp.status) {
+        throw new Error(resp.message);
+      }
+
+      toast({
+        title: '连接成功',
+        position: 'top',
+        description: 'GPT 连接成功',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      const errormsg =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      toast({
+        title: '连接失败',
+        position: 'top',
+        description: errormsg,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  if (isLoading) {
     return (
       <Stack>
         <Skeleton height="20px" />
@@ -156,14 +195,20 @@ const LLMSettings = ({
               API 地址设置（尾部需要加上 /v1）
             </Highlight>
 
-            <Button size="sm" colorScheme="blue" ml="4" loadingText="检查中">
+            <Button
+              size="sm"
+              colorScheme="blue"
+              ml="4"
+              loadingText="检查中"
+              onClick={handleCheckHealth}
+            >
               检查连接
             </Button>
           </FormLabel>
           <InputGroup size="sm">
-            <InputLeftAddon>http(s)://</InputLeftAddon>
             <Input
               id="gptAddress"
+              value={config.baseUrl}
               placeholder="输入站点地址"
               onChange={handleBaseURLChange}
             />
@@ -178,6 +223,7 @@ const LLMSettings = ({
               pr="4.5rem"
               type={show ? 'text' : 'password'}
               placeholder="Enter password"
+              value={config.key}
               onChange={(e) => handleUpdateConfig({ key: e.target.value })}
             />
             <InputRightElement width="4.5rem">

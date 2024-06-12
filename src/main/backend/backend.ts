@@ -370,26 +370,18 @@ class BKServer {
     });
 
     // 检查 GPT 链接是否正常
-    this.app.get('/api/v1/base/gpt/health', async (req, res) => {
-      // const { base_url: gptBaseUrl, key, use_dify: useDify, model } = req.query;
-      // try {
-      //   const { status, message } = await this.messageService.checkApiHealth({
-      //     baseUrl: String(gptBaseUrl),
-      //     apiKey: String(key),
-      //     useDify: dify,
-      //     model: String(model),
-      //   });
-      //   res.json({
-      //     status,
-      //     message,
-      //   });
-      // } catch (error) {
-      //   console.error(error);
-      //   res.json({
-      //     status: false,
-      //     message: error instanceof Error ? error.message : 'Unknown error',
-      //   });
-      // }
+    this.app.post('/api/v1/base/gpt/health', async (req, res) => {
+      const { cfg } = req.body;
+      try {
+        const resp = await this.messageService.checkGptHealth(cfg);
+        res.json(resp);
+      } catch (error) {
+        console.error(error);
+        res.json({
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
     });
 
     // 检查插件是否正常工作

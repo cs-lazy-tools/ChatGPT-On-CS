@@ -54,6 +54,7 @@ export class ModelsPage extends Page<Model> {
       };
     });
 
+    // @ts-ignore
     super(client, response, { data, object: 'list' }, options);
   }
 }

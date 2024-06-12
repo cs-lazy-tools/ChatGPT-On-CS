@@ -26,117 +26,87 @@ export class Completions extends APIResource {
     const response: Response = await this._client.post(path, {
       ...options,
       body: body as unknown as Record<string, unknown>,
+      // 响应内容被包裹了一层，需要解构并转换为 OpenAI 的格式
+      // 设置 __binaryResponse 为 true， 是为了让 client 返回原始的 response
+      stream: false,
+      __binaryResponse: true,
+    });
+    const controller = new AbortController();
+
+    options?.signal?.addEventListener('abort', () => {
+      controller.abort();
     });
 
     if (stream) {
-      const controller = new AbortController();
-
-      options?.signal?.addEventListener('abort', () => {
-        controller.abort();
-      });
-
-      return this.afterSSEResponse(response, controller);
-    }
-  }
-
-  private async afterSSEResponse(
-    response: Response,
-    controller: AbortController,
-  ): Promise<Stream<OpenAI.ChatCompletionChunk>> {
-    const reader = response.body?.getReader();
-
-    // eslint-disable-next-line func-names
-    const iterator = async function* () {
-      let buffer = '';
-
-      while (true) {
-        // eslint-disable-next-line no-await-in-loop, no-unsafe-optional-chaining
-        const { done, value } = await reader?.read()!;
-        if (done) {
-          break;
-        }
-
-        buffer += new TextDecoder('utf-8').decode(value);
-        const lines = buffer.split('\n');
-
-        for (let i = 0; i < lines.length - 1; i++) {
-          const line = lines[i].trim();
-          if (line === '') continue;
-
-          try {
-            const cleanedLine = line.replace(/^data: /, '').trim();
-            if (cleanedLine.startsWith('{') && cleanedLine.endsWith('}')) {
-              const chunkObj = JSON.parse(
-                cleanedLine,
-              ) as OpenAI.ChatCompletionChunk;
-              yield chunkObj;
-            }
-          } catch (error) {
-            console.error('Error parsing JSON:', error);
-          }
-        }
-
-        buffer = lines[lines.length - 1];
-      }
-    };
-
-    controller.signal.addEventListener('abort', () => {
-      reader?.cancel();
-    });
-
-    return new Stream(iterator, controller);
-  }
-
-  protected async afterResponse(
-    model: string,
-    response: Response,
-  ): Promise<OpenAI.ChatCompletion> {
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Request failed with status ${response.status}: ${errorText}`,
+      // return this.afterSSEResponse(response, controller);
+      return Completions.fromOpenAIStream(
+        'your-model-id',
+        Stream.fromSSEResponse(response, controller),
+        controller,
       );
     }
 
-    const controller = new AbortController();
+    return this.afterResponse(
+      Completions.fromOpenAIStream(
+        'your-model-id',
+        Stream.fromSSEResponse(response, controller),
+        controller,
+      ),
+    );
+  }
 
-    const stream = await this.afterSSEResponse(response, controller);
-
-    const chunks: OpenAI.ChatCompletionChunk[] = [];
+  protected async afterResponse(
+    stream: Stream<OpenAI.ChatCompletionChunk>,
+  ): Promise<OpenAI.ChatCompletion> {
+    const choices: OpenAI.ChatCompletion.Choice[] = [];
+    const id = `chatcmpl-${Date.now()}`;
+    const created = Math.floor(Date.now() / 1000);
+    const model = 'your-model-id';
+    let system_fingerprint: string | undefined;
 
     // eslint-disable-next-line no-restricted-syntax
     for await (const chunk of stream) {
-      chunks.push(chunk);
+      if (chunk.choices) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const choice of chunk.choices) {
+          if (choice.delta?.content) {
+            if (choices[choice.index]) {
+              choices[choice.index].message.content += choice.delta.content;
+            } else {
+              choices[choice.index] = {
+                index: choice.index,
+                message: {
+                  content: choice.delta.content,
+                  role: 'assistant',
+                },
+                logprobs: null,
+                finish_reason: 'length',
+              };
+            }
+          }
+          if (choice.finish_reason) {
+            choices[choice.index].finish_reason = choice.finish_reason;
+          }
+        }
+      }
+      if (chunk.system_fingerprint) {
+        system_fingerprint = chunk.system_fingerprint;
+      }
     }
 
-    // 将收集到的chunks合并成一个ChatCompletion对象
-    const chatCompletion: OpenAI.ChatCompletion = this.mergeChunks(chunks);
-
-    return chatCompletion;
-  }
-
-  private mergeChunks(
-    chunks: OpenAI.ChatCompletionChunk[],
-  ): OpenAI.ChatCompletion {
-    // 根据需要合并 chunks 成 ChatCompletion
-    // 这里假设 OpenAI.ChatCompletion 与 OpenAI.ChatCompletionChunk 结构相似
-    const merged: OpenAI.ChatCompletion = {
-      id: chunks[0].id,
-      created: chunks[0].created,
-      model: chunks[0].model,
-      choices: chunks.flatMap((chunk) => chunk.choices),
-      usage: chunks.reduce(
-        (acc, chunk) => {
-          acc.prompt_tokens += chunk.usage.prompt_tokens;
-          acc.completion_tokens += chunk.usage.completion_tokens;
-          acc.total_tokens += chunk.usage.total_tokens;
-          return acc;
-        },
-        { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-      ),
+    return {
+      id,
+      choices,
+      created,
+      model,
+      object: 'chat.completion',
+      system_fingerprint,
+      usage: {
+        completion_tokens: 0,
+        prompt_tokens: 0,
+        total_tokens: 0,
+      },
     };
-
-    return merged;
   }
 
   protected buildCreateBody(params: ChatCompletionCreateParams) {
@@ -149,11 +119,76 @@ export class Completions extends APIResource {
       .join('\n')}\n'''\n\n这是我的最新问题:\n${lastMessage.content}`;
 
     return {
+      inputs: {},
       query: queryString,
       user: 'apiuser',
+      conversation_id: '',
       auto_generate_name: false,
       response_mode: 'streaming',
     };
+  }
+
+  static fromOpenAIStream(
+    model: string,
+    stream: Stream<any>,
+    controller: AbortController,
+  ): Stream<OpenAI.ChatCompletionChunk> {
+    async function* iterator(): AsyncIterator<
+      OpenAI.ChatCompletionChunk,
+      any,
+      undefined
+    > {
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const chunk of stream) {
+        // chunk = {
+        //   event: "message",
+        //   conversation_id: "8681e2d5-3f39-4f29-bb6d-5fca10a17ef8",
+        //   message_id: "a09c1271-8f9d-4f28-8f3e-27930232f9f1",
+        //   created_at: 1718175273,
+        //   task_id: "bfbd3174-d014-4b81-86df-0f958f685ae1",
+        //   id: "a09c1271-8f9d-4f28-8f3e-27930232f9f1",
+        //   answer: "Good",
+        // }
+
+        // 结束的 chunk
+        // end_chunk = {"event": "message_end", "conversation_id": "e7ea9f43-13e5-4562-90a4-33348141319b", "message_id": "d8059e9a-2932-4425-ba87-ae71dba8d3bf", "created_at": 1718175370, "task_id": "f7f050f5-b58f-45e6-9ab3-7d21f1ef1d9e", "id": "d8059e9a-2932-4425-ba87-ae71dba8d3bf", "metadata": {"usage": {"prompt_tokens": 17, "prompt_unit_price": "0.001", "prompt_price_unit": "0.001", "prompt_price": "0.0000170", "completion_tokens": 12, "completion_unit_price": "0.002", "completion_price_unit": "0.001", "completion_price": "0.0000240", "total_tokens": 29, "total_price": "0.0000410", "currency": "USD", "latency": 0.6319410030264407}}}
+
+        const choice: OpenAI.ChatCompletionChunk.Choice = {
+          index: 0,
+          delta: {
+            role: 'assistant',
+            content: chunk.answer,
+          },
+          finish_reason: null,
+        };
+
+        if (chunk.event === 'message_end') {
+          choice.finish_reason = 'stop';
+        }
+
+        // const usage = {
+        //   completion_tokens: 0,
+        //   prompt_tokens: 0,
+        //   total_tokens: 0,
+        // };
+
+        // if (chunk.metadata?.usage) {
+        //   usage.completion_tokens = chunk.metadata.usage.completion_tokens;
+        //   usage.prompt_tokens = chunk.metadata.usage.prompt_tokens;
+        //   usage.total_tokens = chunk.metadata.usage.total_tokens;
+        // }
+
+        yield {
+          id: chunk.id,
+          model,
+          choices: [choice],
+          created: chunk.created_at,
+          object: 'chat.completion.chunk',
+        };
+      }
+    }
+
+    return new Stream(iterator, controller);
   }
 }
 
@@ -194,6 +229,11 @@ export namespace Chat {
 export namespace DifyChat {
   export interface GenerateContentResponse {
     event: 'message' | 'agent_message';
+    conversation_id: string;
+    message_id: string;
+    created_at: number;
+    task_id: string;
+    id: string;
     answer: string;
   }
 }

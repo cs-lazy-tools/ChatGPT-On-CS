@@ -172,18 +172,19 @@ export async function getMessageList({
   return data;
 }
 
-export async function checkGptHealth(data: {
-  base_url: string;
-  key: string;
-  model: string;
-  use_dify: boolean;
-}) {
-  const resp = await GET<{
+export async function checkGptHealth(cfg: LLMConfig) {
+  const resp = await POST<{
     status: boolean;
     message: string;
-  }>('/api/v1/base/gpt/health', data, {
-    timeout: 5000,
-  });
+  }>(
+    '/api/v1/base/gpt/health',
+    {
+      cfg,
+    },
+    {
+      timeout: 5000,
+    },
+  );
   return resp;
 }
 

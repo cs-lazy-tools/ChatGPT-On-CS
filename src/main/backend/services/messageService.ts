@@ -1,7 +1,13 @@
 import fs from 'fs/promises';
 import { ConfigController } from '../controllers/configController';
 import { KeywordReplyController } from '../controllers/keywordReplyController';
-import { MessageDTO, ReplyDTO, Context, MessageType } from '../types';
+import {
+  MessageDTO,
+  ReplyDTO,
+  Context,
+  MessageType,
+  LLMConfig,
+} from '../types';
 import { Config } from '../entities/config';
 
 import {
@@ -34,7 +40,18 @@ export class MessageService {
 
   private autoReplyController: KeywordReplyController;
 
-  private llmClientMap: Map<string, any>;
+  private llmClientMap: Map<
+    string,
+    | ErnieAI
+    | GeminiAI
+    | HunYuanAI
+    | MinimaxAI
+    | OpenAI
+    | QWenAI
+    | SparkAI
+    | VYroAI
+    | DifyAI
+  >;
 
   constructor(
     configService: ConfigController,
@@ -108,6 +125,51 @@ export class MessageService {
   }
 
   /**
+   * 检查 LLM 是否可用
+   */
+  public async checkGptHealth(cfg: LLMConfig) {
+    const llmClient = this.createLLMClient(cfg, cfg.llmType);
+    // 尝试使用它回复 Hi 来检查是否可用
+    if ('chat' in llmClient) {
+      try {
+        // @ts-ignore
+        const response = await llmClient.chat.completions.create({
+          model: cfg.model,
+          messages: [
+            {
+              role: 'user',
+              content: 'Hi',
+            },
+          ],
+          stream: true,
+        });
+
+        const chunks = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for await (const chunk of response) {
+          chunks.push(chunk.choices[0]?.delta?.content || '');
+        }
+
+        return {
+          status: true,
+          message: chunks.join(''),
+        };
+      } catch (error) {
+        console.error(`Error in getLLMResponse: ${error}`);
+        return {
+          status: false,
+          message: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }
+
+    return {
+      status: false,
+      message: '该模型的 LLM 不可用',
+    };
+  }
+
+  /**
    * 获取 GPT 回复
    * @param cfg
    * @param ctx
@@ -130,26 +192,30 @@ export class MessageService {
       this.llmClientMap.set(llm_name, llmClient);
     }
 
-    // 使用 completions 方法生成回复
-    try {
-      const response = await llmClient.chat.completions.create({
-        model: cfg.model,
-        messages: this.toLLMMessages(ctx, messages),
-        stream: true,
-      });
+    // 检查 llmClient 是否存在 completions 方法
+    // const chatCompletion = await client.chat.completions.create
+    if ('chat' in llmClient) {
+      try {
+        // @ts-ignore
+        const response = await llmClient.chat.completions.create({
+          model: cfg.model,
+          messages: this.toLLMMessages(ctx, messages),
+          stream: true,
+        });
 
-      const chunks = [];
-      // eslint-disable-next-line no-restricted-syntax
-      for await (const chunk of response) {
-        chunks.push(chunk.choices[0]?.delta?.content || '');
+        const chunks = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for await (const chunk of response) {
+          chunks.push(chunk.choices[0]?.delta?.content || '');
+        }
+
+        return {
+          type: 'TEXT',
+          content: chunks.join(''),
+        };
+      } catch (error) {
+        console.error(`Error in getLLMResponse: ${error}`);
       }
-
-      return {
-        type: 'TEXT',
-        content: chunks.join(''),
-      };
-    } catch (error) {
-      console.error(`Error in getLLMResponse: ${error}`);
     }
 
     return null;
@@ -161,9 +227,19 @@ export class MessageService {
    * @param llmName
    * @returns
    */
-  private createLLMClient(cfg: Config, llmName: string) {
-    const { key: apiKey, base_url: baseURL } = cfg;
-    const options = { apiKey, baseURL };
+  private createLLMClient(cfg: LLMConfig | Config, llmName: string) {
+    let key;
+    let baseUrl;
+
+    if ('baseUrl' in cfg) {
+      key = cfg.key;
+      baseUrl = cfg.baseUrl;
+    } else {
+      key = cfg.key;
+      baseUrl = cfg.base_url;
+    }
+
+    const options = { apiKey: key, baseURL: baseUrl };
 
     if (llmName === 'ernie') {
       return new ErnieAI(options);

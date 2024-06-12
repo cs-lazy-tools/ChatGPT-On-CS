@@ -66,11 +66,11 @@ Authorization: Bearer fastgpt-3xgXbDwBHcb7ii9gBDM583kDHxYKEbG6eaHWAWjNPaFc1vaQB0
 
 POST https://api.dify.ai/v1/chat-messages
 content-type: application/json
-Authorization: Bearer app-5uPNxwQ6Q8bU6FzO3WZ72tqV
+authorization: Bearer app-5uPNxwQ6Q8bU6FzO3WZ72tqV
 
 {
     "inputs": {},
-    "response_mode": "blocking",
+    "response_mode": "streaming",
     "user": "apiuser",
     "query": "Who won the world series in 2020?"
 }

@@ -315,6 +315,10 @@ export class ConfigController {
           plugin = await Plugin.create({
             code: config.pluginCode,
           });
+        } else {
+          await plugin.update({
+            code: config.pluginCode,
+          });
         }
 
         pluginId = plugin.id;

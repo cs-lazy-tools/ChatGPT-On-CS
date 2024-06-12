@@ -48,17 +48,20 @@ export class DifyAI extends APIClient {
 
   completions = new API.Completions(this);
 
+  chat = new API.Chat(this);
+
   protected override defaultHeaders(opts: FinalRequestOptions): Headers {
     return {
       ...super.defaultHeaders(opts),
       ...this._options.defaultHeaders,
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json',
     };
   }
 
   protected override defaultQuery(): DefaultQuery | undefined {
     return {
       ...this._options.defaultQuery,
-      key: this.apiKey,
     };
   }
 }
