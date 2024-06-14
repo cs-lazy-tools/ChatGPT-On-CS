@@ -9,7 +9,6 @@ import {
 import Store from 'electron-store';
 import os from 'os';
 import path from 'path';
-import { setCron } from './system/cron';
 import type BackendServiceManager from './system/backend';
 import { getBrowserVersionFromOS } from './system/chrome';
 
@@ -91,22 +90,6 @@ const setupIpcHandlers = (
       body: message,
     };
     new Notification(notification).show();
-  });
-
-  // 每隔 5 秒执行一次
-  setCron('*/5 * * * * *', () => {
-    mainWindow.webContents.send('refresh-config');
-  });
-
-  // 每隔 5 秒执行一次检查后端服务是否健康
-  setCron('*/5 * * * * *', async () => {
-    if (!bsm) {
-      console.error('BackendServiceManager not found');
-      return;
-    }
-
-    const isHealthy = await bsm.check_health();
-    mainWindow.webContents.send('check-health', isHealthy);
   });
 };
 

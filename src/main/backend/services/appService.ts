@@ -60,6 +60,12 @@ export class AppService {
           throw new Error('Failed to update tasks');
         }
 
+        // 遍历 result 检查，判断是否存在 error 属性
+        const err_target = result.find((task) => task.error);
+        if (err_target) {
+          throw new Error(err_target.error);
+        }
+
         const target = result.find(
           (task) => task.task_id === String(instance.id),
         );

@@ -1,6 +1,5 @@
 import { spawn, exec } from 'child_process';
 import { createServer } from 'net';
-import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { getTempPath } from '../utils';
@@ -124,18 +123,6 @@ class BackendServiceManager {
         });
       });
     });
-  }
-
-  async check_health() {
-    // 发送 HTTP 请求检查服务是否健康
-    try {
-      const {
-        data: { data },
-      } = await axios.get(`http://127.0.0.1:${this.port}/api/v1/base/health`);
-      return data;
-    } catch (error) {
-      return false;
-    }
   }
 
   stop() {

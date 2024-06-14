@@ -25,7 +25,7 @@ export class DispatchService {
   constructor(
     mainWindow: BrowserWindow,
     io: socketIo.Server,
-    configService: ConfigController,
+    configController: ConfigController,
     messageService: MessageService,
     messageController: MessageController,
     pluginService: PluginService,
@@ -34,17 +34,28 @@ export class DispatchService {
     this.mainWindow = mainWindow;
     this.messageService = messageService;
     this.messageController = messageController;
-    this.configController = configService;
+    this.configController = configController;
     this.pluginService = pluginService;
   }
 
   public registerHandlers(socket: socketIo.Socket): void {
-    socket.on('messageService-broadcast', (msg: any, callback) => {
-      const { event_id: eventId, message } = msg;
-      this.receiveBroadcast(msg);
+    socket.on('messageService-broadcast', async (msg: any, callback) => {
+      const { event, data } = msg;
+      if (event === 'mouse_move') {
+        const change = await this.configController.moveMouseHandler();
+        if (change) {
+          this.receiveBroadcast({
+            event: 'has_paused',
+            data: {},
+          });
+        }
+      } else {
+        this.receiveBroadcast(msg);
+      }
+
       callback({
-        event_id: eventId,
-        event_type: message,
+        event,
+        data,
       });
     });
 
@@ -60,18 +71,27 @@ export class DispatchService {
       // 检查是否使用插件
       const cfg = await this.configController.get(ctxMap);
       await this.messageService.extractMsgInfo(cfg, ctxMap, messages);
-      if (cfg.use_plugin && cfg.plugin_id) {
-        reply = await this.pluginService.executePlugin(
-          cfg.plugin_id,
-          ctx,
-          messages,
-        );
-      } else {
-        reply = await this.pluginService.executePluginCode(
-          PluginDefaultRunCode,
-          ctxMap,
-          messages,
-        );
+
+      try {
+        if (cfg.use_plugin && cfg.plugin_id) {
+          reply = await this.pluginService.executePlugin(
+            cfg.plugin_id,
+            ctx,
+            messages,
+          );
+        } else {
+          reply = await this.pluginService.executePluginCode(
+            PluginDefaultRunCode,
+            ctxMap,
+            messages,
+          );
+        }
+      } catch (error) {
+        console.error('Failed to execute plugin', error);
+        reply = {
+          content: cfg.default_reply || 'Failed to execute plugin',
+          type: 'TEXT',
+        };
       }
 
       callback(reply);
@@ -94,10 +114,43 @@ export class DispatchService {
     }
   }
 
+  public async syncConfig(): Promise<boolean> {
+    try {
+      const cfg = await this.configController.getConfigByType({
+        appId: undefined,
+        instanceId: undefined,
+        type: 'driver',
+      });
+
+      if (!cfg) {
+        return false;
+      }
+
+      let hasPaused = false;
+      if ('hasPaused' in cfg) {
+        hasPaused = cfg.hasPaused || false;
+      }
+
+      await emitAndWait(this.io, 'strategyService-updateStatus', {
+        status: hasPaused
+          ? StrategyServiceStatusEnum.STOPPED
+          : StrategyServiceStatusEnum.RUNNING,
+      });
+
+      const instances = await Instance.findAll();
+      await this.updateTasks(instances);
+      return true;
+    } catch (error) {
+      console.error('Failed to sync config', error);
+      return false;
+    }
+  }
+
   public async updateTasks(tasks: Instance[]): Promise<
     | {
         task_id: string;
         env_id: string;
+        error?: string;
       }[]
     | null
   > {

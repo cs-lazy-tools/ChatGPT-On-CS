@@ -104,9 +104,6 @@ dependencies:
   node-cron:
     specifier: ^3.0.3
     version: 3.0.3
-  node-fetch:
-    specifier: 2.6.7
-    version: 2.6.7
   openai:
     specifier: ^4.38.3
     version: 4.38.5

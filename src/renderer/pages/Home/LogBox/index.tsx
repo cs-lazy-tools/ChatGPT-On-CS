@@ -21,7 +21,7 @@ const LogBox = () => {
 
   useEffect(() => {
     const unregister = registerEventHandler((message) => {
-      if (message.message === 'log_show') {
+      if (message.event === 'log_show') {
         if (message.data) {
           const log = message.data as {
             time: string;

@@ -70,3 +70,10 @@ export interface PluginConfig {
   usePlugin: boolean;
   pluginCode: string;
 }
+
+export interface DriverConfig {
+  hasPaused: boolean;
+  hasKeywordMatch: boolean;
+  hasUseGpt: boolean;
+  hasMouseClose: boolean;
+}

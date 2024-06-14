@@ -41,6 +41,7 @@ export class Completions extends APIResource {
       // return this.afterSSEResponse(response, controller);
       return Completions.fromOpenAIStream(
         'your-model-id',
+        // @ts-ignore
         Stream.fromSSEResponse(response, controller),
         controller,
       );
@@ -49,6 +50,7 @@ export class Completions extends APIResource {
     return this.afterResponse(
       Completions.fromOpenAIStream(
         'your-model-id',
+        // @ts-ignore
         Stream.fromSSEResponse(response, controller),
         controller,
       ),

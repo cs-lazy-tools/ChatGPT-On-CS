@@ -185,6 +185,10 @@ export class PluginService {
         throw new Error('Plugin does not export a function');
       }
 
+      if (!messages || messages.length === 0) {
+        throw new Error('No messages provided to the plugin');
+      }
+
       let data;
       if (sandbox.module.exports[Symbol.toStringTag] === 'AsyncFunction') {
         data = await sandbox.module.exports(ctx, messages);

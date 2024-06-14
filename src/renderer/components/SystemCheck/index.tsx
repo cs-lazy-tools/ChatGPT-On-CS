@@ -19,7 +19,6 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useWebSocketContext } from '../../hooks/useBroadcastContext';
-import { useSystemStore } from '../../stores/useSystemStore';
 
 const SystemCheck = () => {
   const [humanTaskMsg, setHumanTaskMsg] = useState<string>('');
@@ -27,13 +26,12 @@ const SystemCheck = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const cancelRef = React.useRef<any>();
   const { registerEventHandler } = useWebSocketContext();
-  const { setDriverSettings, driverSettings } = useSystemStore();
 
   useEffect(() => {
     const unregister = registerEventHandler((message) => {
-      if (message.message === 'chrome_download') {
+      if (message.event === 'chrome_download') {
         setIsModalOpen(true);
-      } else if (message.message === 'human_task') {
+      } else if (message.event === 'human_task') {
         if (!message.data) {
           return;
         }
@@ -43,11 +41,6 @@ const SystemCheck = () => {
           '警告',
           '有需要人工处理的消息，请手动处理，注意处理完成后请取消暂停勾选。',
         );
-
-        setDriverSettings({
-          ...driverSettings,
-          isPaused: true,
-        });
 
         const data = message.data as {
           message: string;

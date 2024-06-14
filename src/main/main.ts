@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import setupIpcHandlers from './ipcHandlers';
+import setupCron from './cron';
 import BackendServiceManager from './system/backend';
 import Server from './backend/backend';
 
@@ -114,6 +115,7 @@ const createWindow = async () => {
   }
 
   setupIpcHandlers(mainWindow, backendServiceManager);
+  setupCron(mainWindow, backendServiceManager);
 
   const server = new Server(backendServiceManager.getPort(), mainWindow);
   // 启动服务器

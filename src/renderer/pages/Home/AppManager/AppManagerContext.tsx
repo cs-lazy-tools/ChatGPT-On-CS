@@ -181,7 +181,11 @@ export const AppManagerProvider = ({ children }: AppManagerProviderProps) => {
     if (selectedAppId) {
       setIsTasksLoading(true);
       try {
-        await addTask(selectedAppId);
+        const { error } = await addTask(selectedAppId);
+        if (error) {
+          throw new Error(error);
+        }
+
         await refetchTasks();
       } finally {
         setIsTasksLoading(false);

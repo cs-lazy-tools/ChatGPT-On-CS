@@ -45,6 +45,14 @@ export class Config extends Model {
   declare activation_code: string;
 
   declare version: string;
+
+  declare has_paused: boolean;
+
+  declare has_keyword_match: boolean;
+
+  declare has_use_gpt: boolean;
+
+  declare has_mouse_close: boolean; // 鼠标移动时是否自动关闭
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -111,6 +119,7 @@ export function initConfig(sequelize: Sequelize) {
       default_reply: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: '当前消息有点多，我稍后再回复你',
       },
       context_count: {
         type: DataTypes.FLOAT,
@@ -145,6 +154,26 @@ export function initConfig(sequelize: Sequelize) {
       version: {
         type: DataTypes.STRING(255),
         defaultValue: '1.0.0',
+        allowNull: true,
+      },
+      has_paused: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: true,
+      },
+      has_keyword_match: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: true,
+      },
+      has_use_gpt: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: true,
+      },
+      has_mouse_close: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
         allowNull: true,
       },
     },

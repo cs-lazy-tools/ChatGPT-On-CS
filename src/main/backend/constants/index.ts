@@ -109,13 +109,13 @@ async function main(ctx, messages) {
   });
 
   // 再检查是否使用关键词匹配
-  if (rp.isKeywordMatch) {
+  if (cfg.has_keyword_match) {
     const data = await rp.matchKeyword(ctx, lastUserMsg);
     if (data) return data;
   }
 
   // 最后检查是否使用 GPT 生成回复
-  if (rp.isUseGptReply) {
+  if (cfg.has_use_gpt) {
     const data = await rp.getLLMResponse(cfg, ctx, messages);
     if (data) return data;
   }

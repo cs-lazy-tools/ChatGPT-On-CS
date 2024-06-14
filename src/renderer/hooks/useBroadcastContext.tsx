@@ -9,9 +9,8 @@ import React, {
 
 // 定义 Broadcast 消息类型
 interface BroadcastMessage {
-  message: string;
   data: any;
-  event_id: string;
+  event: string;
 }
 
 // 定义上下文类型
@@ -44,6 +43,7 @@ export const BroadcastProvider = ({ children }: { children: ReactNode }) => {
 
   window.electron.ipcRenderer.on('broadcast', (msg) => {
     const message = msg as BroadcastMessage;
+    console.log('Received broadcast', message);
     eventHandlers.forEach((handler) => handler(message));
   });
 

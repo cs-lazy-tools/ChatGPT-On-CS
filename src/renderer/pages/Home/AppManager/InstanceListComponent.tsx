@@ -7,6 +7,7 @@ import {
   IconButton,
   Tooltip,
   Spinner,
+  useToast,
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import InstanceCardComponent from './InstanceCardComponent';
@@ -26,12 +27,28 @@ const InstanceListComponent = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentAppId, setCurrentAppId] = useState(selectedAppId);
+  const toast = useToast();
 
   useEffect(() => {
     console.log('selectedAppId', selectedAppId, filteredInstances);
     setCurrentAppId(selectedAppId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAppId]);
+
+  const handleAddTaskWrapper = async () => {
+    try {
+      await handleAddTask();
+    } catch (error) {
+      toast({
+        title: '添加失败',
+        description: (error as Error).message || '未知错误',
+        position: 'top',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   let content;
 
@@ -83,7 +100,7 @@ const InstanceListComponent = () => {
               p={3}
               justify="center"
               cursor="pointer"
-              onClick={handleAddTask}
+              onClick={handleAddTaskWrapper}
               _hover={{ bg: 'gray.200' }}
             >
               <IconButton

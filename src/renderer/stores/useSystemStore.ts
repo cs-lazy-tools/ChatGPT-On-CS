@@ -29,36 +29,13 @@ type MessageState = {
   removeMessage: (index: number) => void;
 };
 
-type DriverState = {
-  driverSettings: {
-    isPaused: boolean;
-    isKeywordMatch: boolean;
-    isUseGpt: boolean;
-  };
-  setDriverSettings: (settings: {
-    isPaused: boolean;
-    isKeywordMatch: boolean;
-    isUseGpt: boolean;
-  }) => void;
-};
-
-type State = MessageState & DriverState;
+type State = MessageState;
 
 // Create Zustand store
 export const useSystemStore = create<State>()(
   devtools(
     persist(
       immer((set) => ({
-        driverSettings: {
-          isPaused: true,
-          isUseGpt: true,
-          isKeywordMatch: true,
-        },
-        setDriverSettings: (settings) => {
-          set((state) => {
-            state.driverSettings = settings;
-          });
-        },
         context: {},
         setContext: (key, value) =>
           set((state) => {
@@ -79,7 +56,6 @@ export const useSystemStore = create<State>()(
         storage: createJSONStorage(() => electronStore),
         partialize: (state) => ({
           context: state.context,
-          driverSettings: state.driverSettings,
           messages: state.messages,
         }),
       },

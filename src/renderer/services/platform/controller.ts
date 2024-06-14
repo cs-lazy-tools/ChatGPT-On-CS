@@ -6,6 +6,7 @@ import {
   LLMConfig,
   AccountConfig,
   PluginConfig,
+  DriverConfig,
   Message,
 } from './platform';
 import { GET, POST } from '../common/api/request';
@@ -20,14 +21,6 @@ export async function getPlatformList() {
 
 export async function updatePlatform(ids: string[]) {
   await POST('/api/v1/base/platform', ids);
-}
-
-export async function updateRunner(data: {
-  is_paused: boolean;
-  is_keyword_match: boolean;
-  is_use_gpt: boolean;
-}) {
-  await POST('/api/v1/base/runner', data);
 }
 
 export async function getReplyList({
@@ -113,7 +106,12 @@ export async function getConfig({
   instanceId?: string;
 }) {
   const data = await GET<{
-    data: GenericConfig | LLMConfig | AccountConfig | PluginConfig;
+    data:
+      | GenericConfig
+      | LLMConfig
+      | AccountConfig
+      | PluginConfig
+      | DriverConfig;
   }>('/api/v1/base/setting', {
     appId,
     instanceId,
@@ -131,7 +129,7 @@ export async function updateConfig({
   type: string;
   appId?: string;
   instanceId?: string;
-  cfg: GenericConfig | LLMConfig | AccountConfig | PluginConfig;
+  cfg: GenericConfig | LLMConfig | AccountConfig | PluginConfig | DriverConfig;
 }) {
   await POST('/api/v1/base/setting', {
     appId,
@@ -217,7 +215,9 @@ export async function getTasks() {
 }
 
 export async function addTask(appId: string) {
-  const data = await POST(`/api/v1/strategy/tasks`, {
+  const data = await POST<{
+    error?: string;
+  }>(`/api/v1/strategy/tasks`, {
     appId,
   });
   return data;

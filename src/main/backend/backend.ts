@@ -6,7 +6,6 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { BrowserWindow, shell } from 'electron';
 import { sequelize } from './ormconfig';
-import { StrategyServiceStatusEnum } from './types';
 import { ConfigController } from './controllers/configController';
 import { MessageController } from './controllers/messageController';
 import { KeywordReplyController } from './controllers/keywordReplyController';
@@ -196,7 +195,7 @@ class BKServer {
         const data = {
           appId: appId ? String(appId) : undefined,
           instanceId: instanceId ? String(instanceId) : undefined,
-          type: type ? String(type) : 'generic',
+          type: type ? String(type) : ('generic' as any),
         };
 
         const obj = await configController.getConfigByType(data);
@@ -225,30 +224,15 @@ class BKServer {
         };
 
         await configController.updateConfigByType(data);
+        await this.dispatchService.syncConfig();
         res.json({ success: true });
       }),
     );
 
     // Endpoint to update runner status based on incoming configuration
-    this.app.post('/api/v1/base/runner', async (req, res) => {
-      const {
-        is_paused: isPaused,
-        is_keyword_match: isKeywordMatch,
-        is_use_gpt: isUseGptReply,
-      } = req.body;
+    this.app.post('/api/v1/base/sync', async (req, res) => {
       try {
-        if (isPaused) {
-          await this.dispatchService.updateStatus(
-            StrategyServiceStatusEnum.STOPPED,
-          );
-        } else {
-          await this.dispatchService.updateStatus(
-            StrategyServiceStatusEnum.RUNNING,
-          );
-        }
-
-        this.messageService.updateKeywordMatch(isKeywordMatch, isUseGptReply);
-
+        await this.dispatchService.syncConfig();
         res.json({ success: true });
       } catch (error) {
         if (error instanceof Error) {
@@ -432,9 +416,9 @@ class BKServer {
           data: task,
         });
       } catch (error) {
-        console.error(error);
         res.json({
           success: false,
+          error: error instanceof Error ? error.message : String(error),
           data: null,
         });
       }
