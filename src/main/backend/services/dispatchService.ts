@@ -1,6 +1,6 @@
 import socketIo from 'socket.io';
 import { BrowserWindow } from 'electron';
-import { Platform, StrategyServiceStatusEnum } from '../types';
+import { Platform, ReplyDTO, StrategyServiceStatusEnum } from '../types';
 import { emitAndWait } from '../../utils';
 import { MessageService } from './messageService';
 import PluginService from './pluginService';
@@ -60,31 +60,33 @@ export class DispatchService {
     });
 
     socket.on('messageService-getMessages', async (data, callback) => {
-      const { ctx, messages } = data;
+      const { ctx, msgs } = data;
       const ctxMap = new Map<string, string>();
       Object.keys(ctx).forEach((key) => {
         ctxMap.set(key, ctx[key]);
       });
 
-      let reply: any;
+      let reply: ReplyDTO;
 
       // 检查是否使用插件
       const cfg = await this.configController.get(ctxMap);
-      await this.messageService.extractMsgInfo(cfg, ctxMap, messages);
+      await this.messageService.extractMsgInfo(cfg, ctxMap, msgs);
 
       try {
         if (cfg.use_plugin && cfg.plugin_id) {
           reply = await this.pluginService.executePlugin(
             cfg.plugin_id,
             ctx,
-            messages,
+            msgs,
           );
         } else {
-          reply = await this.pluginService.executePluginCode(
+          const reply_data = await this.pluginService.executePluginCode(
             PluginDefaultRunCode,
             ctxMap,
-            messages,
+            msgs,
           );
+
+          reply = reply_data.data;
         }
       } catch (error) {
         console.error('Failed to execute plugin', error);
@@ -97,7 +99,7 @@ export class DispatchService {
       callback(reply);
 
       // 回复后保存消息
-      await this.messageController.saveMessages(ctxMap, reply, messages);
+      await this.messageController.saveMessages(ctxMap, reply, msgs);
     });
   }
 

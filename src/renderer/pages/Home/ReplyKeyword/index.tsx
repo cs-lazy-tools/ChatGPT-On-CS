@@ -29,11 +29,11 @@ import {
   updateReplyExcel,
   exportReplyExcel,
 } from '../../../services/platform/controller';
-import { Reply } from '../../../services/platform/platform';
+import { Keyword } from '../../../services/platform/platform';
 
 const ReplyKeyword = () => {
-  const [keywords, setKeywords] = useState<Reply[]>([]);
-  const [editKeyword, setEditKeyword] = useState<Reply | null>(null);
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
+  const [editKeyword, setEditKeyword] = useState<Keyword | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [updated, setUpdated] = useState(false);
@@ -152,7 +152,7 @@ const ReplyKeyword = () => {
     }
   };
 
-  const handleDoubleClick = (keyword: Reply) => {
+  const handleDoubleClick = (keyword: Keyword) => {
     setEditKeyword(keyword);
     onOpen();
   };
@@ -168,7 +168,7 @@ const ReplyKeyword = () => {
   };
 
   const handleAddKeyword = () => {
-    const newKeyword: Reply = {
+    const newKeyword: Keyword = {
       keyword: '',
       reply: '',
       mode: 'fuzzy',

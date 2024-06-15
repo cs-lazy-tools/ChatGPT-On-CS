@@ -27,10 +27,10 @@ import {
 import MyTextarea from '../../../components/MyTextarea';
 import Markdown from '../../../components/Markdown';
 import MyModal from '../../../components/MyModal';
-import { Reply, App } from '../../../services/platform/platform';
+import { Keyword, App } from '../../../services/platform/platform';
 
 interface EditKeywordProps {
-  editKeyword: Reply | null;
+  editKeyword: Keyword | null;
   isOpen: boolean;
   onClose: () => void;
   handleEdit: () => void;

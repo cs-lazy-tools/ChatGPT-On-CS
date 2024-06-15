@@ -131,12 +131,18 @@ dependencies:
   react-markdown:
     specifier: ^9.0.1
     version: 9.0.1(@types/react@18.3.0)(react@18.3.0)
+  react-paginate:
+    specifier: ^8.2.0
+    version: 8.2.0(react@18.3.0)
   react-router-dom:
     specifier: ^6.16.0
     version: 6.23.0(react-dom@18.3.0)(react@18.3.0)
   react-spinners:
     specifier: ^0.13.8
     version: 0.13.8(react-dom@18.3.0)(react@18.3.0)
+  react-table:
+    specifier: ^7.8.0
+    version: 7.8.0(react@18.3.0)
   react-use-websocket:
     specifier: ^4.8.1
     version: 4.8.1(react-dom@18.3.0)(react@18.3.0)
@@ -232,6 +238,9 @@ devDependencies:
   '@types/react-dom':
     specifier: ^18.2.7
     version: 18.3.0
+  '@types/react-table':
+    specifier: ^7.7.20
+    version: 7.7.20
   '@types/react-test-renderer':
     specifier: ^18.0.1
     version: 18.3.0
@@ -4239,6 +4248,12 @@ packages:
 
   /@types/react-dom@18.3.0:
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
+    dependencies:
+      '@types/react': 18.3.0
+    dev: true
+
+  /@types/react-table@7.7.20:
+    resolution: {integrity: sha512-ahMp4pmjVlnExxNwxyaDrFgmKxSbPwU23sGQw2gJK4EhCvnvmib2s/O/+y1dfV57dXOwpr2plfyBol+vEHbi2w==}
     dependencies:
       '@types/react': 18.3.0
     dev: true
@@ -12422,6 +12437,15 @@ packages:
       - supports-color
     dev: false
 
+  /react-paginate@8.2.0(react@18.3.0):
+    resolution: {integrity: sha512-sJCz1PW+9PNIjUSn919nlcRVuleN2YPoFBOvL+6TPgrH/3lwphqiSOgdrLafLdyLDxsgK+oSgviqacF4hxsDIw==}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.3.0
+    dev: false
+
   /react-refresh@0.14.1:
     resolution: {integrity: sha512-iZiRCtNGY3QYP3pYOSSBOvQmBpQTcJccr/VcK2blpJrpPTUDjeN51mxm5nsrkCzBwsbGUj+TN9q2oPz5E13FLg==}
     engines: {node: '>=0.10.0'}
@@ -12520,6 +12544,14 @@ packages:
       invariant: 2.2.4
       react: 18.3.0
       tslib: 2.6.2
+    dev: false
+
+  /react-table@7.8.0(react@18.3.0):
+    resolution: {integrity: sha512-hNaz4ygkZO4bESeFfnfOft73iBUj8K5oKi1EcSHPAibEydfsX2MyU6Z8KCr3mv3C9Kqqh71U+DhZkFvibbnPbA==}
+    peerDependencies:
+      react: ^16.8.3 || ^17.0.0-0 || ^18.0.0
+    dependencies:
+      react: 18.3.0
     dev: false
 
   /react-test-renderer@18.3.0(react@18.3.0):

@@ -202,6 +202,9 @@ export class PluginService {
         'content' in data &&
         'type' in data
       ) {
+        console.log('Plugin response:', data);
+        console.log('Console output:', consoleOutput);
+
         return { data: data as ReplyDTO, consoleOutput };
       }
 

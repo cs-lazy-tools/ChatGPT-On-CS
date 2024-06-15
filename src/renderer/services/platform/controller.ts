@@ -1,13 +1,15 @@
 import {
   App,
   Instance,
-  Reply,
+  Keyword,
   GenericConfig,
   LLMConfig,
   AccountConfig,
   PluginConfig,
   DriverConfig,
   Message,
+  Session,
+  MessageModel,
 } from './platform';
 import { GET, POST } from '../common/api/request';
 
@@ -34,7 +36,7 @@ export async function getReplyList({
 }) {
   const data = await GET<{
     total: number;
-    data: Reply[];
+    data: Keyword[];
   }>('/api/v1/reply/list', {
     page,
     page_size: pageSize,
@@ -43,11 +45,11 @@ export async function getReplyList({
   return data;
 }
 
-export async function addReplyKeyword(keyword: Reply) {
+export async function addReplyKeyword(keyword: Keyword) {
   await POST('/api/v1/reply/create', keyword);
 }
 
-export async function updateReplyKeyword(keyword: Reply) {
+export async function updateReplyKeyword(keyword: Keyword) {
   await POST('/api/v1/reply/update', keyword);
 }
 
@@ -139,37 +141,6 @@ export async function updateConfig({
   });
 }
 
-export async function getMessageList({
-  page,
-  pageSize,
-  ptfId,
-  keyword,
-  startTime,
-  endTime,
-}: {
-  page: number;
-  pageSize: number;
-  ptfId?: string;
-  keyword?: string;
-  startTime?: string;
-  endTime?: string;
-}) {
-  const data = await GET<{
-    total: number;
-    data: {
-      [key: string]: Message[];
-    };
-  }>('/api/v1/msg/list', {
-    page,
-    page_size: pageSize,
-    platform_id: ptfId,
-    keyword,
-    start_time: startTime,
-    end_time: endTime,
-  });
-  return data;
-}
-
 export async function checkGptHealth(cfg: LLMConfig) {
   const resp = await POST<{
     status: boolean;
@@ -227,5 +198,44 @@ export async function removeTask(taskId: string) {
   const data = await POST(`/api/v1/strategy/task/remove`, {
     taskId,
   });
+  return data;
+}
+
+export async function getSessions({
+  page,
+  pageSize,
+  keyword,
+  platformId,
+}: {
+  page: number;
+  pageSize: number;
+  keyword?: string;
+  platformId?: string;
+}) {
+  const data = await POST<{
+    data: {
+      count: number;
+      rows: Session[];
+    };
+  }>('/api/v1/message/session', {
+    page,
+    pageSize,
+    keyword,
+    platformId,
+  });
+  return data;
+}
+
+export async function getMessages({ sessionId }: { sessionId: number }) {
+  const data = await POST<{
+    data: MessageModel[];
+  }>('/api/v1/message/list', {
+    sessionId,
+  });
+  return data;
+}
+
+export async function exportMessageExcel() {
+  const data = await GET('/api/v1/message/excel');
   return data;
 }

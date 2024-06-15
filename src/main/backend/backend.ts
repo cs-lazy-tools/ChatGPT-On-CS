@@ -14,10 +14,6 @@ import { DispatchService } from './services/dispatchService';
 import { PluginService } from './services/pluginService';
 import { AppService } from './services/appService';
 
-const configController = new ConfigController();
-const messageController = new MessageController();
-const keywordReplyController = new KeywordReplyController();
-
 class BKServer {
   private app: express.Application;
 
@@ -26,6 +22,12 @@ class BKServer {
   private server: http.Server;
 
   private io: Server;
+
+  private configController: ConfigController;
+
+  private messageController: MessageController;
+
+  private keywordReplyController: KeywordReplyController;
 
   private messageService: MessageService;
 
@@ -55,22 +57,23 @@ class BKServer {
       transports: ['websocket'],
     });
 
-    this.messageService = new MessageService(
-      configController,
-      keywordReplyController,
-    );
+    this.configController = new ConfigController();
+    this.messageController = new MessageController();
+    this.keywordReplyController = new KeywordReplyController(port);
+
+    this.messageService = new MessageService(this.keywordReplyController);
 
     this.pluginService = new PluginService(
-      configController,
+      this.configController,
       this.messageService,
     );
 
     this.dispatchService = new DispatchService(
       mainWindow,
       this.io,
-      configController,
+      this.configController,
       this.messageService,
-      messageController,
+      this.messageController,
       this.pluginService,
     );
 
@@ -98,48 +101,51 @@ class BKServer {
   }
 
   private setupRoutes(): void {
-    // 查看消息列表
-    // this.app.get(
-    //   '/api/v1/msg/list',
-    //   asyncHandler(async (req, res) => {
-    //     const {
-    //       page,
-    //       page_size: pageSize,
-    //       platform_id: platformId,
-    //       keyword,
-    //       start_time: startTime,
-    //       end_time: endTime,
-    //     } = req.query;
+    // 查询聊天会话
+    this.app.post(
+      '/api/v1/message/session',
+      asyncHandler(async (req, res) => {
+        const { page, pageSize, keyword, platformId } = req.body;
+        const data = await this.messageController.getSessions({
+          page,
+          pageSize,
+          keyword,
+          platformId,
+        });
 
-    //     const query = {
-    //       page,
-    //       pageSize,
-    //       platformId,
-    //       keyword,
-    //       startTime,
-    //       endTime,
-    //       orderBy: 'messages.created_at desc',
-    //     };
+        res.json({
+          success: true,
+          data,
+        });
+      }),
+    );
 
-    //     const { total, msgs } =
-    //       // @ts-ignore
-    //       await sessionController.listMessagesWithSessions(query);
+    // 查询聊天消息
+    this.app.post(
+      '/api/v1/message/list',
+      asyncHandler(async (req, res) => {
+        const { sessionId } = req.body;
+        const data = await this.messageController.getMessages(sessionId);
+        res.json({
+          success: true,
+          data,
+        });
+      }),
+    );
 
-    //     // group messages
-    //     const groupedMsgs = msgs.reduce((acc: any, msg) => {
-    //       acc[msg.username] = acc[msg.username] || [];
-    //       acc[msg.username].push(msg);
-    //       return acc;
-    //     }, {});
-    //     res.json({
-    //       success: true,
-    //       data: groupedMsgs,
-    //       total,
-    //       page,
-    //       page_size: pageSize,
-    //     });
-    //   }),
-    // );
+    // 导出消息到 Excel
+    this.app.get('/api/v1/message/excel', async (req, res) => {
+      try {
+        const path = await this.messageController.exportExcel();
+        shell.openPath(path);
+        res.json({ success: true, data: path });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
 
     // 获取所有平台
     this.app.get(
@@ -158,7 +164,7 @@ class BKServer {
       '/api/v1/base/platform/active',
       asyncHandler(async (req, res) => {
         const { appId, instanceId } = req.query;
-        const active = await configController.checkConfigActive({
+        const active = await this.configController.checkConfigActive({
           appId: appId ? String(appId) : undefined,
           instanceId: instanceId ? String(instanceId) : undefined,
         });
@@ -176,7 +182,7 @@ class BKServer {
       '/api/v1/base/platform/active',
       asyncHandler(async (req, res) => {
         const { appId, instanceId, active } = req.body;
-        await configController.activeConfig({
+        await this.configController.activeConfig({
           appId: appId ? String(appId) : undefined,
           instanceId: instanceId ? String(instanceId) : undefined,
           active,
@@ -198,8 +204,8 @@ class BKServer {
           type: type ? String(type) : ('generic' as any),
         };
 
-        const obj = await configController.getConfigByType(data);
-        const active = await configController.checkConfigActive(data);
+        const obj = await this.configController.getConfigByType(data);
+        const active = await this.configController.checkConfigActive(data);
 
         res.json({
           success: true,
@@ -223,7 +229,7 @@ class BKServer {
           cfg,
         };
 
-        await configController.updateConfigByType(data);
+        await this.configController.updateConfigByType(data);
         await this.dispatchService.syncConfig();
         res.json({ success: true });
       }),
@@ -250,8 +256,9 @@ class BKServer {
         platformId,
       };
 
-      // @ts-ignore
-      const { total, autoReplies } = await keywordReplyController.list(query);
+      const { total, autoReplies } =
+        // @ts-ignore
+        await this.keywordReplyController.list(query);
 
       const data = autoReplies;
       const ptfs = await this.dispatchService.getAllPlatforms();
@@ -285,7 +292,7 @@ class BKServer {
 
     this.app.post('/api/v1/reply/create', async (req, res) => {
       const { platform_id: platformId, keyword, reply, mode } = req.body;
-      await keywordReplyController.create({
+      await this.keywordReplyController.create({
         mode,
         platform_id: platformId,
         keyword,
@@ -296,7 +303,7 @@ class BKServer {
 
     this.app.post('/api/v1/reply/update', async (req, res) => {
       const { id, platform_id: platformId, keyword, reply, mode } = req.body;
-      await keywordReplyController.update(id, {
+      await this.keywordReplyController.update(id, {
         mode,
         platform_id: platformId,
         keyword,
@@ -307,14 +314,14 @@ class BKServer {
 
     this.app.post('/api/v1/reply/delete', async (req, res) => {
       const { id } = req.body;
-      await keywordReplyController.delete(id);
+      await this.keywordReplyController.delete(id);
       res.json({ success: true });
     });
 
     this.app.post('/api/v1/reply/excel', async (req, res) => {
       const { path } = req.body;
       try {
-        await keywordReplyController.importExcel(path);
+        await this.keywordReplyController.importExcel(path);
         res.json({ success: true });
       } catch (error) {
         // @ts-ignore
@@ -324,12 +331,14 @@ class BKServer {
 
     this.app.get('/api/v1/reply/excel', async (req, res) => {
       try {
-        const path = await keywordReplyController.exportExcel();
+        const path = await this.keywordReplyController.exportExcel();
         shell.openPath(path);
         res.json({ success: true, data: path });
       } catch (error) {
-        // @ts-ignore
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({
+          success: false,
+          message: error instanceof Error ? error.message : String(error),
+        });
       }
     });
 

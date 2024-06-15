@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import { ConfigController } from '../controllers/configController';
 import { KeywordReplyController } from '../controllers/keywordReplyController';
 import {
   MessageDTO,
@@ -32,12 +31,6 @@ import {
 } from '../../gptproxy';
 
 export class MessageService {
-  private isKeywordMatch: boolean;
-
-  private isUseGptReply: boolean;
-
-  private configController: ConfigController;
-
   private autoReplyController: KeywordReplyController;
 
   private llmClientMap: Map<
@@ -53,26 +46,57 @@ export class MessageService {
     | DifyAI
   >;
 
-  constructor(
-    configService: ConfigController,
-    keywordReplyController: KeywordReplyController,
-  ) {
-    this.isKeywordMatch = true;
-    this.isUseGptReply = true;
-    this.configController = configService;
+  constructor(keywordReplyController: KeywordReplyController) {
     this.autoReplyController = keywordReplyController;
 
     this.llmClientMap = new Map();
   }
 
-  /**
-   * 更新关键词匹配和 GPT 回复的状态
-   * @param isKeywordMatch
-   * @param isUseGptReply
-   */
-  public updateKeywordMatch(isKeywordMatch: boolean, isUseGptReply: boolean) {
-    this.isKeywordMatch = isKeywordMatch;
-    this.isUseGptReply = isUseGptReply;
+  public async getDefaultReply(
+    cfg: Config,
+    ctx: Context,
+    messages: MessageDTO[],
+  ) {
+    // 先检查是否存在用户的消息
+    const lastUserMsg = messages
+      .slice()
+      .reverse()
+      .find((msg) => msg.role === 'OTHER');
+
+    const reply = {
+      type: 'TEXT',
+      content: cfg.default_reply || '当前消息有点多，我稍后再回复你',
+    };
+
+    if (!lastUserMsg) {
+      return reply;
+    }
+
+    // 等待随机时间
+    await new Promise((resolve) => {
+      const min = cfg.reply_speed;
+      const max = cfg.reply_random_speed + cfg.reply_speed;
+      const randomTime = min + Math.random() * (max - min);
+      setTimeout(resolve, randomTime * 1000);
+    });
+
+    // 再检查是否使用关键词匹配
+    if (cfg.has_keyword_match) {
+      const data = await this.matchKeyword(ctx, lastUserMsg);
+      if (data && data.content) {
+        return data;
+      }
+    }
+
+    // 最后检查是否使用 GPT 生成回复
+    if (cfg.has_use_gpt) {
+      const data = await this.getLLMResponse(cfg, ctx, messages);
+      if (data && data.content) {
+        return data;
+      }
+    }
+
+    return reply;
   }
 
   /**

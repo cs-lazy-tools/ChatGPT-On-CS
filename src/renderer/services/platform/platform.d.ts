@@ -77,3 +77,31 @@ export interface DriverConfig {
   hasUseGpt: boolean;
   hasMouseClose: boolean;
 }
+
+export interface Session {
+  id: number;
+  platform: string;
+  platform_id: string;
+  instance_id: string;
+  context: string;
+  created_at: Date;
+}
+
+export interface MessageModel {
+  id: number;
+  session_id: number;
+  role: RoleType;
+  content: string;
+  sender: string;
+  type: MessageType;
+  created_at: Date;
+}
+
+export interface Keyword {
+  id?: number;
+  mode?: string;
+  ptf_name?: string;
+  platform_id?: string;
+  keyword: string;
+  reply: string;
+}

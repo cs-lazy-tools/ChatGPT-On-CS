@@ -29,9 +29,9 @@ export function matchKeyword(ptt: string, msg: string): boolean {
   // 合并连续的 '*' 字符为一个 '*'
   pattern = pattern.replace(/\*+/g, '*');
 
-  // 如果模式不包含 '*'，则直接比较是否相等
+  // 如果模式不包含 '*'，则检查是否包含关键词
   if (!pattern.includes('*')) {
-    return pattern === msg;
+    return msg.includes(pattern);
   }
 
   const parts = pattern.split('*');

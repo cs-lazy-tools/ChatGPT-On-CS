@@ -1,11 +1,15 @@
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import { Op } from 'sequelize';
+import axios from 'axios';
 import { Keyword } from '../entities/keyword';
-import { ALL_PLATFORMS } from '../constants';
 import { getTempPath } from '../../utils';
 
 export class KeywordReplyController {
+  constructor(private port: number) {
+    this.port = port;
+  }
+
   async create(autoReplyData: any) {
     return Keyword.create(autoReplyData);
   }
@@ -40,10 +44,19 @@ export class KeywordReplyController {
       throw new Error('文件内容为空');
     }
 
-    const platformMap = ALL_PLATFORMS.reduce((acc: any, platform) => {
-      acc[platform.name] = platform;
-      return acc;
-    }, {});
+    const data = await this.getApps();
+    if (!data) {
+      throw new Error('获取平台信息失败');
+    }
+
+    const ALL_PLATFORMS = data.data;
+    const platformMap: Map<string, string> = ALL_PLATFORMS.reduce(
+      (map, platform) => {
+        map.set(platform.name, platform.id);
+        return map;
+      },
+      new Map<string, string>(),
+    );
 
     const autoReplies: any = [];
 
@@ -55,8 +68,8 @@ export class KeywordReplyController {
         const platform = row.getCell(3).text.trim();
         let platformId = '';
 
-        if (platform && platformMap[platform]) {
-          platformId = platformMap[platform].id;
+        if (platform && platformMap.has(platform)) {
+          platformId = platformMap.get(platform) || '';
         }
 
         autoReplies.push({
@@ -83,6 +96,20 @@ export class KeywordReplyController {
   }
 
   async exportExcel() {
+    const data = await this.getApps();
+    if (!data) {
+      throw new Error('获取平台信息失败');
+    }
+
+    const ALL_PLATFORMS = data.data;
+    const platformMap: Map<string, string> = ALL_PLATFORMS.reduce(
+      (map, platform) => {
+        map.set(platform.id, platform.name);
+        return map;
+      },
+      new Map<string, string>(),
+    );
+
     const autoReplies = await Keyword.findAll();
 
     const workbook = new ExcelJS.Workbook();
@@ -106,7 +133,12 @@ export class KeywordReplyController {
     * 有时候我们希望能有多个随机回答，可以使用 “[or]” 来分隔不同的句子；
     * 使用 “[~]” 表示一个随机符，在拼多多平台等平台，是不允许每次重复一个回答的，所以可以插入一个随机符，以规避这个问题；
     * 可以使用 “[@]” 和 “[/@]” 包裹图片地址，如果支持图片发送的平台则可以直接发送这个文件
-平台：哔哩哔哩、知乎、抖店、抖音、抖音企业号...（参考页面上的名字）`;
+
+可使用的平台名称：${
+      ALL_PLATFORMS.length > 0
+        ? ALL_PLATFORMS.map((platform) => platform.name).join('、')
+        : '暂无平台'
+    }`;
     titleCell.font = { bold: true };
     titleCell.alignment = {
       vertical: 'top',
@@ -117,18 +149,9 @@ export class KeywordReplyController {
 
     worksheet.addRow(['匹配关键词', '回复内容', '平台']);
 
-    const platformMap = ALL_PLATFORMS.reduce((acc: any, platform) => {
-      acc[platform.id] = platform;
-      return acc;
-    });
-
     // 添加数据行
     autoReplies.forEach((autoReply) => {
-      // @ts-ignore
-      const name = platformMap[autoReply.platform_id]
-        ? // @ts-ignore
-          platformMap[autoReply.platform_id].name
-        : '';
+      const name = platformMap.get(autoReply.platform_id) || '';
       worksheet.addRow([autoReply.keyword, autoReply.reply, name]);
     });
 
@@ -197,5 +220,19 @@ export class KeywordReplyController {
       }
       throw error;
     }
+  }
+
+  /**
+   * FIXME: 为了避免依赖注入，这里直接通过网络请求获取所有平台，后续优化
+   * @returns 所有平台
+   */
+  async getApps() {
+    const { data } = await axios.get<{
+      data: {
+        id: string;
+        name: string;
+      }[];
+    }>(`http://127.0.0.1:${this.port}/api/v1/base/platform/all`);
+    return data;
   }
 }

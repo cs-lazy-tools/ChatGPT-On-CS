@@ -9,7 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './pages/Home';
 import SettingsPage from './pages/Settings';
 import AboutPage from './pages/About';
-import MsgList from './pages/MsgList';
+import ChatSessionsTable from './pages/ChatSessionsTable';
 import FullScreenLoader from './pages/FullScreenLoader';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
@@ -59,7 +59,7 @@ function App() {
                   <Box flex="1" mt={{ base: '4rem', md: '5rem' }}>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
-                      <Route path="/msg" element={<MsgList />} />
+                      <Route path="/msg" element={<ChatSessionsTable />} />
                       <Route path="/settings" element={<SettingsPage />} />
                       <Route path="/about" element={<AboutPage />} />
                     </Routes>
