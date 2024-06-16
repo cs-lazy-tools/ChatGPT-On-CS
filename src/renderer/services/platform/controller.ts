@@ -2,6 +2,7 @@ import {
   App,
   Instance,
   Keyword,
+  LogBody,
   GenericConfig,
   LLMConfig,
   AccountConfig,
@@ -170,6 +171,7 @@ export async function checkPluginAvailability({
     status: boolean;
     message: string;
     error: string;
+    consoleOutput: LogBody[];
   }>('/api/v1/base/plugin/check', {
     code,
     ctx,

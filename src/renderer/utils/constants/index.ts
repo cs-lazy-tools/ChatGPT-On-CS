@@ -42,53 +42,8 @@ const rp = require('reply_srv');
  * @returns {Reply} 插件执行结果
  */
 async function main(ctx, messages) {
-  const appId = ctx.get('app_id');
-  const instanceId = ctx.get('instance_id');
-
-  const cfg = cc.get(ctx);
-
-  console.log('插件开始执行....');
-  console.log('当前应用 ID:', appId);
-  console.log('当前客服实例 ID:', instanceId);
-  console.log('当前配置:', ctx, messages);
-
-  // 先检查是否存在用户的消息
-  const lastUserMsg = messages
-    .slice()
-    .reverse()
-    .find((msg) => msg.role === 'OTHER');
-
-  if (!lastUserMsg) {
-    return {
-      type: 'TEXT',
-      content: cfg.default_reply, // 默认回复
-    };
-  }
-
-  // 等待随机时间
-  await new Promise((resolve) => {
-    const min = cfg.reply_speed;
-    const max = cfg.reply_random_speed + cfg.reply_speed;
-    const randomTime = min + Math.random() * (max - min);
-    setTimeout(resolve, randomTime * 1000);
-  });
-
-  // 再检查是否使用关键词匹配
-  if (rp.isKeywordMatch) {
-    const data = await rp.matchKeyword(ctx, lastUserMsg);
-    if (data) return data;
-  }
-
-  // 最后检查是否使用 GPT 生成回复
-  if (rp.isUseGptReply) {
-    const data = await rp.getLLMResponse(cfg, ctx, messages);
-    if (data) return data;
-  }
-
-  return {
-    type: 'TEXT',
-    content: cfg.default_reply,
-  };
+  const cfg = await cc.get(ctx);
+  return await rp.getDefaultReply(cfg, ctx, messages);
 }`;
 
 export const LLMTypeList = [

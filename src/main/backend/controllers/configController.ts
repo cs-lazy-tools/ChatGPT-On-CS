@@ -20,23 +20,23 @@ export class ConfigController {
     const appId = ctx.get(CTX_APP_ID);
     const instanceId = ctx.get(CTX_INSTANCE_ID);
 
-    const instanceConfig = await Config.findOne({
+    let config;
+
+    config = await Config.findOne({
       where: { instance_id: instanceId },
     });
-    if (instanceConfig) {
-      return instanceConfig;
+
+    if (!config && appId) {
+      config = await Config.findOne({
+        where: { platform_id: appId },
+      });
     }
 
-    const appConfig = await Config.findOne({
-      where: { platform_id: appId },
-    });
-    if (appConfig) {
-      return appConfig;
+    if (!config) {
+      config = await Config.findOne({
+        where: { global: true },
+      });
     }
-
-    let config = await Config.findOne({
-      where: { global: true },
-    });
 
     if (!config) {
       config = await Config.create({
@@ -53,6 +53,20 @@ export class ConfigController {
         config.has_paused = globalConfig.has_paused;
         config.has_use_gpt = globalConfig.has_use_gpt;
         config.has_mouse_close = globalConfig.has_mouse_close;
+      }
+
+      // 再检查 key 和 base_url 是否存在，不存在则使用全局配置
+      if (!config.key || !config.base_url) {
+        config.llm_type = globalConfig?.llm_type || 'chatgpt';
+        config.model = globalConfig?.model || 'gpt-3.5-turbo';
+      }
+
+      if (!config.key) {
+        config.key = globalConfig?.key || '';
+      }
+
+      if (!config.base_url) {
+        config.base_url = globalConfig?.base_url || '';
       }
     }
 

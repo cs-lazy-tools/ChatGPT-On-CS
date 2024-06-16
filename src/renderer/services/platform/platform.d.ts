@@ -38,6 +38,12 @@ export interface Message {
   type: MessageType;
 }
 
+export interface LogBody {
+  level: string;
+  time: string;
+  message: string;
+}
+
 export interface GenericConfig {
   appId: string;
   instanceId: string;

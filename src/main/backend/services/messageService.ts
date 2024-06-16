@@ -152,10 +152,10 @@ export class MessageService {
    * 检查 LLM 是否可用
    */
   public async checkGptHealth(cfg: LLMConfig) {
-    const llmClient = this.createLLMClient(cfg, cfg.llmType);
-    // 尝试使用它回复 Hi 来检查是否可用
-    if ('chat' in llmClient) {
-      try {
+    try {
+      const llmClient = this.createLLMClient(cfg, cfg.llmType);
+      // 尝试使用它回复 Hi 来检查是否可用
+      if ('chat' in llmClient) {
         // @ts-ignore
         const response = await llmClient.chat.completions.create({
           model: cfg.model,
@@ -178,13 +178,13 @@ export class MessageService {
           status: true,
           message: chunks.join(''),
         };
-      } catch (error) {
-        console.error(`Error in getLLMResponse: ${error}`);
-        return {
-          status: false,
-          message: error instanceof Error ? error.message : String(error),
-        };
       }
+    } catch (error) {
+      console.error(`Error in getLLMResponse: ${error}`);
+      return {
+        status: false,
+        message: error instanceof Error ? error.message : String(error),
+      };
     }
 
     return {
@@ -212,8 +212,13 @@ export class MessageService {
 
     let llmClient = this.llmClientMap.get(llm_name);
     if (!llmClient) {
-      llmClient = this.createLLMClient(cfg, llm_name);
-      this.llmClientMap.set(llm_name, llmClient);
+      try {
+        llmClient = this.createLLMClient(cfg, llm_name);
+        this.llmClientMap.set(llm_name, llmClient);
+      } catch (error) {
+        console.error(`Error in getLLMResponse: ${error}`);
+        return null;
+      }
     }
 
     // 检查 llmClient 是否存在 completions 方法
@@ -255,6 +260,8 @@ export class MessageService {
     let key;
     let baseUrl;
 
+    console.log('Creating LLM client:', llmName, cfg);
+
     if ('baseUrl' in cfg) {
       key = cfg.key;
       baseUrl = cfg.baseUrl;
@@ -264,6 +271,9 @@ export class MessageService {
     }
 
     const options = { apiKey: key, baseURL: baseUrl };
+    if (!options.baseURL || !options.apiKey) {
+      throw new Error('Missing required API key or base URL');
+    }
 
     if (llmName === 'ernie') {
       return new ErnieAI(options);

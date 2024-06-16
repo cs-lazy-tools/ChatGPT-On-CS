@@ -26,7 +26,7 @@ import {
   updateConfig,
   checkPluginAvailability,
 } from '../../services/platform/controller';
-import { PluginConfig } from '../../services/platform/platform.d';
+import { PluginConfig, LogBody } from '../../services/platform/platform.d';
 import MessageModal from '../MessageModal';
 import { useSystemStore } from '../../stores/useSystemStore';
 
@@ -40,6 +40,7 @@ const PluginSettings = ({
   // TODO: 后面需要把这个参数说明放到文档中
 
   const [code, setCode] = useState<string | undefined>(PluginExampleCode);
+  const [consoleLogs, setConsoleLogs] = useState<LogBody[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isOpenMessageModal, setIsOpenMessageModal] = useState(false);
   const cancelRef = React.useRef<any>();
@@ -152,10 +153,16 @@ const PluginSettings = ({
       provideCompletionItems: () => {
         const suggestions = [
           {
-            label: 'cc.get',
+            label: 'require',
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: 'cc.get(ctx)',
-            documentation: '从上下文中取得当前使用的配置',
+            insertText: 'require()',
+            documentation: '引入模块',
+          },
+          {
+            label: 'console',
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: 'console.log()',
+            documentation: '打印日志',
           },
         ];
         return { suggestions };
@@ -186,6 +193,8 @@ const PluginSettings = ({
         ctx: context,
         messages,
       });
+
+      setConsoleLogs(resp.consoleOutput || []);
 
       if (resp.status) {
         toast({
@@ -264,17 +273,41 @@ const PluginSettings = ({
         >
           启用自定义代码
         </Switch>
-        <Button
-          onClick={handleCheckPlugin}
-          colorScheme="green"
-          size="sm"
-          ml={4}
-        >
-          测试插件
-        </Button>
       </HStack>
       {config.usePlugin && (
         <>
+          <HStack>
+            <Button
+              onClick={() => {
+                handleSaveCode();
+              }}
+              size="sm"
+              colorScheme="orange"
+            >
+              保存代码
+            </Button>
+
+            <Button onClick={handleDefaultCode} colorScheme="red" size="sm">
+              重置代码
+            </Button>
+
+            <Button
+              onClick={() => {
+                setIsOpenMessageModal(true);
+              }}
+              size="sm"
+              colorScheme="teal"
+            >
+              配置测试用例
+            </Button>
+            <Button onClick={handleCheckPlugin} colorScheme="green" size="sm">
+              测试插件
+            </Button>
+            <Button onClick={handleExportCode} colorScheme="blue" size="sm">
+              导出代码
+            </Button>
+          </HStack>
+
           <Box width="100%" height="400px">
             <Editor
               height="100%"
@@ -286,33 +319,23 @@ const PluginSettings = ({
             />
           </Box>
 
-          <HStack>
-            <Button
-              onClick={() => {
-                handleSaveCode();
-              }}
-              colorScheme="orange"
-            >
-              保存代码
-            </Button>
+          <Divider />
 
-            <Button onClick={handleDefaultCode} colorScheme="red">
-              重置代码
-            </Button>
-
-            <Button
-              onClick={() => {
-                setIsOpenMessageModal(true);
-              }}
-              colorScheme="teal"
-            >
-              配置测试用例
-            </Button>
-
-            <Button onClick={handleExportCode} colorScheme="blue">
-              导出代码
-            </Button>
-          </HStack>
+          {/* 展示日志 */}
+          {consoleLogs && consoleLogs.length > 0 && (
+            <>
+              <Text fontSize="1xl" fontWeight="bold">
+                插件执行日志：
+              </Text>
+              <Box height="200px" overflowY="auto">
+                {consoleLogs.map((log, index) => (
+                  <Text key={index}>
+                    {log.level} {log.time} {log.message}
+                  </Text>
+                ))}
+              </Box>
+            </>
+          )}
 
           <AlertDialog
             isOpen={isOpen}

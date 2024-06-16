@@ -43,7 +43,6 @@ export const BroadcastProvider = ({ children }: { children: ReactNode }) => {
 
   window.electron.ipcRenderer.on('broadcast', (msg) => {
     const message = msg as BroadcastMessage;
-    console.log('Received broadcast', message);
     eventHandlers.forEach((handler) => handler(message));
   });
 

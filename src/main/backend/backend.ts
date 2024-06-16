@@ -394,6 +394,7 @@ class BKServer {
           success: false,
           error: error instanceof Error ? error.message : String(error),
           message: error instanceof Error ? error.message : String(error),
+          consoleOutput: [],
         });
       }
     });
