@@ -56,7 +56,7 @@
 
 ## 下载地址
 
-<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.0.5-beta.3/1.0.5-beta.3.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
+<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.1.0-beta.1/1.1.0-beta.1.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
@@ -81,13 +81,13 @@
 - [x] 优化微信平台的回复速度
 - [x] 添加中文路径的支持
 - [x] 支持企业微信外部群聊天功能
-- [ ] 支持自动检测人类操作后自动暂停项目
+- [x] 支持自动检测人类操作后自动暂停项目
 - [ ] 新增 wx 群聊需要使用 @ 机器人才能回复的功能
-- [ ] 支持浏览器多开功能
-- [ ] 支持导出聊天记录到 Excel
+- [x] 支持浏览器多开功能
+- [x] 支持导出聊天记录到 Excel
 - [ ] 支持关键词匹配测试功能
-- [ ] 实现小红书回复后，自动私聊的功能
-- [ ] 支持企业微信自动识别内部群聊
+- [x] 实现小红书回复后，自动私聊的功能
+- [x] 支持企业微信自动识别内部群聊
 - [ ] 支持企业微信自动加人功能
 - [ ] 支持抖音直播平台自动回复功能
 - [ ] 支持拼多多

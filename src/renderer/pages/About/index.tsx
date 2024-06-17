@@ -72,11 +72,15 @@ const AboutPage: React.FC = () => {
 
 * [GitHub](https://github.com/lrhh123/ChatGPT-On-CS)
 * [Gitee](https://gitee.com/alsritter/ChatGPT-On-CS) (国内用户推荐)
+
+## 联系方式
+扫码添加微信小助手，备注 “懒人客服” 即可。
+
+![](https://image.quicktoolset.top/img202406172039969.png)
       `}
         />
       </VStack>
 
-      <br />
       <br />
 
       <Box p={5}>

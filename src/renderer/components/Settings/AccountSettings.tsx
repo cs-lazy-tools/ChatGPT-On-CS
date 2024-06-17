@@ -28,7 +28,7 @@ const AccountSettings = () => {
   const handleActivation = () => {
     // 在这里添加激活逻辑
     if (activationCode && !isExpired) {
-      setActivationStatus('激活成功');
+      setActivationStatus('激活失败');
     } else if (isExpired) {
       setActivationStatus('激活码已过期');
     } else {
@@ -48,7 +48,7 @@ const AccountSettings = () => {
             onChange={(e) => setActivationCode(e.target.value)}
             isDisabled={isExpired}
           />
-          <Text>激活码到期时间: {expiryDate}</Text>
+          {/* <Text>激活码到期时间: {expiryDate}</Text> */}
           <Button
             colorScheme="blue"
             onClick={handleActivation}
