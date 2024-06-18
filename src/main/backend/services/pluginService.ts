@@ -93,18 +93,8 @@ export class PluginService {
 
     const cfg = await this.configController.get(ctx);
 
-    // ctx 转成对象
-    const ctxObj = Array.from(ctx).reduce((acc: any, [key, value]) => {
-      acc[key] = value;
-      return acc;
-    }, {});
-
     try {
-      const { data } = await this.executePluginCode(
-        plugin.code,
-        ctxObj,
-        messages,
-      );
+      const { data } = await this.executePluginCode(plugin.code, ctx, messages);
       return { ...data };
     } catch (error) {
       console.error('Plugin execution error:', error);

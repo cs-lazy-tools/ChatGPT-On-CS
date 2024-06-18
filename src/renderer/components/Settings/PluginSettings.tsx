@@ -110,6 +110,8 @@ const PluginSettings = ({
   };
 
   const handleSaveCode = async (icode?: string) => {
+    console.log('handleSaveCode', icode);
+
     if (!config) return;
     try {
       await updateConfig({
@@ -173,17 +175,6 @@ const PluginSettings = ({
       PluginExtraLib,
       'ts:filename/types.d.ts',
     );
-
-    // Add the save command
-    monaco.editor.addEditorAction({
-      id: 'save',
-      label: 'Save',
-      // eslint-disable-next-line no-bitwise
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
-      run: () => {
-        handleSaveCode();
-      },
-    });
   };
 
   const handleCheckPlugin = async () => {
@@ -256,7 +247,7 @@ const PluginSettings = ({
   return (
     <VStack spacing="4" align="start" width="100%">
       <Text fontSize="1xl" fontWeight="bold">
-        全局插件配置
+        {appId || instanceId ? '' : '全局'}插件配置
       </Text>
       <Divider />
       <Text>
@@ -277,16 +268,6 @@ const PluginSettings = ({
       {config.usePlugin && (
         <>
           <HStack>
-            <Button
-              onClick={() => {
-                handleSaveCode();
-              }}
-              size="sm"
-              colorScheme="orange"
-            >
-              保存代码
-            </Button>
-
             <Button onClick={handleDefaultCode} colorScheme="red" size="sm">
               重置代码
             </Button>
@@ -313,7 +294,10 @@ const PluginSettings = ({
               height="100%"
               defaultLanguage="javascript"
               value={code}
-              onChange={setCode}
+              onChange={(value) => {
+                setCode(value);
+                handleSaveCode(value);
+              }}
               beforeMount={handleEditorWillMount}
               theme="vs-dark"
             />

@@ -53,6 +53,21 @@ export class Config extends Model {
   declare has_use_gpt: boolean;
 
   declare has_mouse_close: boolean; // 鼠标移动时是否自动关闭
+
+  declare has_esc_close: boolean; // 按ESC键是否自动关闭
+}
+
+export async function checkAndAddFields(sequelize: Sequelize) {
+  const tableDescription = await Config.describe();
+
+  // @ts-ignore
+  if (!tableDescription.has_esc_close) {
+    await sequelize.getQueryInterface().addColumn('n_config', 'has_esc_close', {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    });
+  }
 }
 
 export function initConfig(sequelize: Sequelize) {
@@ -176,6 +191,11 @@ export function initConfig(sequelize: Sequelize) {
         defaultValue: true,
         allowNull: true,
       },
+      has_esc_close: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: true,
+      },
     },
     {
       sequelize,
@@ -184,4 +204,6 @@ export function initConfig(sequelize: Sequelize) {
       timestamps: false,
     },
   );
+
+  checkAndAddFields(sequelize);
 }

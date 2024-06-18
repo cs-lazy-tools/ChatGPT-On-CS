@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { debounce } from 'lodash';
 import { Checkbox, Stack, HStack, Tooltip } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '../../../hooks/useToast';
@@ -14,6 +15,7 @@ const Panels = () => {
     hasKeywordMatch: false,
     hasUseGpt: false,
     hasMouseClose: true,
+    hasEscClose: true,
   });
 
   const { data } = useQuery(['config', 'driver'], async () => {
@@ -33,13 +35,15 @@ const Panels = () => {
     }
   });
 
-  useEffect(() => {
-    const unregister = registerEventHandler((message) => {
+  // 使用 useCallback 确保 debounce 函数不会在每次渲染时重建
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedHandler = useCallback(
+    debounce((message) => {
       if (message.event === 'has_paused') {
-        setDriverSettings({
-          ...driverSettings,
+        setDriverSettings((prevSettings) => ({
+          ...prevSettings,
           hasPaused: true,
-        });
+        }));
 
         toast({
           title: '自动回复已暂停',
@@ -49,11 +53,16 @@ const Panels = () => {
           isClosable: true,
         });
       }
-    });
+    }, 2000), // 这里的 300 表示防抖延迟时间（毫秒）
+    [],
+  );
+
+  useEffect(() => {
+    const unregister = registerEventHandler(debouncedHandler);
 
     // 组件卸载时注销事件处理器
     return () => unregister();
-  }, [registerEventHandler]); // eslint-disable-line
+  }, [registerEventHandler, debouncedHandler]); // eslint-disable-line
 
   useEffect(() => {
     if (data) {
@@ -131,7 +140,7 @@ const Panels = () => {
           </Checkbox>
         </HStack>
         <HStack width="full" alignItems="center">
-          <Checkbox
+          {/* <Checkbox
             isChecked={driverSettings.hasMouseClose}
             onChange={(e) =>
               handleUpdateConfig({ hasMouseClose: e.target.checked })
@@ -140,6 +149,14 @@ const Panels = () => {
             <Tooltip label="是否开启鼠标移动时，自动暂停自动客服">
               鼠标移动自动暂停
             </Tooltip>
+          </Checkbox> */}
+          <Checkbox
+            isChecked={driverSettings.hasEscClose}
+            onChange={(e) =>
+              handleUpdateConfig({ hasEscClose: e.target.checked })
+            }
+          >
+            <Tooltip label="当按下 ESC 键时自动暂停">按 ESC 键自动暂停</Tooltip>
           </Checkbox>
         </HStack>
       </Stack>

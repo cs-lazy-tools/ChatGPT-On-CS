@@ -53,6 +53,7 @@ export class ConfigController {
         config.has_paused = globalConfig.has_paused;
         config.has_use_gpt = globalConfig.has_use_gpt;
         config.has_mouse_close = globalConfig.has_mouse_close;
+        config.has_esc_close = globalConfig.has_esc_close;
       }
 
       // 再检查 key 和 base_url 是否存在，不存在则使用全局配置
@@ -272,6 +273,7 @@ export class ConfigController {
         hasKeywordMatch: config?.has_keyword_match || false,
         hasUseGpt: config?.has_use_gpt || false,
         hasMouseClose: config?.has_mouse_close || false,
+        hasEscClose: config?.has_esc_close || false,
       };
     }
 
@@ -390,6 +392,7 @@ export class ConfigController {
         has_keyword_match: config.hasKeywordMatch,
         has_use_gpt: config.hasUseGpt,
         has_mouse_close: config.hasMouseClose,
+        has_esc_close: config.hasEscClose,
       });
     } else {
       const config = cfg as AccountConfig;
@@ -414,6 +417,29 @@ export class ConfigController {
 
     // 检查是否开启了鼠标移动自动暂停功能
     if (dbConfig.has_mouse_close) {
+      if (!dbConfig.has_paused) {
+        await dbConfig.update({
+          has_paused: true,
+        });
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public async escKeyDowHandler(): Promise<boolean> {
+    const dbConfig = await Config.findOne({
+      where: { global: true },
+    });
+
+    if (!dbConfig) {
+      return false;
+    }
+
+    // 检查是否开启了 ESC 键自动暂停功能
+    if (dbConfig.has_esc_close) {
       if (!dbConfig.has_paused) {
         await dbConfig.update({
           has_paused: true,

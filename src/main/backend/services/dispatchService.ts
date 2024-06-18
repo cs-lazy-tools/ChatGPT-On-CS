@@ -49,6 +49,14 @@ export class DispatchService {
             data: {},
           });
         }
+      } else if (event === 'key_esc') {
+        const change = await this.configController.escKeyDowHandler();
+        if (change) {
+          this.receiveBroadcast({
+            event: 'has_paused',
+            data: {},
+          });
+        }
       } else {
         this.receiveBroadcast(msg);
       }
@@ -76,7 +84,7 @@ export class DispatchService {
         if (cfg.use_plugin && cfg.plugin_id) {
           reply = await this.pluginService.executePlugin(
             cfg.plugin_id,
-            ctx,
+            ctxMap,
             msgs,
           );
         } else {

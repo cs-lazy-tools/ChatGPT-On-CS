@@ -76,4 +76,5 @@ export interface DriverConfig {
   hasKeywordMatch: boolean;
   hasUseGpt: boolean;
   hasMouseClose: boolean;
+  hasEscClose: boolean;
 }
