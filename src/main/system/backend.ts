@@ -29,10 +29,10 @@ class BackendServiceManager {
   }
 
   async start() {
-    // if (process.env.NODE_ENV === 'development') {
-    //   this.port = 9999;
-    //   return;
-    // }
+    if (process.env.NODE_ENV === 'development') {
+      this.port = 9999;
+      return;
+    }
 
     // 避免重复启动时端口冲突
     if (!this.port) {

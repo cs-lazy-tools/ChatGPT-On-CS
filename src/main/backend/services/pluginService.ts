@@ -1,6 +1,9 @@
 import * as vm from 'vm';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
+import * as url from 'url';
+import * as crypto from 'crypto';
 import axios from 'axios';
 import { ConfigController } from '../controllers/configController';
 import { MessageDTO, ReplyDTO, Context } from '../types';
@@ -14,6 +17,9 @@ const preloadedModules: PreloadedModules = {
   fs,
   path,
   axios,
+  os,
+  url,
+  crypto,
 };
 
 const createSandbox = (contextOverrides: Record<string, any> = {}) => {
