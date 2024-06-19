@@ -16,8 +16,10 @@ import Panels from './Panels';
 import LogBox from './LogBox';
 
 const HomePage = () => {
+  const currentVersion = window.electron.ipcRenderer.get('get-version');
   useEffect(() => {
-    trackPageView('Home');
+    trackPageView(`Home-${currentVersion}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
