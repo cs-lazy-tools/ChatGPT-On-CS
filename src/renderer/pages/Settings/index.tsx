@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ChakraProvider,
   Flex,
@@ -12,8 +12,13 @@ import AccountSettings from '../../components/Settings/AccountSettings';
 import GeneralSettings from '../../components/Settings/GeneralSettings';
 import LLMSettings from '../../components/Settings/LLMSettings';
 import PluginSettings from '../../components/Settings/PluginSettings';
+import { trackPageView } from '../../services/analytics';
 
 const SettingsPage = () => {
+  useEffect(() => {
+    trackPageView('Settings');
+  }, []);
+
   return (
     <ChakraProvider>
       <Flex direction="column" height="70vh">

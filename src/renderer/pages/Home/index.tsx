@@ -17,7 +17,6 @@ import LogBox from './LogBox';
 
 const HomePage = () => {
   useEffect(() => {
-    // 页面访问埋点
     trackPageView('Home');
   }, []);
 

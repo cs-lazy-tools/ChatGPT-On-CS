@@ -12,6 +12,7 @@ import {
 import { AddIcon } from '@chakra-ui/icons';
 import InstanceCardComponent from './InstanceCardComponent';
 import { useAppManager } from './AppManagerContext';
+import { trackButtonClick } from '../../../services/analytics';
 
 const InstanceListComponent = () => {
   const {
@@ -37,6 +38,7 @@ const InstanceListComponent = () => {
 
   const handleAddTaskWrapper = async () => {
     try {
+      trackButtonClick(`add_task_${selectedAppId || ''}`);
       await handleAddTask();
     } catch (error) {
       toast({

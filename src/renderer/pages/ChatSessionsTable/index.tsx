@@ -39,6 +39,7 @@ import {
   getPlatformList,
   exportMessageExcel,
 } from '../../services/platform/controller';
+import { trackPageView } from '../../services/analytics';
 
 const ChatSessionsTable = () => {
   const toast = useToast();
@@ -56,6 +57,10 @@ const ChatSessionsTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [updated, setUpdated] = useState(false);
   const itemsPerPage = 10; // 每一页显示的条数
+
+  useEffect(() => {
+    trackPageView('ChatSessionsTable');
+  }, []);
 
   useEffect(() => {
     const fetchSessions = async () => {

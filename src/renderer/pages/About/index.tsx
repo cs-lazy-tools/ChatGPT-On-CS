@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -17,6 +17,7 @@ import {
 import PageContainer from '../../components/PageContainer';
 import Markdown from '../../components/Markdown';
 import { getVersionInfo } from '../../services/system/controller';
+import { trackPageView } from '../../services/analytics';
 
 const AboutPage: React.FC = () => {
   const toast = useToast();
@@ -54,6 +55,10 @@ const AboutPage: React.FC = () => {
       window.electron.ipcRenderer.sendMessage('open-url', latestVersion.url);
     }
   };
+
+  useEffect(() => {
+    trackPageView('AboutPage');
+  }, []);
 
   return (
     <PageContainer>
