@@ -9,6 +9,7 @@ import {
   InputRightElement,
   Button,
   VStack,
+  Text,
   useToast,
   Stack,
   Skeleton,
@@ -32,6 +33,7 @@ const LLMSettings = ({
 }) => {
   const toast = useToast();
   const [show, setShow] = useState(false);
+  const [reply, setReply] = useState(''); // 新增一个状态用于展示回复内容
 
   const { data, isLoading } = useQuery(
     ['config', 'llm', appId, instanceId],
@@ -114,6 +116,8 @@ const LLMSettings = ({
       if (!resp.status) {
         throw new Error(resp.message);
       }
+
+      setReply(resp.message); // 设置回复内容
 
       toast({
         title: '连接成功',
@@ -239,6 +243,14 @@ const LLMSettings = ({
             </InputRightElement>
           </InputGroup>
         </FormControl>
+
+        {/* 新增一个展示回复内容的块 */}
+        {reply && (
+          <>
+            <Text>回复内容</Text>
+            <Text>{reply}</Text>
+          </>
+        )}
       </>
     </VStack>
   );

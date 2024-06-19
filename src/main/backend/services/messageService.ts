@@ -306,10 +306,12 @@ export class MessageService {
   toLLMMessages(ctx: Context, messages: MessageDTO[]) {
     // 先过滤 system 消息
     const f_messages = messages.filter((msg) => msg.role !== 'SYSTEM');
-    return f_messages.map((msg) => ({
+    const msgs = f_messages.map((msg) => ({
       role: msg.role === 'SELF' ? 'user' : 'assistant',
       content: msg.content,
     }));
+
+    return msgs;
   }
 
   /**
