@@ -129,7 +129,7 @@ const createWindow = async () => {
       console.error('Error starting server:', err);
     });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(resolveHtmlPath('main.html'));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {

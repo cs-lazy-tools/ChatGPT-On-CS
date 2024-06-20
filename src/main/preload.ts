@@ -21,6 +21,7 @@ export type Channels =
   | 'notification'
   | 'get-browser-version'
   | 'broadcast'
+  | 'open-settings-window'
   | 'get-version';
 
 const electronHandler = {
@@ -67,6 +68,7 @@ const electronHandler = {
     const v = ipcRenderer.sendSync('get-port');
     return v;
   },
+  getArgs: () => process.argv,
 };
 
 export type ElectronHandler = typeof electronHandler;

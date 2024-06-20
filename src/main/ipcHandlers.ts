@@ -11,6 +11,7 @@ import os from 'os';
 import path from 'path';
 import type BackendServiceManager from './system/backend';
 import { getBrowserVersionFromOS } from './system/chrome';
+import { createWindow as createSettingsWindow } from '../settings-main/settings-main';
 
 const store = new Store();
 
@@ -91,6 +92,23 @@ const setupIpcHandlers = (
     };
     new Notification(notification).show();
   });
+
+  ipcMain.on(
+    'open-settings-window',
+    async (event, { appId, instanceId } = {}) => {
+      const args = [];
+
+      if (appId) {
+        args.push(`settings-app-id-${appId}`);
+      }
+
+      if (instanceId) {
+        args.push(`settings-instance-id-${instanceId}`);
+      }
+
+      createSettingsWindow(args);
+    },
+  );
 };
 
 export default setupIpcHandlers;
