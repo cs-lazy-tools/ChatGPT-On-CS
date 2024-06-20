@@ -9,8 +9,8 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 import { SettingsIcon } from '@chakra-ui/icons';
-import defaultPlatformIcon from '../../../../../assets/base/default-platform-icon.png';
-import windowsIcon from '../../../../../assets/base/windows.png';
+import defaultPlatformIcon from '../../../../../../assets/base/default-platform-icon.png';
+import windowsIcon from '../../../../../../assets/base/windows.png';
 
 type AppCardComponentProps = {
   app: {

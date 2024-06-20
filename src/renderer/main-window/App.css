@@ -14,7 +14,7 @@ body {
 
 @font-face {
   font-family: 'zhFont';
-  src: url('../../assets/fonts/庞门正道标题体.ttf') format('truetype');
+  src: url('../../../assets/fonts/庞门正道标题体.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }

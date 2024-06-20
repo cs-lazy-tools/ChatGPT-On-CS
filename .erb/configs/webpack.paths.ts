@@ -6,8 +6,8 @@ const dllPath = path.join(__dirname, '../dll');
 
 const srcPath = path.join(rootPath, 'src');
 const srcMainPath = path.join(srcPath, 'main');
-const srcRendererPath = path.join(srcPath, 'renderer');
-const srcSettingsRendererPath = path.join(srcPath, 'settings-renderer');
+const srcRendererPath = path.join(srcPath, 'renderer/main-window');
+const srcSettingsRendererPath = path.join(srcPath, 'renderer/settings-window');
 
 const releasePath = path.join(rootPath, 'release');
 const appPath = path.join(releasePath, 'app');

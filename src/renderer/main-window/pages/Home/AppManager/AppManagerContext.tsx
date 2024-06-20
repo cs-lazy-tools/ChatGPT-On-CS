@@ -14,7 +14,7 @@ import {
   removeTask,
   addTask,
 } from '../../../services/platform/controller';
-import defaultPlatformIcon from '../../../../../assets/base/default-platform-icon.png';
+import defaultPlatformIcon from '../../../../../../assets/base/default-platform-icon.png';
 import { Instance, App } from '../../../services/platform/platform.d';
 
 interface AppManagerContextType {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Flex, Image, Badge, HStack, IconButton } from '@chakra-ui/react';
 import { SettingsIcon, DeleteIcon } from '@chakra-ui/icons';
-import defaultPlatformIcon from '../../../../../assets/base/default-platform-icon.png';
+import defaultPlatformIcon from '../../../../../../assets/base/default-platform-icon.png';
 
 type InstanceCardComponentProps = {
   instance: {
