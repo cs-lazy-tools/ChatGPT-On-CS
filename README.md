@@ -61,8 +61,8 @@
 如果网络环境导致下载不了，可以使用百度云盘下载：
 
 ```txt
-链接：https://pan.baidu.com/s/1QDrp6c38G7-NIWu_btLCMQ?pwd=6666 
-提取码：6666
+链接：https://pan.baidu.com/s/1PgWOvgMoG6eh5nBIr7R-SA?pwd=6666 
+提取码：6666 
 ```
 
 ## 使用说明
