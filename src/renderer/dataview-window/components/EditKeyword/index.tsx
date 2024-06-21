@@ -2,39 +2,35 @@ import React, { useState, useEffect } from 'react';
 import {
   Button,
   Input,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Stack,
-  Text,
-  Icon,
-  HStack,
-  Box,
-  Switch,
-  Select,
-  IconButton,
-  Tooltip,
-  Flex,
   useToast,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import { FiHelpCircle } from 'react-icons/fi';
-import { AddIcon, DeleteIcon, AttachmentIcon } from '@chakra-ui/icons';
 import {
   getPlatformList,
   addReplyKeyword,
   updateReplyKeyword,
 } from '../../../common/services/platform/controller';
-import MyTextarea from '../../../common/components/MyTextarea';
-import Markdown from '../../../common/components/Markdown';
-import MyModal from '../../../common/components/MyModal';
 import { Keyword, App } from '../../../common/services/platform/platform';
+import GlobalSwitch from './GlobalSwitch';
+import PlatformSelector from './PlatformSelector';
+import KeywordInput from './KeywordInput';
+import KeywordList from './KeywordList';
+import ReplyInput from './ReplyInput';
+import ReplyList from './ReplyList';
 
-interface EditKeywordProps {
-  editKeyword: Keyword | null;
+type EditKeywordProps = {
+  editKeyword: Keyword | undefined | null;
   isOpen: boolean;
   onClose: () => void;
   handleEdit: () => void;
-}
+};
 
 const EditKeyword = ({
   editKeyword,
@@ -192,208 +188,62 @@ const EditKeyword = ({
   };
 
   return (
-    <MyModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={editKeyword?.id ? '编辑关键词' : '新增关键词'}
-    >
-      <ModalBody>
-        <HStack width="full" alignItems="center" my={3}>
-          <Box width="30%">
-            <Flex mt={3}>
-              <Text mr={2} fontSize={'large'} fontWeight={'bold'}>
-                全局关键词
-              </Text>
-              <Tooltip label="该关键词是否面向全部平台，否则请选择一个适用的平台">
-                <Box color={'gray.500'}>
-                  <Icon as={FiHelpCircle} w={6} h={6} />
-                </Box>
-              </Tooltip>
-            </Flex>
-          </Box>
-          <Box width="70%">
-            <Switch
-              isChecked={isGlobal}
-              onChange={() => setIsGlobal(!isGlobal)}
+    <Modal isOpen={isOpen} onClose={onClose} size={'4xl'}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          {editKeyword?.id ? '编辑关键词' : '新增关键词'}
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <GlobalSwitch isGlobal={isGlobal} setIsGlobal={setIsGlobal} />
+          {!isGlobal && (
+            <PlatformSelector
+              ptf={ptf}
+              setPtf={setPtf}
+              platforms={platforms}
+              isLoading={isPlatformsLoading}
             />
-          </Box>
-        </HStack>
-
-        {!isGlobal && (
-          <HStack width="full" alignItems="center" mb={5}>
-            <Box width="30%">
-              <Text>选择平台：</Text>
-            </Box>
-            <Box width="70%">
-              <Select
-                value={ptf || ''}
-                onChange={(e) => setPtf(e.target.value)}
-                isDisabled={isPlatformsLoading}
-              >
-                {platforms?.data.map((platform) => (
-                  <option key={platform.id} value={platform.id}>
-                    {platform.name}
-                  </option>
-                ))}
-              </Select>
-            </Box>
-          </HStack>
-        )}
-
-        <Flex mb="8px" mt="12px">
-          <Text mr={2} fontSize={'large'} fontWeight={'bold'}>
-            关键词设置
-          </Text>
-          <Tooltip label="设置关键词以匹配具体的回复，命中关键词的问题，不会使用 GPT 进行回答">
-            <Box color={'gray.500'}>
-              <Icon as={FiHelpCircle} w={6} h={6} />
-            </Box>
-          </Tooltip>
-        </Flex>
-        <Stack direction="row" mb="4">
-          <Input
-            placeholder="新增关键词"
-            value={newKeyword}
-            onChange={(e) => setNewKeyword(e.target.value)}
+          )}
+          <KeywordInput
+            newKeyword={newKeyword}
+            setNewKeyword={setNewKeyword}
+            handleAddKeyword={handleAddKeyword}
+            startKeyword={startKeyword}
+            setStartKeyword={setStartKeyword}
+            endKeyword={endKeyword}
+            setEndKeyword={setEndKeyword}
+            handleAddFuzzyKeyword={handleAddFuzzyKeyword}
           />
-          <Tooltip label="新增一条关键词，可以使用 * 字符模糊匹配，如果要输入 * 字符，则使用 \* 代替">
-            <Button onClick={handleAddKeyword} colorScheme="green">
-              <AddIcon />
-            </Button>
-          </Tooltip>
-        </Stack>
-        <Stack direction="row" mb="4">
-          <Input
-            placeholder="开始关键词"
-            value={startKeyword}
-            onChange={(e) => setStartKeyword(e.target.value)}
+          <KeywordList
+            keywords={keywords}
+            handleKeywordClick={handleKeywordClick}
+            handleDeleteKeyword={handleDeleteKeyword}
           />
-          <Input
-            placeholder="结束关键词"
-            value={endKeyword}
-            onChange={(e) => setEndKeyword(e.target.value)}
+          <ReplyInput
+            newReply={newReply}
+            setNewReply={setNewReply}
+            handleAddReply={handleAddReply}
+            handleInsertRandomChar={handleInsertRandomChar}
+            handleInsertFile={handleInsertFile}
+            currentPlatform={currentPlatform}
           />
-          <Tooltip label="新增一个范围关键词，如果匹配上了开始关键词和结束关键词，也能匹配成功">
-            <Button onClick={handleAddFuzzyKeyword} colorScheme="green">
-              <AddIcon />
-            </Button>
-          </Tooltip>
-        </Stack>
-
-        <Stack direction="row" spacing={4} wrap="wrap">
-          {keywords.map((keyword, index) => (
-            <Text
-              key={index}
-              p="1"
-              borderRadius="md"
-              borderWidth="1px"
-              cursor="pointer"
-              maxWidth="220px"
-              onClick={() => handleKeywordClick(keyword, index)}
-              style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}
-            >
-              {keyword}
-              <IconButton
-                ml={3}
-                aria-label="Delete keyword"
-                colorScheme="red"
-                icon={<DeleteIcon />}
-                size="xs"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteKeyword(index);
-                }}
-              />
-            </Text>
-          ))}
-        </Stack>
-
-        <Flex mb="8px" mt="22px">
-          <Text mr={2} fontSize={'large'} fontWeight={'bold'}>
-            回复内容
-          </Text>
-          <Tooltip label="添加的多个关键词只要一个匹配上了，将会触发回复，如果有多个回复，将会随机选择一个回复。">
-            <Box color={'gray.500'}>
-              <Icon as={FiHelpCircle} w={6} h={6} />
-            </Box>
-          </Tooltip>
-        </Flex>
-        {currentPlatform && currentPlatform.desc && (
-          <Box>
-            <Markdown content={currentPlatform.desc} />
-          </Box>
-        )}
-
-        <Tooltip label="在拼多多平台等平台，是不允许每次重复一个回答的，所以可以插入一个随机符，以规避这个问题">
-          <Button
-            onClick={handleInsertRandomChar}
-            mt="4"
-            mr={4}
-            colorScheme="teal"
-          >
-            插入随机符
+          <ReplyList
+            replyList={replyList}
+            handleReplyClick={handleReplyClick}
+            handleDeleteReply={handleDeleteReply}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={handleSave}>
+            保存
           </Button>
-        </Tooltip>
-        <Tooltip label="有些无法发送文件或者图片的平台无法使用该文件">
-          <Button
-            leftIcon={<AttachmentIcon />}
-            mt="4"
-            onClick={handleInsertFile}
-            colorScheme="orange"
-          >
-            插入文件
+          <Button variant="ghost" onClick={onClose}>
+            取消
           </Button>
-        </Tooltip>
-
-        <Stack direction="row" mt="4">
-          <MyTextarea
-            mb="4"
-            maxLength={200}
-            placeholder="回复内容"
-            value={newReply}
-            onChange={(e) => setNewReply(e.target.value)}
-          />
-          <Button onClick={handleAddReply} colorScheme="green">
-            <AddIcon />
-          </Button>
-        </Stack>
-        <Stack direction="row" spacing={4} wrap="wrap">
-          {replyList.map((item, index) => (
-            <Text
-              key={index}
-              p="1"
-              borderRadius="md"
-              borderWidth="1px"
-              cursor="pointer"
-              maxWidth="220px"
-              onClick={() => handleReplyClick(item, index)}
-              style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}
-            >
-              {item}
-              <IconButton
-                ml={3}
-                aria-label="Delete reply"
-                icon={<DeleteIcon />}
-                colorScheme="red"
-                size="xs"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteReply(index);
-                }}
-              />
-            </Text>
-          ))}
-        </Stack>
-      </ModalBody>
-      <ModalFooter>
-        <Button colorScheme="blue" mr={3} onClick={handleSave}>
-          保存
-        </Button>
-        <Button variant="ghost" onClick={onClose}>
-          取消
-        </Button>
-      </ModalFooter>
-    </MyModal>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 

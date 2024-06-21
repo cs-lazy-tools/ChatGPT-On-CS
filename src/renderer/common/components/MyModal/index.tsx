@@ -27,6 +27,7 @@ const MyModal = ({
   isCentered,
   w = 'auto',
   maxW = ['90vw', '600px'],
+  style,
   ...props
 }: MyModalProps) => {
   return (

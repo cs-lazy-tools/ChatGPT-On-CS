@@ -6,7 +6,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './pages/Home';
-import ChatSessionsTable from '../dataview-window/components/ChatHistory';
+import ChatSessionsTable from '../dataview-window/components/SessionHistory';
 import FullScreenLoader from './pages/FullScreenLoader';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';

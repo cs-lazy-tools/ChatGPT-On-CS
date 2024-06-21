@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReplyKeyword from './components/ReplyKeyword';
-import ChatHistory from './components/ChatHistory';
+import SessionHistory from './components/SessionHistory';
 import theme from '../common/styles/theme';
 import '../common/App.css';
 
@@ -76,7 +76,7 @@ const App = () => {
                 <Heading as="h3" size="md" mb={4}>
                   历史聊天记录
                 </Heading>
-                <ChatHistory />
+                <SessionHistory />
               </TabPanel>
             </TabPanels>
           </Tabs>
