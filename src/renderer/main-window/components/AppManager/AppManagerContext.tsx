@@ -51,7 +51,27 @@ export const useAppManager = (): AppManagerContextType => {
 };
 
 const usePlatformList = () => {
-  return useQuery(['platformList'], getPlatformList);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const { data, error, refetch, isLoading } = useQuery(
+    ['platformList'],
+    getPlatformList,
+    {
+      retry: false, // 禁用 react-query 内置的重试机制
+    },
+  );
+
+  useEffect(() => {
+    if ((data?.data?.length === 0 || !data) && retryCount < 5) {
+      const timer = setTimeout(() => {
+        setRetryCount(retryCount + 1);
+        refetch();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [data, retryCount, refetch]);
+
+  return { data, isLoading, error, retryCount };
 };
 
 const useTaskList = () => {
