@@ -20,9 +20,9 @@ import {
   getConfig,
   updateConfig,
   checkGptHealth,
-} from '../../services/platform/controller';
-import { LLMConfig } from '../../services/platform/platform.d';
-import { ModelList, LLMTypeList } from '../../utils/constants';
+} from '../../../common/services/platform/controller';
+import { LLMConfig } from '../../../common/services/platform/platform.d';
+import { ModelList, LLMTypeList } from '../../../common/utils/constants';
 
 const LLMSettings = ({
   appId,

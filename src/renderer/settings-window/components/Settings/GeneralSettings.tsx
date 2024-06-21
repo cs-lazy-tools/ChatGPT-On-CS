@@ -18,6 +18,7 @@ import {
   RangeSliderTrack,
   RangeSliderFilledTrack,
   RangeSliderThumb,
+  Divider,
   Text,
   Tooltip,
   useToast,
@@ -25,15 +26,20 @@ import {
   Skeleton,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import { getConfig, updateConfig } from '../../services/platform/controller';
-import { GenericConfig } from '../../services/platform/platform.d';
+import {
+  getConfig,
+  updateConfig,
+} from '../../../common/services/platform/controller';
+import { GenericConfig } from '../../../common/services/platform/platform.d';
 
 const GeneralSettings = ({
   appId,
   instanceId,
+  style,
 }: {
   appId?: string;
   instanceId?: string;
+  style?: React.CSSProperties;
 }) => {
   const toast = useToast();
   const { data, isLoading } = useQuery(
@@ -144,7 +150,7 @@ const GeneralSettings = ({
   }
 
   return (
-    <VStack spacing="4" align="start">
+    <VStack spacing="4" align="start" style={style}>
       <Checkbox
         mr={4}
         isChecked={config.extractPhone}
@@ -185,11 +191,16 @@ const GeneralSettings = ({
         打开本地文件夹
       </Button>
 
-      <Flex my={3} alignItems="center">
-        <Tooltip label="接口报错，或者没有匹配到回复时的返回值">
-          <Text mb="8px">默认回复</Text>
-        </Tooltip>
-        <Box ml={6} flex="1">
+      <Divider />
+
+      <FormControl mt={3}>
+        <FormLabel>
+          {' '}
+          <Tooltip label="接口报错，或者没有匹配到回复时的返回值">
+            <Text mb="8px">默认回复</Text>
+          </Tooltip>
+        </FormLabel>
+        <Flex>
           <Input
             placeholder="输入默认回复内容"
             value={config.defaultReply}
@@ -197,8 +208,8 @@ const GeneralSettings = ({
               handleUpdateConfig({ defaultReply: e.target.value })
             }
           />
-        </Box>
-      </Flex>
+        </Flex>
+      </FormControl>
 
       <Tooltip label="回复等待时间，当设置了随机时间则，等待时间为 “固定等待时间” + “随机等待时间”">
         <Text mb="8px">回复等待时间（单位秒）: {` ${getReplySpeedStr()}`}</Text>

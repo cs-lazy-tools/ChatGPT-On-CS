@@ -2,25 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ChakraProvider, Box, Flex } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { loader } from '@monaco-editor/react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './pages/Home';
-import SettingsPage from './pages/Settings';
-import AboutPage from './pages/About';
 import ChatSessionsTable from './pages/ChatSessionsTable';
 import FullScreenLoader from './pages/FullScreenLoader';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
 import { BroadcastProvider } from './hooks/useBroadcastContext';
-import './App.css';
-import theme from './ui/styles/theme';
-
-// TODO: 后续考虑将 monaco-editor 的路径改为本地路径
-loader.config({
-  paths: { vs: 'https://jsd.onmicrosoft.cn/npm/monaco-editor@0.43.0/min/vs' },
-});
+import '../common/App.css';
+import theme from '../common/styles/theme';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -60,8 +52,6 @@ function App() {
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/msg" element={<ChatSessionsTable />} />
-                      <Route path="/settings" element={<SettingsPage />} />
-                      <Route path="/about" element={<AboutPage />} />
                     </Routes>
                   </Box>
                   <Footer />

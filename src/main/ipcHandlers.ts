@@ -11,7 +11,7 @@ import os from 'os';
 import path from 'path';
 import type BackendServiceManager from './system/backend';
 import { getBrowserVersionFromOS } from './system/chrome';
-import { createWindow as createSettingsWindow } from '../settings-main/settings-main';
+import { createWindow as createSettingsWindow } from './windows/settings-main/settings-main';
 
 const store = new Store();
 

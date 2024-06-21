@@ -14,10 +14,10 @@ import {
   Stack,
   useToast,
 } from '@chakra-ui/react';
-import PageContainer from '../../components/PageContainer';
-import Markdown from '../../components/Markdown';
-import { getVersionInfo } from '../../services/system/controller';
-import { trackPageView } from '../../services/analytics';
+import PageContainer from '../../../common/components/PageContainer';
+import Markdown from '../../../common/components/Markdown';
+import { getVersionInfo } from '../../../common/services/system/controller';
+import { trackPageView } from '../../../common/services/analytics';
 
 const AboutPage: React.FC = () => {
   const toast = useToast();

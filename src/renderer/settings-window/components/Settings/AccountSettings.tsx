@@ -40,7 +40,6 @@ const AccountSettings = () => {
     <ChakraProvider>
       <Container>
         <VStack spacing="4" align="start" mt="8">
-          <Text fontSize="2xl">账户设置</Text>
           <Text>输入激活码</Text>
           <Input
             placeholder="激活码"

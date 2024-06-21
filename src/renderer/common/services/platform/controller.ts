@@ -91,7 +91,9 @@ export async function checkConfigActive({
   instanceId?: string;
 }) {
   const data = await GET<{
-    active: boolean;
+    data: {
+      active: boolean;
+    };
   }>('/api/v1/base/platform/active', {
     appId,
     instanceId,

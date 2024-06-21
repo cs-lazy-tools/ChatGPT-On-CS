@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { debounce } from 'lodash';
-import { Checkbox, Stack, HStack, Tooltip, Button } from '@chakra-ui/react';
+import { Checkbox, Stack, HStack, Tooltip } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '../../../hooks/useToast';
-import { getConfig, updateConfig } from '../../../services/platform/controller';
-import { DriverConfig } from '../../../services/platform/platform.d';
+import {
+  getConfig,
+  updateConfig,
+} from '../../../../common/services/platform/controller';
+import { DriverConfig } from '../../../../common/services/platform/platform';
 import { useWebSocketContext } from '../../../hooks/useBroadcastContext';
 
 const Panels = () => {
@@ -70,13 +73,6 @@ const Panels = () => {
       setDriverSettings(obj);
     }
   }, [data]);
-
-  const handleOpenSettings = () => {
-    window.electron.ipcRenderer.sendMessage('open-settings-window', {
-      appId: '123',
-      instanceId: '456',
-    });
-  };
 
   const handleUpdateConfig = async (newConfig: Partial<DriverConfig>) => {
     const updatedConfig = { ...driverSettings, ...newConfig };
@@ -157,7 +153,6 @@ const Panels = () => {
               鼠标移动自动暂停
             </Tooltip>
           </Checkbox> */}
-          <Button onClick={handleOpenSettings}>测试窗口</Button>
           <Checkbox
             isChecked={driverSettings.hasEscClose}
             onChange={(e) =>

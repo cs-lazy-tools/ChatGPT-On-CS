@@ -24,6 +24,10 @@ const Navbar = () => {
     navigate(path);
   };
 
+  const handleOpenSettings = () => {
+    window.electron.ipcRenderer.sendMessage('open-settings-window', {});
+  };
+
   return (
     <Flex
       as="nav"
@@ -59,15 +63,11 @@ const Navbar = () => {
             </MenuItem>
             <MenuItem
               icon={<SettingsIcon />}
-              onClick={handleNavigate('/settings')}
+              onClick={() => {
+                handleOpenSettings();
+              }}
             >
               设置
-            </MenuItem>
-            <MenuItem
-              icon={<InfoOutlineIcon />}
-              onClick={handleNavigate('/about')}
-            >
-              关于
             </MenuItem>
           </MenuList>
         </Menu>

@@ -2,7 +2,7 @@
 
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import { resolveHtmlPath } from '../main/util';
+import { resolveHtmlPath } from '../../util';
 
 let settingsWindow: BrowserWindow | null = null;
 
@@ -27,6 +27,12 @@ export const createWindow = async (args: string[]) => {
     // await installExtensions();
   }
 
+  if (settingsWindow) {
+    settingsWindow.focus();
+    settingsWindow.webContents.send('update-settings-params', args);
+    return;
+  }
+
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -43,7 +49,7 @@ export const createWindow = async (args: string[]) => {
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
+        : path.join(__dirname, '../../../../.erb/dll/preload.js'),
       additionalArguments: args,
     },
   });

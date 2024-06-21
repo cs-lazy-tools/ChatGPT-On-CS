@@ -32,14 +32,17 @@ import { useTable, useGlobalFilter, useFilters } from 'react-table';
 import ReactPaginate from 'react-paginate';
 import './index.css';
 import { DownloadIcon } from '@chakra-ui/icons';
-import { Session, MessageModel } from '../../services/platform/platform';
+import {
+  Session,
+  MessageModel,
+} from '../../../common/services/platform/platform';
 import {
   getSessions,
   getMessages,
   getPlatformList,
   exportMessageExcel,
-} from '../../services/platform/controller';
-import { trackPageView } from '../../services/analytics';
+} from '../../../common/services/platform/controller';
+import { trackPageView } from '../../../common/services/analytics';
 
 const ChatSessionsTable = () => {
   const toast = useToast();

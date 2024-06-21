@@ -28,8 +28,12 @@ import {
   Message,
   RoleType,
   MessageType,
-} from '../../services/platform/platform';
-import { ContextKeys, MockCtx, MockMessages } from '../../utils/constants';
+} from '../../../common/services/platform/platform';
+import {
+  ContextKeys,
+  MockCtx,
+  MockMessages,
+} from '../../../common/utils/constants';
 
 type MessageModalProps = {
   isOpen: boolean;

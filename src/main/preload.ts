@@ -22,6 +22,7 @@ export type Channels =
   | 'get-browser-version'
   | 'broadcast'
   | 'open-settings-window'
+  | 'update-settings-params'
   | 'get-version';
 
 const electronHandler = {

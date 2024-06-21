@@ -12,8 +12,8 @@ import {
   ModalCloseButton,
   VStack,
 } from '@chakra-ui/react';
-import { getVersionInfo } from '../../services/system/controller';
-import Markdown from '../Markdown';
+import { getVersionInfo } from '../../../common/services/system/controller';
+import Markdown from '../../../common/components/Markdown';
 
 const Updater = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);

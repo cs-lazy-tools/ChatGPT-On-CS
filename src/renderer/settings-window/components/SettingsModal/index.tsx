@@ -18,14 +18,14 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import GeneralSettings from '../../../components/Settings/GeneralSettings';
-import LLMSettings from '../../../components/Settings/LLMSettings';
-import PluginSettings from '../../../components/Settings/PluginSettings';
+import GeneralSettings from '../Settings/GeneralSettings';
+import LLMSettings from '../Settings/LLMSettings';
+import PluginSettings from '../Settings/PluginSettings';
 import {
   activeConfig,
   checkConfigActive,
-} from '../../../services/platform/controller';
-import { useAppManager } from './AppManagerContext';
+} from '../../../common/services/platform/controller';
+// import { useAppManager } from './AppManagerContext';
 
 const SettingsModal = ({
   isOpen,
@@ -38,7 +38,7 @@ const SettingsModal = ({
   appId?: string;
   instanceId?: string;
 }) => {
-  const { data: appInfo } = useAppManager();
+  // const { data: appInfo } = useAppManager();
   const [appName, setAppName] = useState<string | undefined>(undefined);
 
   const toast = useToast();
@@ -68,7 +68,7 @@ const SettingsModal = ({
   }, [appId, instanceId]);
 
   useEffect(() => {
-    setAppName(appInfo?.data.find((app) => app.id === appId)?.name);
+    // setAppName(appInfo?.data.find((app) => app.id === appId)?.name);
     fetchConfigActive();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appId, instanceId]);

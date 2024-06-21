@@ -20,13 +20,19 @@ import {
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import Editor, { Monaco } from '@monaco-editor/react';
-import { PluginExtraLib, PluginExampleCode } from '../../utils/constants';
+import {
+  PluginExtraLib,
+  PluginExampleCode,
+} from '../../../common/utils/constants';
 import {
   getConfig,
   updateConfig,
   checkPluginAvailability,
-} from '../../services/platform/controller';
-import { PluginConfig, LogBody } from '../../services/platform/platform.d';
+} from '../../../common/services/platform/controller';
+import {
+  PluginConfig,
+  LogBody,
+} from '../../../common/services/platform/platform.d';
 import MessageModal from '../MessageModal';
 import { useSystemStore } from '../../stores/useSystemStore';
 
