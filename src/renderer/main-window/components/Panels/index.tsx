@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { debounce } from 'lodash';
 import { Checkbox, Stack, HStack, Tooltip } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '../../hooks/useToast';
@@ -38,34 +37,30 @@ const Panels = () => {
     }
   });
 
-  // 使用 useCallback 确保 debounce 函数不会在每次渲染时重建
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedHandler = useCallback(
-    debounce((message) => {
-      if (message.event === 'has_paused') {
-        setDriverSettings((prevSettings) => ({
-          ...prevSettings,
-          hasPaused: true,
-        }));
+  const pausedHandler = useCallback((message: any) => {
+    if (message.event === 'has_paused') {
+      setDriverSettings((prevSettings) => ({
+        ...prevSettings,
+        hasPaused: true,
+      }));
 
-        toast({
-          title: '自动回复已暂停',
-          status: 'info',
-          position: 'top',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    }, 2000), // 这里的 300 表示防抖延迟时间（毫秒）
-    [],
-  );
+      toast({
+        title: '自动回复已暂停',
+        status: 'info',
+        position: 'top',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    const unregister = registerEventHandler(debouncedHandler);
+    const unregister = registerEventHandler(pausedHandler);
 
     // 组件卸载时注销事件处理器
     return () => unregister();
-  }, [registerEventHandler, debouncedHandler]); // eslint-disable-line
+  }, [registerEventHandler, pausedHandler]); // eslint-disable-line
 
   useEffect(() => {
     if (data) {

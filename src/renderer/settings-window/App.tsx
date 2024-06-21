@@ -225,19 +225,29 @@ const App = () => {
           <Heading as="h3" size="md" mb={4}>
             通用设置
           </Heading>
-          <GeneralSettings style={{ width: '60vw' }} />
+          <GeneralSettings
+            style={{ width: '60vw' }}
+            appId={settings.appId}
+            instanceId={settings.instanceId}
+          />
         </TabPanel>
         <TabPanel>
           <Heading as="h3" size="md" mb={4}>
             AI 配置
           </Heading>
-          <LLMSettings />
+          <LLMSettings
+            appId={settings.appId}
+            instanceId={settings.instanceId}
+          />
         </TabPanel>
         <TabPanel>
           <Heading as="h3" size="md" mb={4}>
             {settings.appId ? '' : '全局'}插件设置
           </Heading>
-          <PluginSettings />
+          <PluginSettings
+            appId={settings.appId}
+            instanceId={settings.instanceId}
+          />
         </TabPanel>
         {!settings.appId && (
           <>

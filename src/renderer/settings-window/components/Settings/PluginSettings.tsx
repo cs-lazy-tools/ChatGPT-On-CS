@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   VStack,
@@ -50,8 +50,8 @@ const PluginSettings = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isOpenMessageModal, setIsOpenMessageModal] = useState(false);
   const cancelRef = React.useRef<any>();
-  const toast = useToast();
   const { context, messages } = useSystemStore();
+  const toast = useToast();
 
   const { data, isLoading } = useQuery(
     ['config', 'plugin', appId, instanceId],
@@ -115,41 +115,45 @@ const PluginSettings = ({
     }
   };
 
-  const handleSaveCode = async (icode?: string) => {
-    console.log('handleSaveCode', icode);
+  const handleSaveCode = useCallback(
+    async (inCode?: string) => {
+      console.log('handleSaveCode', inCode);
+      console.log('handleSaveCode - code', code);
 
-    if (!config) return;
-    try {
-      await updateConfig({
-        appId,
-        instanceId,
-        type: 'plugin',
-        cfg: {
-          ...config,
-          pluginCode: icode || code || PluginExampleCode,
-        },
-      });
-      toast({
-        title: '更新代码成功',
-        position: 'top',
-        description: '配置已更新',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (error) {
-      const errormsg =
-        error instanceof Error ? error.message : JSON.stringify(error);
-      toast({
-        title: '更新配置失败',
-        position: 'top',
-        description: errormsg,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
+      if (!config) return;
+      try {
+        await updateConfig({
+          appId,
+          instanceId,
+          type: 'plugin',
+          cfg: {
+            ...config,
+            pluginCode: inCode || code || PluginExampleCode,
+          },
+        });
+        toast({
+          title: '更新代码成功',
+          position: 'top',
+          description: '配置已更新',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (error) {
+        const errormsg =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        toast({
+          title: '更新配置失败',
+          position: 'top',
+          description: errormsg,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    },
+    [code, config], // 更新依赖项
+  );
 
   const handleDefaultCode = () => {
     onOpen();
@@ -181,6 +185,16 @@ const PluginSettings = ({
       PluginExtraLib,
       'ts:filename/types.d.ts',
     );
+
+    // FIXME: 这里似乎有引用问题，暂时注释掉
+    // monaco.editor.addEditorAction({
+    //   id: 'save-code',
+    //   label: '保存代码',
+    //   keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+    //   run: () => {
+    //     handleSaveCode();
+    //   },
+    // });
   };
 
   const handleCheckPlugin = async () => {
@@ -277,7 +291,15 @@ const PluginSettings = ({
             <Button onClick={handleDefaultCode} colorScheme="red" size="sm">
               重置代码
             </Button>
-
+            <Button
+              onClick={() => {
+                handleSaveCode();
+              }}
+              colorScheme="teal"
+              size="sm"
+            >
+              保存代码
+            </Button>
             <Button
               onClick={() => {
                 setIsOpenMessageModal(true);
@@ -302,7 +324,6 @@ const PluginSettings = ({
               value={code}
               onChange={(value) => {
                 setCode(value);
-                handleSaveCode(value);
               }}
               beforeMount={handleEditorWillMount}
               theme="vs-dark"

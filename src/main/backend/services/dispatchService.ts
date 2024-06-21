@@ -8,29 +8,20 @@ import { ConfigController } from '../controllers/configController';
 import { MessageController } from '../controllers/messageController';
 import { Instance } from '../entities/instance';
 import { PluginDefaultRunCode } from '../constants';
+import { LoggerService } from './loggerService';
 
 export class DispatchService {
-  private mainWindow: BrowserWindow;
-
-  private messageService: MessageService;
-
-  private messageController: MessageController;
-
-  private io: socketIo.Server;
-
-  private configController: ConfigController;
-
-  private pluginService: PluginService;
-
   constructor(
-    mainWindow: BrowserWindow,
-    io: socketIo.Server,
-    configController: ConfigController,
-    messageService: MessageService,
-    messageController: MessageController,
-    pluginService: PluginService,
+    private mainWindow: BrowserWindow,
+    private log: LoggerService,
+    private io: socketIo.Server,
+    private configController: ConfigController,
+    private messageService: MessageService,
+    private messageController: MessageController,
+    private pluginService: PluginService,
   ) {
     this.io = io;
+    this.log = log;
     this.mainWindow = mainWindow;
     this.messageService = messageService;
     this.messageController = messageController;
@@ -87,6 +78,8 @@ export class DispatchService {
             ctxMap,
             msgs,
           );
+
+          this.log.info(`使用自定义插件回复: ${reply.content}`);
         } else {
           const reply_data = await this.pluginService.executePluginCode(
             PluginDefaultRunCode,
@@ -98,6 +91,12 @@ export class DispatchService {
         }
       } catch (error) {
         console.error('Failed to execute plugin', error);
+        this.log.error(
+          `回复失败: ${
+            error instanceof Error ? error.message : String(error)
+          }，使用默认回复`,
+        );
+
         reply = {
           content: cfg.default_reply || 'Failed to execute plugin',
           type: 'TEXT',

@@ -64,7 +64,7 @@ const LogBox = () => {
           </Button>
         </HStack>
 
-        <TableContainer overflowY="scroll" width="full">
+        <TableContainer overflowY="scroll" width="full" maxH={'40vh'}>
           <Table size="sm">
             <Thead>
               <Tr>

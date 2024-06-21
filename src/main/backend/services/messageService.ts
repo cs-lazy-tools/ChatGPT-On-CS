@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { BrowserWindow } from 'electron';
 import { KeywordReplyController } from '../controllers/keywordReplyController';
 import {
   MessageDTO,
@@ -29,10 +30,9 @@ import {
   VYroAI,
   DifyAI,
 } from '../../gptproxy';
+import { LoggerService } from './loggerService';
 
 export class MessageService {
-  private autoReplyController: KeywordReplyController;
-
   private llmClientMap: Map<
     string,
     | ErnieAI
@@ -46,8 +46,12 @@ export class MessageService {
     | DifyAI
   >;
 
-  constructor(keywordReplyController: KeywordReplyController) {
-    this.autoReplyController = keywordReplyController;
+  constructor(
+    private log: LoggerService,
+    private autoReplyController: KeywordReplyController,
+  ) {
+    this.log = log;
+    this.autoReplyController = autoReplyController;
 
     this.llmClientMap = new Map();
   }
@@ -69,6 +73,7 @@ export class MessageService {
     };
 
     if (!lastUserMsg) {
+      this.log.warn(`未匹配到用户消息，所以使用默认回复: ${reply.content}`);
       return reply;
     }
 
@@ -84,18 +89,27 @@ export class MessageService {
     if (cfg.has_keyword_match) {
       const data = await this.matchKeyword(ctx, lastUserMsg);
       if (data && data.content) {
+        this.log.success(`匹配关键词: ${data.content}`);
         return data;
       }
+      this.log.warn(`未匹配到关键词`);
     }
 
     // 最后检查是否使用 GPT 生成回复
     if (cfg.has_use_gpt) {
+      this.log.info(`开始使用 GPT 生成回复`);
+
       const data = await this.getLLMResponse(cfg, ctx, messages);
+
       if (data && data.content) {
+        this.log.success(`GPT 生成回复: ${data.content}`);
         return data;
       }
+
+      this.log.warn(`AI 回复生成失败`);
     }
 
+    this.log.info('使用默认回复');
     return reply;
   }
 

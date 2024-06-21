@@ -13,6 +13,7 @@ import { MessageService } from './services/messageService';
 import { DispatchService } from './services/dispatchService';
 import { PluginService } from './services/pluginService';
 import { AppService } from './services/appService';
+import { LoggerService } from './services/loggerService';
 
 class BKServer {
   private app: express.Application;
@@ -34,6 +35,8 @@ class BKServer {
   private pluginService: PluginService;
 
   private dispatchService: DispatchService;
+
+  private loggerService: LoggerService;
 
   private appService: AppService;
 
@@ -60,16 +63,22 @@ class BKServer {
     this.configController = new ConfigController();
     this.messageController = new MessageController();
     this.keywordReplyController = new KeywordReplyController(port);
+    this.loggerService = new LoggerService(mainWindow);
 
-    this.messageService = new MessageService(this.keywordReplyController);
+    this.messageService = new MessageService(
+      this.loggerService,
+      this.keywordReplyController,
+    );
 
     this.pluginService = new PluginService(
+      this.loggerService,
       this.configController,
       this.messageService,
     );
 
     this.dispatchService = new DispatchService(
       mainWindow,
+      this.loggerService,
       this.io,
       this.configController,
       this.messageService,

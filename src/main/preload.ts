@@ -50,6 +50,9 @@ const electronHandler = {
     remove(channel: Channels) {
       ipcRenderer.removeAllListeners(channel);
     },
+    removeListener(channel: Channels, func: (...args: unknown[]) => void) {
+      ipcRenderer.removeListener(channel, func);
+    },
   },
   store: {
     get(key: string) {

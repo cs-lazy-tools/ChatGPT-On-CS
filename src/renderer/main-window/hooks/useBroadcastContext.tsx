@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
 
 // 定义 Broadcast 消息类型
@@ -31,7 +32,7 @@ export const BroadcastProvider = ({ children }: { children: ReactNode }) => {
   const registerEventHandler = useCallback(
     (handler: (message: BroadcastMessage) => void) => {
       setEventHandlers((prevHandlers) => [...prevHandlers, handler]);
-      // 返回注销该处理器的函数
+
       return () => {
         setEventHandlers((prevHandlers) =>
           prevHandlers.filter((h) => h !== handler),
@@ -41,10 +42,20 @@ export const BroadcastProvider = ({ children }: { children: ReactNode }) => {
     [],
   );
 
-  window.electron.ipcRenderer.on('broadcast', (msg) => {
-    const message = msg as BroadcastMessage;
-    eventHandlers.forEach((handler) => handler(message));
-  });
+  useEffect(() => {
+    const handleBroadcast = (msg: any) => {
+      const message = msg as BroadcastMessage;
+      console.log('Received broadcast message:', message);
+      eventHandlers.forEach((handler) => handler(message));
+    };
+
+    window.electron.ipcRenderer.on('broadcast', handleBroadcast);
+
+    // 在组件卸载时移除监听器
+    return () => {
+      window.electron.ipcRenderer.remove('broadcast');
+    };
+  }, [eventHandlers]);
 
   const value = useMemo(
     () => ({

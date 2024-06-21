@@ -8,6 +8,7 @@ import axios from 'axios';
 import { ConfigController } from '../controllers/configController';
 import { MessageDTO, ReplyDTO, Context } from '../types';
 import { MessageService } from './messageService';
+import { LoggerService } from './loggerService';
 
 interface PreloadedModules {
   [key: string]: any;
@@ -38,15 +39,17 @@ const createSandbox = (contextOverrides: Record<string, any> = {}) => {
 };
 
 export class PluginService {
-  private configController: ConfigController;
-
   constructor(
-    configController: ConfigController,
-    messageService: MessageService,
+    private log: LoggerService,
+    private configController: ConfigController,
+    private messageService: MessageService,
   ) {
+    this.log = log;
     this.configController = configController;
-    preloadedModules.config_srv = configController;
-    preloadedModules.reply_srv = messageService;
+    this.messageService = messageService;
+
+    preloadedModules.config_srv = this.configController;
+    preloadedModules.reply_srv = this.messageService;
   }
 
   async checkPlugin(
@@ -162,6 +165,7 @@ export class PluginService {
         console: customConsole,
         messages,
         require: (module: string) => {
+          console.log('Require:', module);
           if (preloadedModules[module]) {
             return preloadedModules[module];
           }
@@ -178,10 +182,12 @@ export class PluginService {
       vm.runInContext(pluginCode, sandbox);
 
       if (typeof sandbox.module.exports !== 'function') {
+        this.log.error('插件格式错误，请检查是否导出函数');
         throw new Error('Plugin does not export a function');
       }
 
       if (!messages || messages.length === 0) {
+        this.log.error('未提供消息给插件');
         throw new Error('No messages provided to the plugin');
       }
 
@@ -204,9 +210,15 @@ export class PluginService {
         return { data: data as ReplyDTO, consoleOutput };
       }
 
+      this.log.error('未返回有效响应');
+
       throw new Error('Plugin function did not return a valid response');
     } catch (error: any) {
       console.error('Plugin execution error:', error);
+
+      this.log.error(
+        `回复失败: ${error instanceof Error ? error.message : String(error)}`,
+      );
       error.consoleOutput = consoleOutput;
       throw error;
     }
