@@ -57,7 +57,7 @@ export class AppService {
         tasks.push(instance);
         const result = await this.dispatchService.updateTasks(tasks);
         if (!result || result.length === 0) {
-          throw new Error('Failed to update tasks');
+          throw new Error('添加任务失败，请重新尝试');
         }
 
         // 遍历 result 检查，判断是否存在 error 属性

@@ -165,13 +165,18 @@ export class DispatchService {
     | null
   > {
     try {
-      return await emitAndWait(this.io, 'strategyService-updateTasks', {
-        tasks: tasks.map((task) => ({
-          task_id: task.id,
-          app_id: task.app_id,
-          env_id: task.env_id,
-        })),
-      });
+      return await emitAndWait(
+        this.io,
+        'strategyService-updateTasks',
+        {
+          tasks: tasks.map((task) => ({
+            task_id: task.id,
+            app_id: task.app_id,
+            env_id: task.env_id,
+          })),
+        },
+        20000,
+      );
     } catch (error) {
       console.error('Failed to add task', error);
       return null;

@@ -28,7 +28,7 @@ export class DifyAI extends APIClient {
     const {
       apiKey = process.env.DIFY_API_KEY || '',
       baseURL = 'https://api.dify.ai/v1/',
-      timeout = 30000,
+      timeout = 50000,
       httpAgent = undefined,
       ...rest
     } = options;
