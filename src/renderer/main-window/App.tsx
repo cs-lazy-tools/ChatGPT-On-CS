@@ -6,7 +6,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './pages/Home';
-import ChatSessionsTable from './pages/ChatSessionsTable';
+import ChatSessionsTable from '../dataview-window/components/ChatHistory';
 import FullScreenLoader from './pages/FullScreenLoader';
 import Updater from './components/Updater';
 import SystemCheck from './components/SystemCheck';
@@ -51,7 +51,6 @@ function App() {
                   <Box flex="1" mt={{ base: '4rem', md: '5rem' }}>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
-                      <Route path="/msg" element={<ChatSessionsTable />} />
                     </Routes>
                   </Box>
                   <Footer />

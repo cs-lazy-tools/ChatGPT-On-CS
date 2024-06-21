@@ -28,8 +28,8 @@ import {
   deleteReplyKeyword,
   updateReplyExcel,
   exportReplyExcel,
-} from '../../../../common/services/platform/controller';
-import { Keyword } from '../../../../common/services/platform/platform';
+} from '../../../common/services/platform/controller';
+import { Keyword } from '../../../common/services/platform/platform';
 
 const ReplyKeyword = () => {
   const [keywords, setKeywords] = useState<Keyword[]>([]);
@@ -222,7 +222,7 @@ const ReplyKeyword = () => {
           </HStack>
         </Flex>
       </Box>
-      <TableContainer maxH={'300px'} overflowY="scroll">
+      <TableContainer maxH={'70vh'} overflowY="scroll">
         <Table variant="striped" size="sm" className="table-tiny">
           <Thead>
             <Tr>

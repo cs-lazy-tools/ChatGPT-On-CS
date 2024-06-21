@@ -8,6 +8,7 @@ const srcPath = path.join(rootPath, 'src');
 const srcMainPath = path.join(srcPath, 'main');
 const srcRendererPath = path.join(srcPath, 'renderer/main-window');
 const srcSettingsRendererPath = path.join(srcPath, 'renderer/settings-window');
+const srcDataviewRendererPath = path.join(srcPath, 'renderer/dataview-window');
 
 const releasePath = path.join(rootPath, 'release');
 const appPath = path.join(releasePath, 'app');
@@ -28,6 +29,7 @@ export default {
   srcMainPath,
   srcRendererPath,
   srcSettingsRendererPath,
+  srcDataviewRendererPath,
   releasePath,
   appPath,
   appPackagePath,

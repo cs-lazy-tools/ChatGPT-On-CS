@@ -1,31 +1,18 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // 导入 Link 组件
+import { Box, Flex, Text, Button } from '@chakra-ui/react';
 import {
-  Box,
-  Flex,
-  Text,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-} from '@chakra-ui/react';
-import {
-  HamburgerIcon,
   SettingsIcon,
-  InfoOutlineIcon,
   ChatIcon,
   CalendarIcon,
 } from '@chakra-ui/icons';
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const handleNavigate = (path: string) => () => {
-    navigate(path);
-  };
-
   const handleOpenSettings = () => {
     window.electron.ipcRenderer.sendMessage('open-settings-window', {});
+  };
+
+  const handleOpenDataview = () => {
+    window.electron.ipcRenderer.sendMessage('open-dataview-window', {});
   };
 
   return (
@@ -46,31 +33,30 @@ const Navbar = () => {
         懒人客服
       </Text>
 
-      <Box display={{ md: 'none' }}>
-        <Menu>
-          <MenuButton
-            as={IconButton}
-            icon={<HamburgerIcon />}
-            variant="outline"
-          />
-          <MenuList mb={2}>
-            {/* 直接在MenuItem上使用onClick进行导航 */}
-            <MenuItem icon={<ChatIcon />} onClick={handleNavigate('/')}>
-              首页
-            </MenuItem>
-            <MenuItem icon={<CalendarIcon />} onClick={handleNavigate('/msg')}>
-              记录
-            </MenuItem>
-            <MenuItem
-              icon={<SettingsIcon />}
-              onClick={() => {
-                handleOpenSettings();
-              }}
-            >
-              设置
-            </MenuItem>
-          </MenuList>
-        </Menu>
+      <Box display={{ md: 'flex' }} gap="1rem">
+        <Button
+          size="sm"
+          mr={2}
+          leftIcon={<CalendarIcon />}
+          onClick={handleOpenDataview}
+        >
+          记录
+        </Button>
+        <Button
+          size="sm"
+          mr={2}
+          leftIcon={<ChatIcon />}
+          onClick={handleOpenDataview}
+        >
+          关键词
+        </Button>
+        <Button
+          size="sm"
+          leftIcon={<SettingsIcon />}
+          onClick={handleOpenSettings}
+        >
+          设置
+        </Button>
       </Box>
     </Flex>
   );

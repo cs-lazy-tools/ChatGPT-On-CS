@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { debounce } from 'lodash';
 import { Checkbox, Stack, HStack, Tooltip } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import { useToast } from '../../../hooks/useToast';
+import { useToast } from '../../hooks/useToast';
 import {
   getConfig,
   updateConfig,
-} from '../../../../common/services/platform/controller';
-import { DriverConfig } from '../../../../common/services/platform/platform';
-import { useWebSocketContext } from '../../../hooks/useBroadcastContext';
+} from '../../../common/services/platform/controller';
+import { DriverConfig } from '../../../common/services/platform/platform';
+import { useWebSocketContext } from '../../hooks/useBroadcastContext';
 
 const Panels = () => {
   const { toast } = useToast();

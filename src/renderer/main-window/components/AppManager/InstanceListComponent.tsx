@@ -12,7 +12,7 @@ import {
 import { AddIcon } from '@chakra-ui/icons';
 import InstanceCardComponent from './InstanceCardComponent';
 import { useAppManager } from './AppManagerContext';
-import { trackButtonClick } from '../../../../common/services/analytics';
+import { trackButtonClick } from '../../../common/services/analytics';
 
 const InstanceListComponent = () => {
   const {

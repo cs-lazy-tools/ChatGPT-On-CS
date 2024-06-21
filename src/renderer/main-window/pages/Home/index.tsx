@@ -1,19 +1,10 @@
 import React, { useEffect } from 'react';
-import {
-  Box,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  Stack,
-} from '@chakra-ui/react';
+import { Box, Heading, Stack, Divider } from '@chakra-ui/react';
 import PageContainer from '../../../common/components/PageContainer';
-import ReplyKeyword from './ReplyKeyword';
 import { trackPageView } from '../../../common/services/analytics';
-import AppManager from './AppManager/index';
-import Panels from './Panels';
-import LogBox from './LogBox';
+import AppManager from '../../components/AppManager/index';
+import Panels from '../../components/Panels';
+import LogBox from '../../components/LogBox';
 
 const HomePage = () => {
   const currentVersion = window.electron.ipcRenderer.get('get-version');
@@ -24,31 +15,19 @@ const HomePage = () => {
 
   return (
     <PageContainer>
-      <ReplyKeyword />
-      <Box mb={4}>
-        <Tabs>
-          <TabList>
-            <Tab>应用</Tab>
-            <Tab>连接</Tab>
-            <Tab>日志</Tab>
-          </TabList>
-
-          <TabPanels>
-            <TabPanel padding="0">
-              <Stack>
-                <AppManager />
-              </Stack>
-            </TabPanel>
-            <TabPanel>
-              <Panels />
-            </TabPanel>
-            <TabPanel>
-              <LogBox />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
-      {/* <PlatformTabs /> */}
+      <Stack spacing={2}>
+        <Box>
+          <AppManager />
+        </Box>
+        <Divider my="4" />
+        <Box>
+          <Panels />
+        </Box>
+        <Divider my="4" />
+        <Box>
+          <LogBox />
+        </Box>
+      </Stack>
     </PageContainer>
   );
 };

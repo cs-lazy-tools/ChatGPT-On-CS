@@ -44,7 +44,7 @@ import {
 } from '../../../common/services/platform/controller';
 import { trackPageView } from '../../../common/services/analytics';
 
-const ChatSessionsTable = () => {
+const ChatHistory = () => {
   const toast = useToast();
   const { data: platforms, isLoading } = useQuery(
     ['platformList'],
@@ -196,7 +196,7 @@ const ChatSessionsTable = () => {
             </InputRightElement>
           </InputGroup>
           <Select
-            placeholder="过滤平台"
+            placeholder="全部平台"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             mb={4}
@@ -307,4 +307,4 @@ const ChatSessionsTable = () => {
   );
 };
 
-export default ChatSessionsTable;
+export default ChatHistory;

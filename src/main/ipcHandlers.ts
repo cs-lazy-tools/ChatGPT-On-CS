@@ -11,7 +11,8 @@ import os from 'os';
 import path from 'path';
 import type BackendServiceManager from './system/backend';
 import { getBrowserVersionFromOS } from './system/chrome';
-import { createWindow as createSettingsWindow } from './windows/settings-main/settings-main';
+import { createWindow as createSettingsWindow } from './windows/settings-main';
+import { createWindow as createDataviewWindow } from './windows/dataview-main';
 
 const store = new Store();
 
@@ -109,6 +110,10 @@ const setupIpcHandlers = (
       createSettingsWindow(args);
     },
   );
+
+  ipcMain.on('open-dataview-window', async (event, args) => {
+    createDataviewWindow(args);
+  });
 };
 
 export default setupIpcHandlers;
