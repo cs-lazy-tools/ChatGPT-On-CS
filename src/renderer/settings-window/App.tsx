@@ -13,7 +13,6 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalCloseButton,
   ModalBody,
   Checkbox,
   Text,
@@ -94,6 +93,8 @@ const App = () => {
       try {
         const { appId, instanceId } = settings;
 
+        console.log('activeConfig', event.target.checked);
+
         setIsActive(event.target.checked);
         await activeConfig({
           active: event.target.checked,
@@ -144,7 +145,6 @@ const App = () => {
 
       // If both appId and instanceId are present, fetch config active state
       if (settingsArgs.appId) {
-        console.log('fetchConfigActive', settingsArgs);
         fetchConfigActive(settingsArgs.appId, settingsArgs.instanceId);
       }
     };
@@ -156,6 +156,7 @@ const App = () => {
       electron.ipcRenderer.on(
         'update-settings-params',
         // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         (receivedArgs: string[]) => {
           console.log('update-settings-params', receivedArgs);
           handleParams(receivedArgs);
@@ -166,7 +167,7 @@ const App = () => {
     return () => {
       window.electron.ipcRenderer.remove('update-settings-params');
     };
-  }, []);
+  }, [fetchConfigActive]);
 
   const renderSettingsTabs = () => (
     <Tabs variant="enclosed" orientation="vertical" flex="1">

@@ -101,7 +101,7 @@ export class ConfigController {
     let config = null;
     if (instanceId) {
       config = await Config.findOne({
-        where: { instance_id: instanceId, active: true },
+        where: { instance_id: instanceId },
       });
       if (!config) {
         config = await Config.create({
@@ -113,7 +113,7 @@ export class ConfigController {
 
     if (!config && appId) {
       config = await Config.findOne({
-        where: { platform_id: appId, active: true },
+        where: { platform_id: appId },
       });
       if (!config) {
         config = await Config.create({

@@ -61,6 +61,7 @@ const usePlatformList = () => {
     },
   );
 
+  // eslint-disable-next-line consistent-return
   useEffect(() => {
     if ((data?.data?.length === 0 || !data) && retryCount < 5) {
       const timer = setTimeout(() => {
