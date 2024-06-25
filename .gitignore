@@ -32,3 +32,5 @@ src/renderer/services/analytics/*
 
 
 open_ai.http
+
+tests/*
