@@ -20,7 +20,6 @@ import {
 } from '@chakra-ui/react';
 import { loader } from '@monaco-editor/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AccountSettings from './components/Settings/AccountSettings';
 import GeneralSettings from './components/Settings/GeneralSettings';
 import LLMSettings from './components/Settings/LLMSettings';
 import PluginSettings from './components/Settings/PluginSettings';
@@ -200,15 +199,17 @@ const App = () => {
           {settings.appId || settings.instanceId ? '' : '全局'}插件设置
         </Tab>
 
-        {!settings.appId && (
-          <Tab
-            _selected={{ bg: 'gray.200' }}
-            _hover={{ bg: 'gray.300' }}
-            textAlign="left"
-          >
-            使用激活码
-          </Tab>
-        )}
+        {
+          // {!settings.appId && (
+          //   <Tab
+          //     _selected={{ bg: 'gray.200' }}
+          //     _hover={{ bg: 'gray.300' }}
+          //     textAlign="left"
+          //   >
+          //     使用激活码
+          //   </Tab>
+          // )}
+        }
 
         {!settings.appId && (
           <Tab
@@ -250,16 +251,18 @@ const App = () => {
             instanceId={settings.instanceId}
           />
         </TabPanel>
-        {!settings.appId && (
-          <>
-            <TabPanel>
-              <Heading as="h3" size="md" mb={4}>
-                账户设置
-              </Heading>
-              <AccountSettings />
-            </TabPanel>
-          </>
-        )}
+        {
+          // {!settings.appId && (
+          //   <>
+          //     <TabPanel>
+          //       <Heading as="h3" size="md" mb={4}>
+          //         账户设置
+          //       </Heading>
+          //       <AccountSettings />
+          //     </TabPanel>
+          //   </>
+          // )}
+        }
         {!settings.appId && (
           <>
             <TabPanel>

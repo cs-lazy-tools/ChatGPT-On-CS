@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import { BrowserWindow } from 'electron';
 import { KeywordReplyController } from '../controllers/keywordReplyController';
 import {
   MessageDTO,
@@ -75,6 +74,12 @@ export class MessageService {
     if (!lastUserMsg) {
       this.log.warn(`未匹配到用户消息，所以使用默认回复: ${reply.content}`);
       return reply;
+    }
+
+    // 再根据 context_count 去保留最后几条消息
+    if (cfg.context_count > 0) {
+      // eslint-disable-next-line no-param-reassign
+      messages = messages.slice(-cfg.context_count);
     }
 
     // 等待随机时间
@@ -239,6 +244,9 @@ export class MessageService {
     // const chatCompletion = await client.chat.completions.create
     if ('chat' in llmClient) {
       try {
+        console.log('开始使用 GPT 生成回复....');
+        console.log('messages:', messages);
+
         // @ts-ignore
         const response = await llmClient.chat.completions.create({
           model: cfg.model,
