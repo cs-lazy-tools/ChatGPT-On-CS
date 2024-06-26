@@ -329,7 +329,7 @@ export class MessageService {
     // 先过滤 system 消息
     const f_messages = messages.filter((msg) => msg.role !== 'SYSTEM');
     const msgs = f_messages.map((msg) => ({
-      role: msg.role === 'SELF' ? 'user' : 'assistant',
+      role: msg.role === 'SELF' ? 'assistant' : 'user',
       content: msg.content,
     }));
 
