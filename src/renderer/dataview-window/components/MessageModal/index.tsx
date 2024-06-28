@@ -16,7 +16,6 @@ import {
   Th,
   Td,
   Tooltip,
-  useDisclosure,
 } from '@chakra-ui/react';
 import ReactPaginate from 'react-paginate';
 
@@ -38,6 +37,9 @@ const MessageModal = ({ isOpen, onClose, messages }: MessageModalProps) => {
   const currentMessages = useMemo(() => {
     const start = currentPage * itemsPerPage;
     const end = start + itemsPerPage;
+
+    console.log('start', start);
+    console.log('end', end);
     return messages.slice(start, end);
   }, [currentPage, messages]);
 
@@ -46,7 +48,14 @@ const MessageModal = ({ isOpen, onClose, messages }: MessageModalProps) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={'3xl'}>
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        setCurrentPage(0);
+        onClose();
+      }}
+      size={'3xl'}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>当前会话的消息</ModalHeader>
@@ -107,7 +116,14 @@ const MessageModal = ({ isOpen, onClose, messages }: MessageModalProps) => {
           </Box>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            onClick={() => {
+              setCurrentPage(0);
+              onClose();
+            }}
+          >
             关闭
           </Button>
         </ModalFooter>

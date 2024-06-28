@@ -10,14 +10,12 @@ import {
   Tr,
   Th,
   Td,
-  Button,
   useDisclosure,
   Tooltip,
   Stack,
   Skeleton,
   InputGroup,
   IconButton,
-  InputRightElement,
   useToast,
   Flex,
 } from '@chakra-ui/react';
@@ -48,6 +46,7 @@ const SessionHistory = () => {
   const [currentPageData, setCurrentPageData] = useState<Session[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [messages, setMessages] = useState<MessageModel[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [search, setSearch] = useState('');
