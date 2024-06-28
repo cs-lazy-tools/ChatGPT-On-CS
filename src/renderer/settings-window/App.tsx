@@ -19,10 +19,12 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { loader } from '@monaco-editor/react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import GeneralSettings from './components/Settings/GeneralSettings';
 import LLMSettings from './components/Settings/LLMSettings';
-import PluginSettings from './components/Settings/PluginSettings';
+import PluginPage from './pages/Plugin';
+import PluginEditorPage from './pages/PluginEditor';
 import AboutPage from './components/About';
 import { trackPageView } from '../common/services/analytics';
 import {
@@ -199,18 +201,6 @@ const App = () => {
           {settings.appId || settings.instanceId ? '' : '全局'}插件设置
         </Tab>
 
-        {
-          // {!settings.appId && (
-          //   <Tab
-          //     _selected={{ bg: 'gray.200' }}
-          //     _hover={{ bg: 'gray.300' }}
-          //     textAlign="left"
-          //   >
-          //     使用激活码
-          //   </Tab>
-          // )}
-        }
-
         {!settings.appId && (
           <Tab
             _selected={{ bg: 'gray.200' }}
@@ -243,26 +233,30 @@ const App = () => {
           />
         </TabPanel>
         <TabPanel>
-          <Heading as="h3" size="md" mb={4}>
-            {settings.appId ? '' : '全局'}插件设置
-          </Heading>
-          <PluginSettings
-            appId={settings.appId}
-            instanceId={settings.instanceId}
-          />
+          <Router>
+            <Routes>
+              <Route
+                path="/settings.html"
+                element={
+                  <PluginPage
+                    appId={settings.appId}
+                    instanceId={settings.instanceId}
+                  />
+                }
+              />
+              <Route
+                path="/settings.html/editor"
+                element={
+                  <PluginEditorPage
+                    appId={settings.appId}
+                    instanceId={settings.instanceId}
+                  />
+                }
+              />
+            </Routes>
+          </Router>
         </TabPanel>
-        {
-          // {!settings.appId && (
-          //   <>
-          //     <TabPanel>
-          //       <Heading as="h3" size="md" mb={4}>
-          //         账户设置
-          //       </Heading>
-          //       <AccountSettings />
-          //     </TabPanel>
-          //   </>
-          // )}
-        }
+
         {!settings.appId && (
           <>
             <TabPanel>

@@ -12,6 +12,7 @@ import {
   DriverConfig,
   Message,
   Session,
+  Plugin,
   MessageModel,
 } from './platform';
 import { GET, POST } from '../common/api/request';
@@ -326,4 +327,30 @@ export async function getMessages({ sessionId }: { sessionId: number }) {
 export async function exportMessageExcel() {
   const data = await GET('/api/v1/message/excel');
   return data;
+}
+
+export async function getCustomPluginList() {
+  const data = await GET<{
+    data: Plugin[];
+  }>('/api/v1/plugin/list');
+  return data;
+}
+
+export async function getCustomPluginDetail(id: number) {
+  const data = await GET<{
+    data: Plugin;
+  }>('/api/v1/plugin/detail', { id });
+  return data;
+}
+
+export async function addCustomPlugin(plugin: Plugin) {
+  await POST('/api/v1/plugin/create', plugin);
+}
+
+export async function updateCustomPlugin(plugin: Plugin) {
+  await POST('/api/v1/plugin/update', plugin);
+}
+
+export async function deleteCustomPlugin(id: number) {
+  await POST('/api/v1/plugin/delete', { id });
 }

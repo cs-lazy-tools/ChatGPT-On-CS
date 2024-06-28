@@ -111,6 +111,7 @@
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.4",
+    "emoji-picker-react": "^4.10.0",
     "exceljs": "^4.4.0",
     "express": "^4.19.2",
     "express-async-handler": "^1.2.0",

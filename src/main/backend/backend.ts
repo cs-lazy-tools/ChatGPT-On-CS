@@ -538,6 +538,88 @@ class BKServer {
       }
     });
 
+    this.app.get('/api/v1/plugin/list', async (req, res) => {
+      const plugins = await this.configController.getAllCustomPlugins();
+      const results = plugins.map((plugin) => {
+        return {
+          id: plugin.id,
+          code: plugin.code,
+          title: plugin.title,
+          description: plugin.description,
+          icon: plugin.icon,
+          source: plugin.source,
+          author: plugin.author,
+          type: plugin.type,
+          tags: JSON.parse(plugin.tags || '[]'),
+        };
+      });
+      res.json({
+        success: true,
+        data: results,
+      });
+    });
+
+    this.app.get('/api/v1/plugin/detail', async (req, res) => {
+      const { id } = req.query;
+      const plugin = await this.configController.getPluginConfig(Number(id));
+      if (!plugin) {
+        res.json({
+          success: false,
+          data: null,
+        });
+        return;
+      }
+
+      const tags = JSON.parse(plugin.tags || '[]');
+      res.json({
+        success: true,
+        data: {
+          id: plugin.id,
+          code: plugin.code,
+          title: plugin.title,
+          description: plugin.description,
+          icon: plugin.icon,
+          source: plugin.source,
+          author: plugin.author,
+          type: plugin.type,
+          tags,
+        },
+      });
+    });
+
+    this.app.post('/api/v1/plugin/create', async (req, res) => {
+      const { code, source, author, description, icon, tags, title } = req.body;
+      await this.configController.createCustomPlugin({
+        code,
+        source,
+        author,
+        description,
+        icon,
+        tags: JSON.stringify(tags),
+        title,
+      });
+      res.json({ success: true });
+    });
+
+    this.app.post('/api/v1/plugin/update', async (req, res) => {
+      const { id, code, description, icon, tags, title } = req.body;
+      await this.configController.updateCustomPlugin({
+        pluginId: id,
+        code,
+        description,
+        icon,
+        tags: JSON.stringify(tags),
+        title,
+      });
+      res.json({ success: true });
+    });
+
+    this.app.post('/api/v1/plugin/delete', async (req, res) => {
+      const { id } = req.body;
+      await this.configController.deleteCustomPlugin(id);
+      res.json({ success: true });
+    });
+
     // Health check endpoint
     // TODO: 后续需要根据通过 WS 去检查后端服务是否健康
     this.app.get('/api/v1/base/health', async (req, res) => {

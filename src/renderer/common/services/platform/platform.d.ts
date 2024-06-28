@@ -44,6 +44,17 @@ export interface LogBody {
   message: string;
 }
 
+export interface Plugin {
+  id?: number;
+  code?: string;
+  type: string;
+  title: string;
+  author?: string;
+  description: string;
+  tags: string[];
+  icon?: string;
+}
+
 export interface GenericConfig {
   appId: string;
   instanceId: string;
@@ -76,7 +87,7 @@ export interface PluginConfig {
   appId: string;
   instanceId: string;
   usePlugin: boolean;
-  pluginCode: string;
+  pluginId: number;
 }
 
 export interface DriverConfig {

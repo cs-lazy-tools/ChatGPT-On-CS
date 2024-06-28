@@ -75,16 +75,6 @@ export class ConfigController {
   }
 
   /**
-   * 取得插件配置
-   * @param pluginId
-   * @returns
-   */
-  public async getPluginConfig(pluginId: number): Promise<Plugin | null> {
-    const plugin = await Plugin.findByPk(pluginId);
-    return plugin;
-  }
-
-  /**
    * 激活或关闭配置
    * @param
    * @returns
@@ -131,6 +121,106 @@ export class ConfigController {
     // 更新配置
     if (config) {
       await config.update({ active });
+    }
+  }
+
+  /**
+   * 取得自定义插件
+   * @param
+   * @returns
+   */
+  public async getAllCustomPlugins(): Promise<Plugin[]> {
+    const plugins = await Plugin.findAll();
+    return plugins;
+  }
+
+  /**
+   * 取得插件配置
+   * @param pluginId
+   * @returns
+   */
+  public async getPluginConfig(pluginId: number): Promise<Plugin | null> {
+    const plugin = await Plugin.findByPk(pluginId);
+    return plugin;
+  }
+
+  /**
+   * 新增自定义插件
+   * @param
+   * @returns
+   */
+  public async createCustomPlugin({
+    source,
+    author,
+    description,
+    icon,
+    tags,
+    title,
+    code,
+  }: {
+    source?: string;
+    author?: string;
+    description?: string;
+    icon?: string;
+    tags?: string;
+    title: string;
+    code: string;
+  }) {
+    const plugin = await Plugin.create({
+      source: source || 'custom',
+      author,
+      description,
+      icon,
+      tags,
+      type: 'plugin',
+      title,
+      code,
+    });
+
+    return plugin;
+  }
+
+  /**
+   * 删除自定义插件
+   * @param
+   * @returns
+   */
+  public async deleteCustomPlugin(pluginId: number) {
+    const plugin = await Plugin.findByPk(pluginId);
+    if (plugin) {
+      await plugin.destroy();
+    }
+  }
+
+  /**
+   * 更新自定义插件
+   * @param
+   * @returns
+   */
+  public async updateCustomPlugin({
+    pluginId,
+    code,
+    description,
+    icon,
+    tags,
+    title,
+  }: {
+    pluginId: number;
+    code: string;
+    description: string;
+    icon: string;
+    tags: string;
+    title: string;
+  }) {
+    const plugin = await Plugin.findByPk(pluginId);
+    if (plugin) {
+      await plugin.update({
+        code,
+        description,
+        icon,
+        tags,
+        title,
+      });
     }
   }
 
@@ -254,18 +344,11 @@ export class ConfigController {
     }
 
     if (type === 'plugin') {
-      let pluginCode = '';
-
-      if (config?.plugin_id) {
-        const plugin = await Plugin.findByPk(config?.plugin_id);
-        pluginCode = plugin?.code || '';
-      }
-
       return {
         appId: config?.platform_id || '',
         instanceId: config?.instance_id || '',
         usePlugin: config?.use_plugin || false,
-        pluginCode,
+        pluginId: config?.plugin_id || 0,
       };
     }
 
@@ -364,18 +447,7 @@ export class ConfigController {
       let pluginId = null;
       const config = cfg as PluginConfig;
       if (dbConfig.use_plugin) {
-        let plugin = await Plugin.findByPk(dbConfig.plugin_id);
-        if (!plugin) {
-          plugin = await Plugin.create({
-            code: config.pluginCode,
-          });
-        } else {
-          await plugin.update({
-            code: config.pluginCode,
-          });
-        }
-
-        pluginId = plugin.id;
+        pluginId = config.pluginId;
       }
 
       await dbConfig.update({

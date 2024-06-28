@@ -70,7 +70,7 @@ export interface PluginConfig {
   appId: string;
   instanceId: string;
   usePlugin: boolean;
-  pluginCode: string;
+  pluginId: number;
 }
 
 export interface DriverConfig {

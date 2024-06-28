@@ -91,7 +91,7 @@ export async function checkAndAddFields(sequelize: Sequelize) {
       .addColumn('n_config', 'truncate_word_key', {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: '...',
+        defaultValue: '',
       });
   }
 }

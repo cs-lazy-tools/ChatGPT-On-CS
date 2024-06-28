@@ -32,7 +32,7 @@ import {
 import {
   PluginConfig,
   LogBody,
-} from '../../../common/services/platform/platform.d';
+} from '../../../common/services/platform/platform';
 import MessageModal from '../MessageModal';
 import { useSystemStore } from '../../stores/useSystemStore';
 
@@ -152,7 +152,7 @@ const PluginSettings = ({
         });
       }
     },
-    [code, config], // 更新依赖项
+    [code, config, appId, instanceId, toast], // 更新依赖项
   );
 
   const handleDefaultCode = () => {
