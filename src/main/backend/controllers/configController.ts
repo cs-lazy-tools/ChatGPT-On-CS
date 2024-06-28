@@ -237,6 +237,8 @@ export class ConfigController {
         contextCount: config?.context_count || 0,
         waitHumansTime: config?.wait_humans_time || 0,
         defaultReply: config?.default_reply || '',
+        truncateWordCount: config?.truncate_word_count || 0,
+        truncateWordKey: config?.truncate_word_key || '',
       };
     }
 
@@ -347,6 +349,8 @@ export class ConfigController {
         context_count: config.contextCount,
         wait_humans_time: config.waitHumansTime,
         default_reply: config.defaultReply,
+        truncate_word_count: config.truncateWordCount,
+        truncate_word_key: config.truncateWordKey,
       });
     } else if (type === 'llm') {
       const config = cfg as LLMConfig;

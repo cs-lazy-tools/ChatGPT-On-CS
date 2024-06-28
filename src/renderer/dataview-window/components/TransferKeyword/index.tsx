@@ -10,7 +10,7 @@ import {
   TableContainer,
   useDisclosure,
   useToast,
-  Text,
+  Alert,
   Button,
   IconButton,
   Box,
@@ -22,29 +22,31 @@ import {
 } from '@chakra-ui/react';
 import { DeleteIcon, AddIcon, EditIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
-import EditKeyword from '../EditKeyword';
+import EditKeyword from '../EditTransferKeyword';
 import {
-  getReplyList,
-  deleteReplyKeyword,
-  updateReplyExcel,
-  exportReplyExcel,
+  getTransferList,
+  deleteTransferKeyword,
+  updateTransferExcel,
+  exportTransferExcel,
 } from '../../../common/services/platform/controller';
-import { Keyword } from '../../../common/services/platform/platform';
+import { TransferKeyword as TransferKeywordType } from '../../../common/services/platform/platform';
 
-const ReplyKeyword = () => {
-  const [keywords, setKeywords] = useState<Keyword[]>([]);
-  const [editKeyword, setEditKeyword] = useState<Keyword | null>(null);
+const TransferKeyword = () => {
+  const [keywords, setKeywords] = useState<TransferKeywordType[]>([]);
+  const [editKeyword, setEditKeyword] = useState<TransferKeywordType | null>(
+    null,
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [updated, setUpdated] = useState(false);
 
   const { data, isLoading, refetch } = useQuery(
-    ['replyList'],
+    ['transferList'],
     () => {
-      return getReplyList({
+      return getTransferList({
         page: 1,
         pageSize: 100,
-        ptfId: '',
+        appId: '',
       });
     },
     {
@@ -83,7 +85,7 @@ const ReplyKeyword = () => {
       console.log(selectedPath);
       setUpdated(true);
       try {
-        await updateReplyExcel({ path: selectedPath[0] });
+        await updateTransferExcel({ path: selectedPath[0] });
         refetch();
         toast({
           title: '导入成功',
@@ -120,7 +122,7 @@ const ReplyKeyword = () => {
   const handleExportReplyExcel = async () => {
     try {
       setUpdated(true);
-      await exportReplyExcel();
+      await exportTransferExcel();
       toast({
         title: '导出成功',
         description: '导出成功',
@@ -152,7 +154,7 @@ const ReplyKeyword = () => {
     }
   };
 
-  const handleDoubleClick = (keyword: Keyword) => {
+  const handleDoubleClick = (keyword: TransferKeywordType) => {
     setEditKeyword(keyword);
     onOpen();
   };
@@ -163,15 +165,15 @@ const ReplyKeyword = () => {
   };
 
   const handleDelete = async (id: number) => {
-    await deleteReplyKeyword(id);
+    await deleteTransferKeyword(id);
     refetch();
   };
 
   const handleAddKeyword = () => {
-    const newKeyword: Keyword = {
+    const newKeyword: TransferKeywordType = {
       keyword: '',
-      reply: '',
-      mode: 'fuzzy',
+      has_regular: false,
+      fuzzy: true,
     };
     setKeywords([...keywords, newKeyword]);
     setEditKeyword(newKeyword);
@@ -181,7 +183,9 @@ const ReplyKeyword = () => {
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" mb={2}>
-        <Text>编辑回复关键词</Text>
+        <Alert status="info" mr={'20px'}>
+          匹配用户的输入，当用户输入的内容包含关键词时，自动转移会话给人工客服
+        </Alert>
         <Flex alignItems="center">
           <HStack>
             <Button
@@ -228,7 +232,8 @@ const ReplyKeyword = () => {
             <Tr>
               <Th>平台</Th>
               <Th>关键词</Th>
-              <Th>回复内容</Th>
+              <Th>是否模糊匹配</Th>
+              <Th>是否含正则表达式</Th>
               <Th>操作</Th>
             </Tr>
           </Thead>
@@ -248,19 +253,13 @@ const ReplyKeyword = () => {
                 >
                   {keyword.keyword}
                 </Td>
-                <Td
-                  maxW="150px"
-                  whiteSpace="nowrap"
-                  overflow="hidden"
-                  textOverflow="ellipsis"
-                >
-                  {keyword.reply}
-                </Td>
+                <Td>{keyword.fuzzy ? '是' : '否'}</Td>
+                <Td>{keyword.has_regular ? '是' : '否'}</Td>
                 <Td>
                   <Grid templateColumns="repeat(2, 1fr)" gap={2}>
                     <Tooltip label="删除">
                       <IconButton
-                        size="xs" // 设置为最小尺寸
+                        size="xs"
                         fontSize="13px"
                         colorScheme="red"
                         aria-label="Delete keyword"
@@ -268,10 +267,9 @@ const ReplyKeyword = () => {
                         onClick={() => keyword.id && handleDelete(keyword.id)}
                       />
                     </Tooltip>
-
                     <Tooltip label="编辑">
                       <IconButton
-                        size="xs" // 设置为最小尺寸
+                        size="xs"
                         fontSize="13px"
                         colorScheme="blue"
                         aria-label="Edit keyword"
@@ -300,4 +298,4 @@ const ReplyKeyword = () => {
   );
 };
 
-export default ReplyKeyword;
+export default TransferKeyword;

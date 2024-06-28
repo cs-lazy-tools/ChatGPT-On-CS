@@ -55,6 +55,10 @@ export class Config extends Model {
   declare has_mouse_close: boolean; // 鼠标移动时是否自动关闭
 
   declare has_esc_close: boolean; // 按ESC键是否自动关闭
+
+  declare truncate_word_count: number; // 截断词数
+
+  declare truncate_word_key: string; // 截断词
 }
 
 export async function checkAndAddFields(sequelize: Sequelize) {
@@ -67,6 +71,28 @@ export async function checkAndAddFields(sequelize: Sequelize) {
       allowNull: false,
       defaultValue: true,
     });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.truncate_word_count) {
+    await sequelize
+      .getQueryInterface()
+      .addColumn('n_config', 'truncate_word_count', {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 4000,
+      });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.truncate_word_key) {
+    await sequelize
+      .getQueryInterface()
+      .addColumn('n_config', 'truncate_word_key', {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: '...',
+      });
   }
 }
 
@@ -195,6 +221,16 @@ export function initConfig(sequelize: Sequelize) {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
         allowNull: true,
+      },
+      truncate_word_count: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 4000,
+      },
+      truncate_word_key: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: '',
       },
     },
     {

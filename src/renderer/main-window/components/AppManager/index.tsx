@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { Flex, Stack, Skeleton } from '@chakra-ui/react';
 import AppListComponent from './AppListComponent';
 import InstanceListComponent from './InstanceListComponent';
@@ -34,6 +34,7 @@ const AppManagerContent = () => {
       setIsSettingsOpen(false);
       handleOpenSettings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAppId, selectedInstanceId, isSettingsOpen, setIsSettingsOpen]);
 
   if (isLoading || !data || !data.data) {

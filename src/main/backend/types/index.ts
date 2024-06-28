@@ -49,6 +49,8 @@ export interface GenericConfig {
   contextCount: number;
   waitHumansTime: number;
   defaultReply: string;
+  truncateWordCount: number;
+  truncateWordKey: string;
 }
 
 export interface LLMConfig {

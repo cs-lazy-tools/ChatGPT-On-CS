@@ -10,7 +10,7 @@ import {
   TableContainer,
   useDisclosure,
   useToast,
-  Text,
+  Alert,
   Button,
   IconButton,
   Box,
@@ -22,43 +22,42 @@ import {
 } from '@chakra-ui/react';
 import { DeleteIcon, AddIcon, EditIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
-import EditKeyword from '../EditKeyword';
+import EditKeyword from '../EditReplaceKeyword';
 import {
-  getReplyList,
-  deleteReplyKeyword,
-  updateReplyExcel,
-  exportReplyExcel,
+  getReplaceList,
+  deleteReplaceKeyword,
+  updateReplaceExcel,
+  exportReplaceExcel,
 } from '../../../common/services/platform/controller';
-import { Keyword } from '../../../common/services/platform/platform';
+import { ReplaceKeyword as ReplaceKeywordType } from '../../../common/services/platform/platform';
 
-const ReplyKeyword = () => {
-  const [keywords, setKeywords] = useState<Keyword[]>([]);
-  const [editKeyword, setEditKeyword] = useState<Keyword | null>(null);
+const ReplaceKeyword = () => {
+  const [keywords, setKeywords] = useState<ReplaceKeywordType[]>([]);
+  const [editKeyword, setEditKeyword] = useState<ReplaceKeywordType | null>(
+    null,
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [updated, setUpdated] = useState(false);
 
   const { data, isLoading, refetch } = useQuery(
-    ['replyList'],
+    ['replaceList'],
     () => {
-      return getReplyList({
+      return getReplaceList({
         page: 1,
         pageSize: 100,
-        ptfId: '',
+        appId: '',
       });
     },
     {
-      retry: () => {
-        return true;
-      },
-      retryDelay: () => {
-        return 1000;
-      },
+      retry: true,
+      retryDelay: 1000,
     },
   );
 
   useEffect(() => {
     if (data) {
+      console.log(data);
       setKeywords(data?.data);
     }
   }, [data]);
@@ -80,10 +79,9 @@ const ReplyKeyword = () => {
     window.electron.ipcRenderer.once('selected-file', async (path) => {
       const selectedPath = path as string[];
       if (!selectedPath.length || !selectedPath[0]) return;
-      console.log(selectedPath);
       setUpdated(true);
       try {
-        await updateReplyExcel({ path: selectedPath[0] });
+        await updateReplaceExcel({ path: selectedPath[0] });
         refetch();
         toast({
           title: '导入成功',
@@ -94,15 +92,13 @@ const ReplyKeyword = () => {
           isClosable: true,
         });
       } catch (e) {
-        let message = '导入失败';
-        if (e instanceof Error) {
-          message = e.message;
-        } else if (typeof e === 'string') {
-          message = e;
-        } else {
-          message = JSON.stringify(e);
-        }
-
+        const message =
+          // eslint-disable-next-line no-nested-ternary
+          e instanceof Error
+            ? e.message
+            : typeof e === 'string'
+              ? e
+              : JSON.stringify(e);
         toast({
           title: '导入失败',
           description: message,
@@ -120,7 +116,7 @@ const ReplyKeyword = () => {
   const handleExportReplyExcel = async () => {
     try {
       setUpdated(true);
-      await exportReplyExcel();
+      await exportReplaceExcel();
       toast({
         title: '导出成功',
         description: '导出成功',
@@ -130,15 +126,13 @@ const ReplyKeyword = () => {
         isClosable: true,
       });
     } catch (e) {
-      let message = '导出失败';
-      if (e instanceof Error) {
-        message = e.message;
-      } else if (typeof e === 'string') {
-        message = e;
-      } else {
-        message = JSON.stringify(e);
-      }
-
+      const message =
+        // eslint-disable-next-line no-nested-ternary
+        e instanceof Error
+          ? e.message
+          : typeof e === 'string'
+            ? e
+            : JSON.stringify(e);
       toast({
         title: '导出失败',
         description: message,
@@ -152,7 +146,7 @@ const ReplyKeyword = () => {
     }
   };
 
-  const handleDoubleClick = (keyword: Keyword) => {
+  const handleDoubleClick = (keyword: ReplaceKeywordType) => {
     setEditKeyword(keyword);
     onOpen();
   };
@@ -163,15 +157,16 @@ const ReplyKeyword = () => {
   };
 
   const handleDelete = async (id: number) => {
-    await deleteReplyKeyword(id);
+    await deleteReplaceKeyword(id);
     refetch();
   };
 
   const handleAddKeyword = () => {
-    const newKeyword: Keyword = {
+    const newKeyword: ReplaceKeywordType = {
       keyword: '',
-      reply: '',
-      mode: 'fuzzy',
+      replace: '',
+      fuzzy: true,
+      has_regular: false,
     };
     setKeywords([...keywords, newKeyword]);
     setEditKeyword(newKeyword);
@@ -181,7 +176,10 @@ const ReplyKeyword = () => {
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" mb={2}>
-        <Text>编辑回复关键词</Text>
+        <Alert status="info" mr={'20px'}>
+          当 ChatGPT
+          生成的回复中包含下面的关键词规则时，将该关键词自动替换为指定的关键词。
+        </Alert>
         <Flex alignItems="center">
           <HStack>
             <Button
@@ -228,7 +226,9 @@ const ReplyKeyword = () => {
             <Tr>
               <Th>平台</Th>
               <Th>关键词</Th>
-              <Th>回复内容</Th>
+              <Th>替换内容</Th>
+              <Th>模糊匹配</Th>
+              <Th>正则</Th>
               <Th>操作</Th>
             </Tr>
           </Thead>
@@ -254,13 +254,15 @@ const ReplyKeyword = () => {
                   overflow="hidden"
                   textOverflow="ellipsis"
                 >
-                  {keyword.reply}
+                  {keyword.replace}
                 </Td>
+                <Td>{keyword.fuzzy ? '是' : '否'}</Td>
+                <Td>{keyword.has_regular ? '是' : '否'}</Td>
                 <Td>
                   <Grid templateColumns="repeat(2, 1fr)" gap={2}>
                     <Tooltip label="删除">
                       <IconButton
-                        size="xs" // 设置为最小尺寸
+                        size="xs"
                         fontSize="13px"
                         colorScheme="red"
                         aria-label="Delete keyword"
@@ -271,7 +273,7 @@ const ReplyKeyword = () => {
 
                     <Tooltip label="编辑">
                       <IconButton
-                        size="xs" // 设置为最小尺寸
+                        size="xs"
                         fontSize="13px"
                         colorScheme="blue"
                         aria-label="Edit keyword"
@@ -300,4 +302,4 @@ const ReplyKeyword = () => {
   );
 };
 
-export default ReplyKeyword;
+export default ReplaceKeyword;

@@ -9,23 +9,27 @@ import {
   ModalBody,
   ModalFooter,
   useToast,
+  Flex,
+  Box,
+  Switch,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
 import {
-  getPlatformList,
-  addReplyKeyword,
-  updateReplyKeyword,
+  addTransferKeyword,
+  updateTransferKeyword,
 } from '../../../common/services/platform/controller';
-import { Keyword, App } from '../../../common/services/platform/platform';
+import {
+  App,
+  TransferKeyword,
+} from '../../../common/services/platform/platform';
 import GlobalSwitch from './GlobalSwitch';
 import PlatformSelector from './PlatformSelector';
 import KeywordInput from './KeywordInput';
 import KeywordList from './KeywordList';
-import ReplyInput from './ReplyInput';
-import ReplyList from './ReplyList';
 
 type EditKeywordProps = {
-  editKeyword: Keyword | undefined | null;
+  editKeyword: TransferKeyword | undefined | null;
   isOpen: boolean;
   onClose: () => void;
   handleEdit: () => void;
@@ -41,19 +45,14 @@ const EditKeyword = ({
   const [keywords, setKeywords] = useState<string[]>(
     editKeyword?.keyword.split('|') || [],
   );
-  const [replyList, setReplyList] = useState<string[]>(
-    editKeyword?.reply.split('[or]') || [],
-  );
 
   const [isGlobal, setIsGlobal] = useState<boolean>(false);
-  const [ptf, setPtf] = useState<string>(editKeyword?.platform_id || '');
+  const [ptf, setPtf] = useState<string>(editKeyword?.app_id || '');
   const [newKeyword, setNewKeyword] = useState<string>('');
-  const [newReply, setNewReply] = useState<string>('');
   const [startKeyword, setStartKeyword] = useState<string>('');
   const [endKeyword, setEndKeyword] = useState<string>('');
-  const [currentPlatform, setCurrentPlatform] = useState<App | undefined>(
-    undefined,
-  );
+  const [fuzzy, setFuzzy] = useState<boolean>(true);
+  const [regular, setRegular] = useState<boolean>(false);
 
   useEffect(() => {
     if (!editKeyword?.keyword) {
@@ -62,31 +61,25 @@ const EditKeyword = ({
       setKeywords(editKeyword?.keyword.split('|') || []);
     }
 
-    if (!editKeyword?.reply) {
-      setReplyList([]);
-    } else {
-      setReplyList(editKeyword?.reply.split('[or]') || []);
-    }
-
-    setPtf(editKeyword?.platform_id || '');
+    setPtf(editKeyword?.app_id || '');
 
     if (editKeyword) {
-      setIsGlobal(!editKeyword.platform_id);
+      setIsGlobal(!editKeyword.app_id);
     }
   }, [editKeyword]);
 
-  const { data: platforms, isLoading: isPlatformsLoading } = useQuery(
-    ['platformList'],
-    getPlatformList,
-  );
-
-  useEffect(() => {
-    if (ptf) {
-      setCurrentPlatform(
-        platforms?.data.find((platform) => platform.id === ptf),
-      );
-    }
-  }, [platforms, ptf]);
+  const platforms: App[] = [
+    {
+      id: 'win_qianniu',
+      name: '千牛',
+      env: 'E_COMMERCE',
+    },
+    {
+      id: 'pinduoduo',
+      name: '拼多多',
+      env: 'E_COMMERCE',
+    },
+  ];
 
   const handleAddKeyword = () => {
     if (newKeyword) {
@@ -108,30 +101,6 @@ const EditKeyword = ({
     setKeywords(keywords.filter((_, i) => i !== index));
   };
 
-  const handleAddReply = () => {
-    if (newReply) {
-      setReplyList([...replyList, newReply]);
-      setNewReply('');
-    }
-  };
-
-  const handleDeleteReply = (index: number) => {
-    setReplyList(replyList.filter((_, i) => i !== index));
-  };
-
-  const handleInsertRandomChar = () => {
-    setNewReply(`${newReply}[~]`);
-  };
-
-  const handleInsertFile = () => {
-    window.electron.ipcRenderer.sendMessage('select-file');
-    window.electron.ipcRenderer.once('selected-file', (path) => {
-      const selectedPath = path as string[];
-      if (!selectedPath.length || !selectedPath[0]) return;
-      setReplyList([...replyList, `[@]${selectedPath[0]}[/@]`]);
-    });
-  };
-
   const handleKeywordClick = (keyword: string, index: number) => {
     if (keyword.includes('[and]')) {
       const parts = keyword.split('[and]');
@@ -143,35 +112,25 @@ const EditKeyword = ({
     handleDeleteKeyword(index);
   };
 
-  const handleReplyClick = (item: string, index: number) => {
-    setNewReply(item);
-    handleDeleteReply(index);
-  };
-
   const handleSave = async () => {
     try {
-      const updatedReply = {
+      const updatedReplace = {
         ...editKeyword,
         keyword: keywords.join('|'),
-        reply: replyList.join('[or]'),
       };
 
       if (!isGlobal) {
-        updatedReply.platform_id = ptf;
+        updatedReplace.app_id = ptf;
       }
 
-      if (updatedReply.keyword === '') {
+      if (updatedReplace.keyword === '') {
         throw new Error('关键词不能为空');
       }
 
-      if (updatedReply.reply === '') {
-        throw new Error('回复内容不能为空');
-      }
-
-      if (updatedReply.id) {
-        await updateReplyKeyword(updatedReply);
+      if (updatedReplace.id) {
+        await updateTransferKeyword(updatedReplace);
       } else {
-        await addReplyKeyword(updatedReply);
+        await addTransferKeyword(updatedReplace);
       }
 
       handleEdit();
@@ -191,19 +150,43 @@ const EditKeyword = ({
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>
-          {editKeyword?.id ? '编辑关键词' : '新增关键词'}
+          {editKeyword?.id ? '编辑替换关键词' : '新增替换关键词'}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <GlobalSwitch isGlobal={isGlobal} setIsGlobal={setIsGlobal} />
           {!isGlobal && (
-            <PlatformSelector
-              ptf={ptf}
-              setPtf={setPtf}
-              platforms={platforms}
-              isLoading={isPlatformsLoading}
-            />
+            <PlatformSelector ptf={ptf} setPtf={setPtf} platforms={platforms} />
           )}
+
+          {/* 垂直展示 */}
+          <Flex direction="column">
+            <Box m={2}>
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="fuzzy" mb="0">
+                  模糊匹配
+                </FormLabel>
+                <Switch
+                  id="fuzzy"
+                  isChecked={fuzzy}
+                  onChange={() => setFuzzy(!fuzzy)}
+                />
+              </FormControl>
+            </Box>
+            <Box m={2}>
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="regular" mb="0">
+                  正则匹配
+                </FormLabel>
+                <Switch
+                  id="regular"
+                  isChecked={regular}
+                  onChange={() => setRegular(!regular)}
+                />
+              </FormControl>
+            </Box>
+          </Flex>
+
           <KeywordInput
             newKeyword={newKeyword}
             setNewKeyword={setNewKeyword}
@@ -218,19 +201,6 @@ const EditKeyword = ({
             keywords={keywords}
             handleKeywordClick={handleKeywordClick}
             handleDeleteKeyword={handleDeleteKeyword}
-          />
-          <ReplyInput
-            newReply={newReply}
-            setNewReply={setNewReply}
-            handleAddReply={handleAddReply}
-            handleInsertRandomChar={handleInsertRandomChar}
-            handleInsertFile={handleInsertFile}
-            currentPlatform={currentPlatform}
-          />
-          <ReplyList
-            replyList={replyList}
-            handleReplyClick={handleReplyClick}
-            handleDeleteReply={handleDeleteReply}
           />
         </ModalBody>
         <ModalFooter>

@@ -55,6 +55,8 @@ export interface GenericConfig {
   contextCount: number;
   waitHumansTime: number;
   defaultReply: string;
+  truncateWordCount: number;
+  truncateWordKey: string;
 }
 
 export interface LLMConfig {
@@ -107,8 +109,27 @@ export interface MessageModel {
 export interface Keyword {
   id?: number;
   mode?: string;
-  ptf_name?: string;
+  app_name?: string;
   platform_id?: string;
   keyword: string;
   reply: string;
+}
+
+export interface TransferKeyword {
+  id?: number;
+  keyword: string;
+  app_id?: string;
+  fuzzy?: boolean;
+  has_regular?: boolean;
+  app_name?: string;
+}
+
+export interface ReplaceKeyword {
+  id?: number;
+  keyword: string;
+  replace: string;
+  app_id?: string;
+  fuzzy?: boolean;
+  has_regular?: boolean;
+  app_name?: string;
 }

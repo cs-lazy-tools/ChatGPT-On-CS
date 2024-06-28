@@ -11,6 +11,8 @@ import { initMessage } from './entities/message';
 import { initPlugin } from './entities/plugin';
 import { initInstance } from './entities/instance';
 import { Keyword, initKeyword } from './entities/keyword';
+import { TransferKeyword, initTransfer } from './entities/transfer';
+import { ReplaceKeyword, initReplace } from './entities/replace';
 
 // Get user's documents directory path
 const DOCUMENTS_DIR = path.join(os.homedir(), 'Documents');
@@ -40,6 +42,8 @@ initMessage(sequelize);
 initKeyword(sequelize);
 initPlugin(sequelize);
 initInstance(sequelize);
+initTransfer(sequelize);
+initReplace(sequelize);
 
 // 异步初始化和数据填充函数
 async function initDb(): Promise<void> {
@@ -165,6 +169,83 @@ async function initDb(): Promise<void> {
     ];
 
     await Keyword.bulkCreate(replies);
+  }
+
+  const transferCount = await TransferKeyword.count();
+  if (transferCount === 0) {
+    const transfers = [
+      {
+        keyword: '转人工',
+        has_regular: false,
+      },
+      {
+        keyword: '人工客服',
+        has_regular: false,
+      },
+      {
+        keyword: '转人工客服',
+        has_regular: false,
+      },
+      {
+        keyword: '转人工处理',
+        has_regular: false,
+      },
+      {
+        keyword: '价格',
+        has_regular: false,
+      },
+      {
+        keyword: '退款',
+        has_regular: false,
+      },
+      {
+        keyword: '顺丰包邮',
+        has_regular: false,
+      },
+      {
+        keyword: '退货',
+        has_regular: false,
+      },
+    ];
+    await TransferKeyword.bulkCreate(transfers);
+  }
+
+  const replaceCount = await ReplaceKeyword.count();
+  if (replaceCount === 0) {
+    const replaces = [
+      {
+        keyword: '微信',
+        replace: 'V兴',
+        has_regular: false,
+      },
+      // “线下”、“电话”、“转账”、“到付”、“shua单” 淘宝、京东、微信、QQ
+      {
+        keyword: '线下',
+        replace: 'X下',
+        has_regular: false,
+      },
+      {
+        keyword: '电话',
+        replace: 'Call',
+        has_regular: false,
+      },
+      {
+        keyword: '转账',
+        replace: '转Z',
+        has_regular: false,
+      },
+      {
+        keyword: '到付',
+        replace: 'V付',
+        has_regular: false,
+      },
+      {
+        keyword: 'shua单',
+        replace: 'V单',
+        has_regular: false,
+      },
+    ];
+    await ReplaceKeyword.bulkCreate(replaces);
   }
 }
 

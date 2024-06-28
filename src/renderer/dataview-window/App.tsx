@@ -8,20 +8,12 @@ import {
   Tab,
   TabPanel,
   Heading,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  Checkbox,
-  Text,
-  Button,
 } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReplyKeyword from './components/ReplyKeyword';
 import SessionHistory from './components/SessionHistory';
+import ReplaceKeyword from './components/ReplaceKeyword';
+import TransferKeyword from './components/TransferKeyword';
 import theme from '../common/styles/theme';
 import '../common/App.css';
 
@@ -57,6 +49,21 @@ const App = () => {
               >
                 编辑关键词
               </Tab>
+
+              <Tab
+                _selected={{ bg: 'gray.200' }}
+                _hover={{ bg: 'gray.300' }}
+                textAlign="left"
+              >
+                替换关键词
+              </Tab>
+              <Tab
+                _selected={{ bg: 'gray.200' }}
+                _hover={{ bg: 'gray.300' }}
+                textAlign="left"
+              >
+                转人工关键词
+              </Tab>
               <Tab
                 _selected={{ bg: 'gray.200' }}
                 _hover={{ bg: 'gray.300' }}
@@ -71,6 +78,19 @@ const App = () => {
                   关键词匹配
                 </Heading>
                 <ReplyKeyword />
+              </TabPanel>
+
+              <TabPanel>
+                <Heading as="h3" size="md" mb={4}>
+                  替换关键词
+                </Heading>
+                <ReplaceKeyword />
+              </TabPanel>
+              <TabPanel>
+                <Heading as="h3" size="md" mb={4}>
+                  转人工关键词
+                </Heading>
+                <TransferKeyword />
               </TabPanel>
               <TabPanel>
                 <Heading as="h3" size="md" mb={4}>

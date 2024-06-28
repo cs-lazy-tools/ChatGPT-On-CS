@@ -283,6 +283,50 @@ const GeneralSettings = ({
         </SliderTrack>
         <SliderThumb />
       </Slider>
+
+      <Flex mt={3}>
+        <Text mb="8px" mr={3}>
+          字数截断设置: {config.truncateWordCount}
+        </Text>
+        <Tooltip label="当回复的字数超过设置的字数时，将会截断回复内容，并转为新发一条回复">
+          <Box color={'gray.500'}>
+            <Icon as={FiHelpCircle} w={6} h={6} />
+          </Box>
+        </Tooltip>
+      </Flex>
+      <Slider
+        min={50}
+        max={4000}
+        step={5}
+        value={config.truncateWordCount}
+        onChange={(truncateWordCount) =>
+          handleUpdateConfig({ truncateWordCount })
+        }
+      >
+        <SliderTrack>
+          <SliderFilledTrack />
+        </SliderTrack>
+        <SliderThumb />
+      </Slider>
+
+      <FormControl mt={3}>
+        <FormLabel>
+          {' '}
+          <Tooltip label="当匹配到这个关键词时，自动截断消息，转为新发一条回复，不写则不根据关键词截断">
+            <Text mb="8px">截断关键词</Text>
+          </Tooltip>
+        </FormLabel>
+        <Flex>
+          <Input
+            placeholder="截断关键词"
+            max={5}
+            value={config.truncateWordKey}
+            onChange={(e) =>
+              handleUpdateConfig({ truncateWordKey: e.target.value })
+            }
+          />
+        </Flex>
+      </FormControl>
     </VStack>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Heading, Stack, Divider } from '@chakra-ui/react';
+import { Box, Stack, Divider } from '@chakra-ui/react';
 import PageContainer from '../../../common/components/PageContainer';
 import { trackPageView } from '../../../common/services/analytics';
 import AppManager from '../../components/AppManager/index';

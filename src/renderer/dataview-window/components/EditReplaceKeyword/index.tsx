@@ -9,23 +9,31 @@ import {
   ModalBody,
   ModalFooter,
   useToast,
+  Flex,
+  Box,
+  Switch,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
   getPlatformList,
-  addReplyKeyword,
-  updateReplyKeyword,
+  addReplaceKeyword,
+  updateReplaceKeyword,
 } from '../../../common/services/platform/controller';
-import { Keyword, App } from '../../../common/services/platform/platform';
+import {
+  ReplaceKeyword,
+  App,
+} from '../../../common/services/platform/platform';
 import GlobalSwitch from './GlobalSwitch';
 import PlatformSelector from './PlatformSelector';
 import KeywordInput from './KeywordInput';
 import KeywordList from './KeywordList';
-import ReplyInput from './ReplyInput';
-import ReplyList from './ReplyList';
+import ReplaceInput from './ReplaceInput';
+import ReplaceList from './ReplaceList';
 
 type EditKeywordProps = {
-  editKeyword: Keyword | undefined | null;
+  editKeyword: ReplaceKeyword | undefined | null;
   isOpen: boolean;
   onClose: () => void;
   handleEdit: () => void;
@@ -41,19 +49,21 @@ const EditKeyword = ({
   const [keywords, setKeywords] = useState<string[]>(
     editKeyword?.keyword.split('|') || [],
   );
-  const [replyList, setReplyList] = useState<string[]>(
-    editKeyword?.reply.split('[or]') || [],
+  const [replaceList, setReplaceList] = useState<string[]>(
+    editKeyword?.replace.split('[or]') || [],
   );
 
   const [isGlobal, setIsGlobal] = useState<boolean>(false);
-  const [ptf, setPtf] = useState<string>(editKeyword?.platform_id || '');
+  const [ptf, setPtf] = useState<string>(editKeyword?.app_id || '');
   const [newKeyword, setNewKeyword] = useState<string>('');
-  const [newReply, setNewReply] = useState<string>('');
+  const [newReplace, setNewReplace] = useState<string>('');
   const [startKeyword, setStartKeyword] = useState<string>('');
   const [endKeyword, setEndKeyword] = useState<string>('');
   const [currentPlatform, setCurrentPlatform] = useState<App | undefined>(
     undefined,
   );
+  const [fuzzy, setFuzzy] = useState<boolean>(true);
+  const [regular, setRegular] = useState<boolean>(false);
 
   useEffect(() => {
     if (!editKeyword?.keyword) {
@@ -62,16 +72,16 @@ const EditKeyword = ({
       setKeywords(editKeyword?.keyword.split('|') || []);
     }
 
-    if (!editKeyword?.reply) {
-      setReplyList([]);
+    if (!editKeyword?.replace) {
+      setReplaceList([]);
     } else {
-      setReplyList(editKeyword?.reply.split('[or]') || []);
+      setReplaceList(editKeyword?.replace.split('[or]') || []);
     }
 
-    setPtf(editKeyword?.platform_id || '');
+    setPtf(editKeyword?.app_id || '');
 
     if (editKeyword) {
-      setIsGlobal(!editKeyword.platform_id);
+      setIsGlobal(!editKeyword.app_id);
     }
   }, [editKeyword]);
 
@@ -109,27 +119,18 @@ const EditKeyword = ({
   };
 
   const handleAddReply = () => {
-    if (newReply) {
-      setReplyList([...replyList, newReply]);
-      setNewReply('');
+    if (newReplace) {
+      setReplaceList([...replaceList, newReplace]);
+      setNewReplace('');
     }
   };
 
-  const handleDeleteReply = (index: number) => {
-    setReplyList(replyList.filter((_, i) => i !== index));
+  const handleDeleteReplace = (index: number) => {
+    setReplaceList(replaceList.filter((_, i) => i !== index));
   };
 
   const handleInsertRandomChar = () => {
-    setNewReply(`${newReply}[~]`);
-  };
-
-  const handleInsertFile = () => {
-    window.electron.ipcRenderer.sendMessage('select-file');
-    window.electron.ipcRenderer.once('selected-file', (path) => {
-      const selectedPath = path as string[];
-      if (!selectedPath.length || !selectedPath[0]) return;
-      setReplyList([...replyList, `[@]${selectedPath[0]}[/@]`]);
-    });
+    setNewReplace(`${newReplace}[~]`);
   };
 
   const handleKeywordClick = (keyword: string, index: number) => {
@@ -143,35 +144,35 @@ const EditKeyword = ({
     handleDeleteKeyword(index);
   };
 
-  const handleReplyClick = (item: string, index: number) => {
-    setNewReply(item);
-    handleDeleteReply(index);
+  const handleReplaceClick = (item: string, index: number) => {
+    setNewReplace(item);
+    handleDeleteReplace(index);
   };
 
   const handleSave = async () => {
     try {
-      const updatedReply = {
+      const updatedReplace = {
         ...editKeyword,
         keyword: keywords.join('|'),
-        reply: replyList.join('[or]'),
+        replace: replaceList.join('[or]'),
       };
 
       if (!isGlobal) {
-        updatedReply.platform_id = ptf;
+        updatedReplace.app_id = ptf;
       }
 
-      if (updatedReply.keyword === '') {
+      if (updatedReplace.keyword === '') {
         throw new Error('关键词不能为空');
       }
 
-      if (updatedReply.reply === '') {
-        throw new Error('回复内容不能为空');
+      if (updatedReplace.replace === '') {
+        throw new Error('替换用的关键词不能为空');
       }
 
-      if (updatedReply.id) {
-        await updateReplyKeyword(updatedReply);
+      if (updatedReplace.id) {
+        await updateReplaceKeyword(updatedReplace);
       } else {
-        await addReplyKeyword(updatedReply);
+        await addReplaceKeyword(updatedReplace);
       }
 
       handleEdit();
@@ -191,7 +192,7 @@ const EditKeyword = ({
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>
-          {editKeyword?.id ? '编辑关键词' : '新增关键词'}
+          {editKeyword?.id ? '编辑替换关键词' : '新增替换关键词'}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -204,6 +205,35 @@ const EditKeyword = ({
               isLoading={isPlatformsLoading}
             />
           )}
+
+          {/* 垂直展示 */}
+          <Flex direction="column">
+            <Box m={2}>
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="fuzzy" mb="0">
+                  模糊匹配
+                </FormLabel>
+                <Switch
+                  id="fuzzy"
+                  isChecked={fuzzy}
+                  onChange={() => setFuzzy(!fuzzy)}
+                />
+              </FormControl>
+            </Box>
+            <Box m={2}>
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="regular" mb="0">
+                  正则匹配
+                </FormLabel>
+                <Switch
+                  id="regular"
+                  isChecked={regular}
+                  onChange={() => setRegular(!regular)}
+                />
+              </FormControl>
+            </Box>
+          </Flex>
+
           <KeywordInput
             newKeyword={newKeyword}
             setNewKeyword={setNewKeyword}
@@ -219,18 +249,17 @@ const EditKeyword = ({
             handleKeywordClick={handleKeywordClick}
             handleDeleteKeyword={handleDeleteKeyword}
           />
-          <ReplyInput
-            newReply={newReply}
-            setNewReply={setNewReply}
-            handleAddReply={handleAddReply}
+          <ReplaceInput
+            newReplace={newReplace}
+            setNewReplace={setNewReplace}
+            handleAddReplace={handleAddReply}
             handleInsertRandomChar={handleInsertRandomChar}
-            handleInsertFile={handleInsertFile}
             currentPlatform={currentPlatform}
           />
-          <ReplyList
-            replyList={replyList}
-            handleReplyClick={handleReplyClick}
-            handleDeleteReply={handleDeleteReply}
+          <ReplaceList
+            replyList={replaceList}
+            handleReplaceClick={handleReplaceClick}
+            handleDeleteReplace={handleDeleteReplace}
           />
         </ModalBody>
         <ModalFooter>

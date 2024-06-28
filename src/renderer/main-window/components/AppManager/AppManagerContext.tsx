@@ -63,7 +63,7 @@ const usePlatformList = () => {
 
   // eslint-disable-next-line consistent-return
   useEffect(() => {
-    if ((data?.data?.length === 0 || !data) && retryCount < 5) {
+    if ((data?.data?.length === 0 || !data) && retryCount < 20) {
       const timer = setTimeout(() => {
         setRetryCount(retryCount + 1);
         refetch();
