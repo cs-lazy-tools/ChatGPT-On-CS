@@ -7,9 +7,10 @@ import {
   Flex,
   HStack,
   IconButton,
-  Checkbox,
+  Tooltip,
+  Link,
 } from '@chakra-ui/react';
-import { FaBook, FaPlus } from 'react-icons/fa';
+import { FaBook, FaPlus, FaCheck } from 'react-icons/fa';
 import { Plugin } from '../../../common/services/platform/platform';
 
 const PluginCard = ({
@@ -44,7 +45,20 @@ const PluginCard = ({
     >
       {plugin.type === 'plugin' && (
         <Flex position="absolute" top={2} right={2}>
-          <Checkbox isChecked={isActive} onChange={onActivate} />
+          <Tooltip label="激活插件" aria-label="Activate Plugin">
+            <IconButton
+              icon={<FaCheck />}
+              aria-label="Activate Plugin"
+              isRound
+              size="sm"
+              colorScheme={isActive ? 'green' : 'gray'}
+              disabled={isActive}
+              onClick={(e) => {
+                e.stopPropagation();
+                onActivate();
+              }}
+            />
+          </Tooltip>
         </Flex>
       )}
 
@@ -56,7 +70,7 @@ const PluginCard = ({
           bg="green.500"
           color="white"
           px={2}
-          py={1}
+          py={2}
           borderBottomLeftRadius="md"
         >
           已激活
@@ -88,7 +102,12 @@ const PluginCard = ({
           <Divider my={4} />
           <Flex align="center" flex="0 0 25%">
             <FaBook />
-            <Text ml={2}>查看指南</Text>
+            <Link
+              href="https://doc.lazaytools.top/category/%E6%8F%92%E4%BB%B6%E7%BC%96%E5%86%99%E4%BB%8B%E7%BB%8D"
+              isExternal
+            >
+              <Text ml={2}>查看指南</Text>
+            </Link>
           </Flex>
         </Flex>
       )}
@@ -119,7 +138,12 @@ const PluginCard = ({
           <Divider my={4} />
           <Flex align="center" flex="0 0 25%">
             <FaBook />
-            <Text ml={2}>查看帮助</Text>
+            <Link
+              href="https://doc.lazaytools.top/category/%E6%8F%92%E4%BB%B6%E7%BC%96%E5%86%99%E4%BB%8B%E7%BB%8D"
+              isExternal
+            >
+              <Text ml={2}>查看指南</Text>
+            </Link>
           </Flex>
         </Flex>
       )}

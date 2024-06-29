@@ -295,7 +295,7 @@ const App = () => {
           </Modal>
         )}
 
-        {isActive && (
+        {settings.appId && isActive && (
           <Button
             position="fixed"
             top="16px"

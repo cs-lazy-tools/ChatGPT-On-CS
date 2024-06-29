@@ -21,7 +21,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import {
   FiChevronLeft,
-  FiShare2,
+  // FiShare2,
   FiTrash2,
   FiPlusCircle,
 } from 'react-icons/fi';
@@ -209,15 +209,17 @@ const PluginEdit = () => {
           boxShadow="md"
           zIndex="2"
         >
-          <Button
-            leftIcon={<FiShare2 />}
-            colorScheme="purple"
-            onClick={() => {
-              /* 发布插件到社区逻辑 */
-            }}
-          >
-            发布社区
-          </Button>
+          {
+            //   <Button
+            //   leftIcon={<FiShare2 />}
+            //   colorScheme="purple"
+            //   onClick={() => {
+            //     /* 发布插件到社区逻辑 */
+            //   }}
+            // >
+            //   发布社区
+            // </Button>
+          }
           {currentPlugin && currentPlugin.id ? (
             <Button leftIcon={<FiTrash2 />} colorScheme="red" onClick={onOpen}>
               删除
