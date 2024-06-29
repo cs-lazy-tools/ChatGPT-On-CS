@@ -118,6 +118,13 @@ export class MessageService {
     return reply;
   }
 
+  public async createTextReply(content: string) {
+    return {
+      type: 'TEXT',
+      content,
+    };
+  }
+
   /**
    * 匹配关键词
    * @param ctx

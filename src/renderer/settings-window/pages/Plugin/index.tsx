@@ -9,43 +9,24 @@ import {
   TabPanel,
   Skeleton,
   Stack,
+  useToast,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Plugin } from '../../../common/services/platform/platform';
-import { getCustomPluginList as getLocalPluginList } from '../../../common/services/platform/controller';
+import {
+  Plugin,
+  PluginConfig,
+} from '../../../common/services/platform/platform';
+import {
+  getCustomPluginList as getLocalPluginList,
+  getThirdPartyPluginList,
+  getConfig,
+  updateConfig,
+  addCustomPlugin,
+} from '../../../common/services/platform/controller';
 import PluginCard from './PluginCard';
-
-const systemPlugins = [
-  {
-    type: 'guide',
-    title: '我有兴趣为懒人客服\n贡献工具',
-    description: '',
-    tags: [],
-    icon: '📘',
-  },
-  {
-    type: 'plugin',
-    title: '系统插件名称',
-    author: '系统作者名',
-    description: '这是一个系统插件的描述。',
-    tags: ['Tag1', 'Tag2', 'Tag3'],
-    icon: '😀',
-  },
-  // 其他系统插件数据...
-];
-
-const userPlugins = [
-  {
-    type: 'plugin',
-    title: '用户插件名称',
-    author: '用户作者名',
-    description: '这是一个用户插件的描述。',
-    tags: ['Tag1', 'Tag2', 'Tag3'],
-    icon: '😀',
-  },
-  // 其他用户插件数据...
-];
+import { SystemPluginList } from '../../../common/utils/plugins/system';
+import useGlobalStore from '../../stores/useGlobalStore';
 
 type PluginPageProps = {
   appId?: string;
@@ -54,14 +35,15 @@ type PluginPageProps = {
 
 const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [activePlugin, setActivePlugin] = useState<number | null>(null);
   const [customPlugins, setCustomPlugins] = useState<Plugin[]>([]);
   const navigate = useNavigate();
+  const toast = useToast();
+  const { setCurrentPlugin } = useGlobalStore();
 
   const {
     data: localPluginData,
     isLoading: isLocalLoading,
-    // refetch: refetchLocalPluginList,
+    refetch: refetchLocalLoading,
   } = useQuery(
     ['localPlugins'],
     () => {
@@ -77,9 +59,57 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
     },
   );
 
+  const { data: thirdPartyPluginData, isLoading: isThirdPartyLoading } =
+    useQuery(
+      ['thirdPartyPlugins'],
+      () => {
+        return getThirdPartyPluginList();
+      },
+      {
+        retry: () => {
+          return true;
+        },
+        retryDelay: () => {
+          return 1000;
+        },
+      },
+    );
+
+  const { data: configData, isLoading: isConfigLoading } = useQuery(
+    ['config', 'plugin', appId, instanceId],
+    async () => {
+      try {
+        const resp = await getConfig({
+          appId,
+          instanceId,
+          type: 'plugin',
+        });
+        return resp;
+      } catch (error) {
+        return null;
+      }
+    },
+    {
+      retry: () => {
+        return true;
+      },
+      retryDelay: () => {
+        return 1000;
+      },
+    },
+  );
+
+  const [config, setConfig] = useState<PluginConfig | null>(null);
+
+  useEffect(() => {
+    if (configData) {
+      const obj = configData.data as PluginConfig;
+      setConfig(obj);
+    }
+  }, [configData]);
+
   useEffect(() => {
     if (localPluginData) {
-      console.log(localPluginData);
       setCustomPlugins([
         {
           type: 'custom',
@@ -92,7 +122,7 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
     }
   }, [localPluginData]);
 
-  if (isLocalLoading) {
+  if (isLocalLoading || isThirdPartyLoading || isConfigLoading) {
     return (
       <Stack>
         <Skeleton height="20px" />
@@ -102,21 +132,78 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
     );
   }
 
-  const handleActivate = (index: number) => {
-    setActivePlugin(activePlugin === index ? null : index);
+  const handleActivate = async (plugin: Plugin) => {
+    if (!config) return;
+    try {
+      // 检查一下插件类型，如果是自定义插件，直接激活
+      if (plugin.source === 'custom' && plugin.id) {
+        // FIXME: 这个 usePlugin 需要独立配置
+        const newConfig = { ...config, usePlugin: true, pluginId: plugin.id };
+        setConfig(newConfig);
+        updateConfig({
+          appId,
+          instanceId,
+          type: 'plugin',
+          cfg: newConfig,
+        });
+      } else {
+        // 先复制一份到自定义插件，然后激活
+        const newPlugin = {
+          ...plugin,
+          source: 'custom',
+        };
+
+        const resp = await addCustomPlugin(newPlugin);
+        if (resp && resp.data && resp.data.id) {
+          const newConfig = {
+            ...config,
+            usePlugin: true,
+            pluginId: resp.data.id,
+          };
+          setConfig(newConfig);
+          updateConfig({
+            appId,
+            instanceId,
+            type: 'plugin',
+            cfg: newConfig,
+          });
+        }
+      }
+
+      setTabIndex(2);
+      await refetchLocalLoading();
+
+      toast({
+        title: '激活插件成功',
+        position: 'top',
+        description: `已经激活 ${plugin.title} 插件`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: '激活插件失败',
+        position: 'top',
+        description:
+          error instanceof Error ? error.message : JSON.stringify(error),
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const handleEdit = (plugin: Plugin) => {
-    console.log('edit', plugin);
-    if (plugin.type === 'custom' || plugin.type === 'plugin') {
-      navigate(
-        '/settings.html/editor',
-        plugin.id
-          ? {
-              state: { pluginId: plugin.id },
-            }
-          : {},
-      );
+    if (plugin.type === 'plugin') {
+      setCurrentPlugin(plugin);
+      navigate('/settings.html/editor');
+    }
+
+    if (plugin.type === 'custom') {
+      setCurrentPlugin(null);
+      navigate('/settings.html/editor');
     }
   };
 
@@ -136,12 +223,13 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
               gap={6}
               p={4}
             >
-              {systemPlugins.map((plugin, index) => (
+              {SystemPluginList.map((plugin, index) => (
                 <PluginCard
                   key={index}
                   plugin={plugin}
-                  isActive={activePlugin === index}
-                  onActivate={() => handleActivate(index)}
+                  isActive={false}
+                  onActivate={() => handleActivate(plugin)}
+                  onEdit={() => handleEdit(plugin)}
                 />
               ))}
             </Grid>
@@ -152,14 +240,16 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
               gap={6}
               p={4}
             >
-              {userPlugins.map((plugin, index) => (
-                <PluginCard
-                  key={index}
-                  plugin={plugin}
-                  isActive={activePlugin === index}
-                  onActivate={() => handleActivate(index)}
-                />
-              ))}
+              {thirdPartyPluginData &&
+                thirdPartyPluginData.map((plugin, index) => (
+                  <PluginCard
+                    key={index}
+                    plugin={plugin}
+                    isActive={false}
+                    onActivate={() => handleActivate(plugin)}
+                    onEdit={() => handleEdit(plugin)}
+                  />
+                ))}
             </Grid>
           </TabPanel>
           <TabPanel>
@@ -172,8 +262,8 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
                 <PluginCard
                   key={index}
                   plugin={plugin}
-                  isActive={activePlugin === index}
-                  onActivate={() => handleActivate(index)}
+                  isActive={plugin.id === config?.pluginId}
+                  onActivate={() => handleActivate(plugin)}
                   onEdit={() => handleEdit(plugin)}
                 />
               ))}

@@ -44,15 +44,21 @@ export interface LogBody {
   message: string;
 }
 
+export interface LogObj {
+  time: string;
+  content: string;
+}
+
 export interface Plugin {
   id?: number;
   code?: string;
-  type: string;
-  title: string;
+  type?: string;
+  title?: string;
   author?: string;
-  description: string;
-  tags: string[];
+  description?: string;
+  tags?: string[];
   icon?: string;
+  source?: string; // custom, third-party
 }
 
 export interface GenericConfig {

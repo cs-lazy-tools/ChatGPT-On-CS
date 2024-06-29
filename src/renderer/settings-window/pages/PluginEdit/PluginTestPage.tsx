@@ -38,6 +38,7 @@ import {
 const PluginTestPage = ({ code }: { code?: string }) => {
   const toast = useToast();
   const [consoleLogs, setConsoleLogs] = useState<LogBody[]>([]);
+  const [hasRuning, setHasRuning] = useState(false);
   const [newMessage, setNewMessage] = useState<Message>({
     sender: '',
     content: '',
@@ -63,13 +64,14 @@ const PluginTestPage = ({ code }: { code?: string }) => {
 
   const handleCheckPlugin = async () => {
     try {
+      setHasRuning(true);
       const resp = await checkPluginAvailability({
         code: code || '',
         ctx: context,
         messages,
       });
       setConsoleLogs(resp.consoleOutput || []);
-      if (resp.status) {
+      if (resp.status && resp.message) {
         toast({
           title: '插件测试通过',
           position: 'top',
@@ -79,10 +81,17 @@ const PluginTestPage = ({ code }: { code?: string }) => {
           isClosable: true,
         });
       } else {
+        let error_msg = '未知错误';
+        if (resp.error) {
+          error_msg = resp.error;
+        } else if (!resp.message) {
+          error_msg = '回复消息为空';
+        }
+
         toast({
           title: '插件测试失败',
           position: 'top',
-          description: resp.error,
+          description: error_msg,
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -97,6 +106,8 @@ const PluginTestPage = ({ code }: { code?: string }) => {
         duration: 5000,
         isClosable: true,
       });
+    } finally {
+      setHasRuning(false);
     }
   };
 
@@ -126,14 +137,12 @@ const PluginTestPage = ({ code }: { code?: string }) => {
           leftIcon={<FiPlay />}
           onClick={handleCheckPlugin}
           colorScheme="green"
+          size="sm"
+          isLoading={hasRuning}
         >
           测试插件
         </Button>
-        <Button
-          leftIcon={<RepeatIcon />}
-          onClick={handleSetDefault}
-          colorScheme="blue"
-        >
+        <Button leftIcon={<RepeatIcon />} onClick={handleSetDefault} size="sm">
           设置默认
         </Button>
       </HStack>

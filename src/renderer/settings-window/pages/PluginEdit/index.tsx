@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   VStack,
   Button,
   useToast,
   HStack,
-  Stack,
-  Skeleton,
   Tabs,
   TabList,
   TabPanels,
@@ -20,8 +18,7 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
 } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   FiChevronLeft,
   FiShare2,
@@ -30,7 +27,6 @@ import {
 } from 'react-icons/fi';
 import { PluginExampleCode } from '../../../common/utils/constants';
 import {
-  getCustomPluginDetail,
   addCustomPlugin,
   updateCustomPlugin,
   deleteCustomPlugin,
@@ -39,67 +35,32 @@ import { Plugin } from '../../../common/services/platform/platform';
 import PluginTestPage from './PluginTestPage';
 import PluginBasicInfo from './PluginBasicInfo';
 import PluginEditorCom from './PluginEditor';
+import useGlobalStore from '../../stores/useGlobalStore';
 
-type PluginEditorProps = {
-  appId?: string;
-  instanceId?: string;
-};
-
-const PluginEditor = ({ appId, instanceId }: PluginEditorProps) => {
-  const [code, setCode] = useState<string | undefined>(PluginExampleCode);
+const PluginEdit = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<any>();
   const toast = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { currentPlugin } = useGlobalStore();
 
-  // 获取 navigate 传递的状态参数
-  const { pluginId } = location.state || {};
-
-  const { data, isLoading } = useQuery(['pluginDetail', pluginId], async () => {
-    try {
-      if (!pluginId) {
-        return null;
-      }
-
-      const resp = await getCustomPluginDetail(pluginId);
-      return resp;
-    } catch (error) {
-      const errormsg =
-        error instanceof Error ? error.message : JSON.stringify(error);
-      toast({
-        title: '获取插件失败',
-        description: errormsg,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-      return null;
-    }
-  });
-
-  const [plugin, setPlugin] = useState<Plugin>({
-    title: '新建插件',
-    description: '这是一个自定义插件~',
-    code: PluginExampleCode,
-    icon: '😀',
-    tags: [],
-    type: 'plugin',
-  });
-
-  useEffect(() => {
-    if (data) {
-      const obj = data.data as Plugin;
-      setPlugin(obj);
-      setCode(obj.code || PluginExampleCode);
-    }
-  }, [data]);
+  const [plugin, setPlugin] = useState<Plugin>(
+    currentPlugin || {
+      title: '新建插件',
+      description: '这是一个自定义插件~',
+      code: PluginExampleCode,
+      icon: '😀',
+      tags: [],
+      type: 'plugin',
+      source: 'custom',
+    },
+  );
 
   const handleAddNewPlugin = async () => {
     try {
       await addCustomPlugin({
         ...plugin,
-        code: code || PluginExampleCode,
+        code: plugin.code || PluginExampleCode,
       });
       toast({
         title: '新增插件成功',
@@ -169,51 +130,34 @@ const PluginEditor = ({ appId, instanceId }: PluginEditorProps) => {
     }
   };
 
-  const handleSaveCode = useCallback(
-    async (inCode?: string) => {
-      if (!plugin) return;
-      try {
-        await updateCustomPlugin({
-          ...plugin,
-          code: inCode || code || PluginExampleCode,
-        });
-        toast({
-          title: '代码已保存',
-          position: 'top',
-          description: '插件已更新',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-      } catch (error) {
-        const errormsg =
-          error instanceof Error ? error.message : JSON.stringify(error);
-        toast({
-          title: '更新插件失败',
-          position: 'top',
-          description: errormsg,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    },
-    [code, plugin, toast],
-  );
-
-  console.log('location 0002', location);
-
-  if (pluginId && (isLoading || !data || !plugin)) {
-    return (
-      <Stack>
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-        <Skeleton height="20px" />
-      </Stack>
-    );
-  }
-
-  console.log('location 0003', location);
+  const handleSaveCode = async (inCode?: string) => {
+    if (!plugin) return;
+    try {
+      await updateCustomPlugin({
+        ...plugin,
+        code: inCode || plugin.code || PluginExampleCode,
+      });
+      toast({
+        title: '代码已保存',
+        position: 'top',
+        description: '插件已更新',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      const errormsg =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      toast({
+        title: '更新插件失败',
+        position: 'top',
+        description: errormsg,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
     <VStack align="start" spacing="4" minHeight="100vh" position="relative">
@@ -242,50 +186,53 @@ const PluginEditor = ({ appId, instanceId }: PluginEditorProps) => {
           </TabPanel>
           <TabPanel>
             <PluginEditorCom
-              code={code}
-              setCode={setCode}
+              plugin={plugin}
+              setPlugin={setPlugin}
               handleSaveCode={handleSaveCode}
             />
           </TabPanel>
           <TabPanel>
-            <PluginTestPage code={code} />
+            <PluginTestPage code={plugin.code} />
           </TabPanel>
         </TabPanels>
       </Tabs>
       <Box h={'30px'} />
 
-      <HStack
-        spacing="4"
-        position="fixed"
-        bottom="0"
-        width="100%"
-        bg="white"
-        p="4"
-        boxShadow="md"
-      >
-        <Button
-          leftIcon={<FiShare2 />}
-          colorScheme="purple"
-          onClick={() => {
-            /* 发布插件到社区逻辑 */
-          }}
+      {plugin.source === 'custom' ? (
+        <HStack
+          spacing="4"
+          position="fixed"
+          bottom="0"
+          width="100%"
+          bg="white"
+          p="4"
+          boxShadow="md"
+          zIndex="2"
         >
-          发布社区
-        </Button>
-        {pluginId ? (
-          <Button leftIcon={<FiTrash2 />} colorScheme="red" onClick={onOpen}>
-            删除
-          </Button>
-        ) : (
           <Button
-            leftIcon={<FiPlusCircle />}
-            colorScheme="blue"
-            onClick={handleAddNewPlugin}
+            leftIcon={<FiShare2 />}
+            colorScheme="purple"
+            onClick={() => {
+              /* 发布插件到社区逻辑 */
+            }}
           >
-            新增
+            发布社区
           </Button>
-        )}
-      </HStack>
+          {currentPlugin && currentPlugin.id ? (
+            <Button leftIcon={<FiTrash2 />} colorScheme="red" onClick={onOpen}>
+              删除
+            </Button>
+          ) : (
+            <Button
+              leftIcon={<FiPlusCircle />}
+              colorScheme="blue"
+              onClick={handleAddNewPlugin}
+            >
+              新增
+            </Button>
+          )}
+        </HStack>
+      ) : null}
 
       <AlertDialog
         isOpen={isOpen}
@@ -323,4 +270,4 @@ const PluginEditor = ({ appId, instanceId }: PluginEditorProps) => {
   );
 };
 
-export default PluginEditor;
+export default PluginEdit;

@@ -589,7 +589,7 @@ class BKServer {
 
     this.app.post('/api/v1/plugin/create', async (req, res) => {
       const { code, source, author, description, icon, tags, title } = req.body;
-      await this.configController.createCustomPlugin({
+      const plugin = await this.configController.createCustomPlugin({
         code,
         source,
         author,
@@ -598,7 +598,28 @@ class BKServer {
         tags: JSON.stringify(tags),
         title,
       });
-      res.json({ success: true });
+      if (!plugin) {
+        res.json({
+          success: false,
+          data: null,
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: {
+          id: plugin.id,
+          code: plugin.code,
+          title: plugin.title,
+          description: plugin.description,
+          icon: plugin.icon,
+          source: plugin.source,
+          author: plugin.author,
+          type: plugin.type,
+          tags,
+        },
+      });
     });
 
     this.app.post('/api/v1/plugin/update', async (req, res) => {

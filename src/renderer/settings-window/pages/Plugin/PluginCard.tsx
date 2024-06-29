@@ -5,6 +5,7 @@ import {
   Divider,
   Tag,
   Flex,
+  HStack,
   IconButton,
   Checkbox,
 } from '@chakra-ui/react';
@@ -69,19 +70,23 @@ const PluginCard = ({
           justify="center"
           height="100%"
         >
-          <Flex align="flex-start">
-            <Text fontSize="4xl">{plugin.icon}</Text>
-            <Text
-              fontWeight="bold"
-              textAlign="left"
-              whiteSpace="pre-line"
-              mt={2}
-            >
-              {plugin.title}
-            </Text>
+          <Flex
+            align="center"
+            justify="center"
+            flex="0 0 75%"
+            direction="column"
+          >
+            <Flex align="center">
+              <Text fontSize="6xl" mr={2}>
+                {plugin.icon}
+              </Text>
+              <Text fontWeight="bold" textAlign="left" whiteSpace="pre-line">
+                {plugin.title}
+              </Text>
+            </Flex>
           </Flex>
           <Divider my={4} />
-          <Flex align="center">
+          <Flex align="center" flex="0 0 25%">
             <FaBook />
             <Text ml={2}>查看指南</Text>
           </Flex>
@@ -95,17 +100,24 @@ const PluginCard = ({
           justify="center"
           height="100%"
         >
-          <Flex align="center">
-            <IconButton
-              icon={<FaPlus />}
-              aria-label="Add Custom Tool"
-              variant="outline"
-              mr={2}
-            />
-            <Text fontWeight="bold">创建自定义工具</Text>
+          <Flex
+            align="center"
+            justify="center"
+            flex="0 0 75%"
+            direction="column"
+          >
+            <HStack>
+              <IconButton
+                icon={<FaPlus />}
+                aria-label="Add Custom Tool"
+                variant="outline"
+                mr={2}
+              />
+              <Text fontWeight="bold">创建自定义工具</Text>
+            </HStack>
           </Flex>
           <Divider my={4} />
-          <Flex align="center">
+          <Flex align="center" flex="0 0 25%">
             <FaBook />
             <Text ml={2}>查看帮助</Text>
           </Flex>
@@ -129,11 +141,12 @@ const PluginCard = ({
             {plugin.description}
           </Text>
           <Flex mt={4} wrap="wrap">
-            {plugin.tags.map((tag, idx) => (
-              <Tag key={idx} mr={2} mt={2}>
-                {tag}
-              </Tag>
-            ))}
+            {plugin.tags &&
+              plugin.tags.map((tag, idx) => (
+                <Tag key={idx} mr={2} mt={2}>
+                  {tag}
+                </Tag>
+              ))}
           </Flex>
         </>
       )}

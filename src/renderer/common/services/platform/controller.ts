@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   App,
   Instance,
@@ -344,7 +345,10 @@ export async function getCustomPluginDetail(id: number) {
 }
 
 export async function addCustomPlugin(plugin: Plugin) {
-  await POST('/api/v1/plugin/create', plugin);
+  const data = await POST<{
+    data: Plugin;
+  }>('/api/v1/plugin/create', plugin);
+  return data;
 }
 
 export async function updateCustomPlugin(plugin: Plugin) {
@@ -353,4 +357,21 @@ export async function updateCustomPlugin(plugin: Plugin) {
 
 export async function deleteCustomPlugin(id: number) {
   await POST('/api/v1/plugin/delete', { id });
+}
+
+export async function getThirdPartyPluginList(): Promise<Plugin[] | null> {
+  try {
+    const data = await axios.get(
+      'https://update.wizgadg.top/statics/chatgpt-on-cs/plugins.json',
+    );
+    console.log(data);
+    if (data.status === 200) {
+      return data.data;
+    }
+
+    return null;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }

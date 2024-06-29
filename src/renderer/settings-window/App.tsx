@@ -24,7 +24,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import GeneralSettings from './components/Settings/GeneralSettings';
 import LLMSettings from './components/Settings/LLMSettings';
 import PluginPage from './pages/Plugin';
-import PluginEditorPage from './pages/PluginEditor';
+import PluginEditPage from './pages/PluginEdit';
 import AboutPage from './components/About';
 import { trackPageView } from '../common/services/analytics';
 import {
@@ -246,12 +246,7 @@ const App = () => {
               />
               <Route
                 path="/settings.html/editor"
-                element={
-                  <PluginEditorPage
-                    appId={settings.appId}
-                    instanceId={settings.instanceId}
-                  />
-                }
+                element={<PluginEditPage />}
               />
             </Routes>
           </Router>

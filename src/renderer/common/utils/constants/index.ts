@@ -31,8 +31,7 @@ export const PluginExtraLib = `
       };
       `;
 
-export const PluginExampleCode = `
-const cc = require('config_srv');
+export const PluginExampleCode = `const cc = require('config_srv');
 const rp = require('reply_srv');
 
 /**
