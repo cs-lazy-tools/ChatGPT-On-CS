@@ -284,6 +284,8 @@ class BKServer {
           keyword: item.keyword,
           reply: item.reply,
           mode: item.mode,
+          fuzzy: item.fuzzy,
+          has_regular: item.has_regular,
           app_name: ptf ? ptf.name : '全局',
         };
 
@@ -300,23 +302,42 @@ class BKServer {
     });
 
     this.app.post('/api/v1/reply/create', async (req, res) => {
-      const { platform_id: platformId, keyword, reply, mode } = req.body;
+      const {
+        platform_id: platformId,
+        keyword,
+        reply,
+        mode,
+        fuzzy,
+        has_regular,
+      } = req.body;
       await this.keywordReplyController.create({
         mode,
         platform_id: platformId,
         keyword,
         reply,
+        fuzzy,
+        has_regular,
       });
       res.json({ success: true });
     });
 
     this.app.post('/api/v1/reply/update', async (req, res) => {
-      const { id, platform_id: platformId, keyword, reply, mode } = req.body;
+      const {
+        id,
+        platform_id: platformId,
+        keyword,
+        reply,
+        mode,
+        fuzzy,
+        has_regular,
+      } = req.body;
       await this.keywordReplyController.update(id, {
         mode,
         platform_id: platformId,
         keyword,
         reply,
+        fuzzy,
+        has_regular,
       });
       res.json({ success: true });
     });
@@ -474,6 +495,8 @@ class BKServer {
           replace: item.replace,
           app_id: item.app_id,
           app_name: ptf ? ptf.name : '全局',
+          has_regular: item.has_regular,
+          fuzzy: item.fuzzy,
         };
 
         results.push(result);

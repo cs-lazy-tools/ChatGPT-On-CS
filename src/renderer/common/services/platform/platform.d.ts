@@ -130,6 +130,8 @@ export interface Keyword {
   platform_id?: string;
   keyword: string;
   reply: string;
+  fuzzy?: boolean;
+  has_regular?: boolean;
 }
 
 export interface TransferKeyword {

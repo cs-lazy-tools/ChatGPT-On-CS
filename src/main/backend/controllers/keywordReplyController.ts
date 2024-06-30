@@ -68,6 +68,8 @@ export class KeywordReplyController {
         const keyword = row.getCell(1).text.trim();
         const reply = row.getCell(2).text.trim();
         const platform = row.getCell(3).text.trim();
+        const fuzzy = row.getCell(4).text.trim() === '是';
+        const has_regular = row.getCell(5).text.trim() === '是';
         let platformId = '';
 
         if (platform && platformMap.has(platform)) {
@@ -78,7 +80,8 @@ export class KeywordReplyController {
           keyword: String(keyword),
           reply: String(reply),
           platform_id: String(platformId),
-          mode: 'fuzzy',
+          fuzzy,
+          has_regular,
         });
       }
     });
@@ -122,6 +125,8 @@ export class KeywordReplyController {
       { key: 'keyword', width: 32 },
       { key: 'reply', width: 100 },
       { key: 'platform', width: 32 },
+      { key: 'fuzzy', width: 10 },
+      { key: 'has_regular', width: 10 },
     ];
 
     // 添加复杂的标题描述并设置换行和加粗
@@ -149,12 +154,24 @@ export class KeywordReplyController {
     };
     worksheet.getRow(1).height = 150;
 
-    worksheet.addRow(['匹配关键词', '回复内容', '平台']);
+    worksheet.addRow([
+      '匹配关键词',
+      '回复内容',
+      '平台',
+      '模糊匹配',
+      '支持正则',
+    ]);
 
     // 添加数据行
     autoReplies.forEach((autoReply) => {
       const name = platformMap.get(autoReply.platform_id) || '';
-      worksheet.addRow([autoReply.keyword, autoReply.reply, name]);
+      worksheet.addRow([
+        autoReply.keyword,
+        autoReply.reply,
+        name,
+        autoReply.fuzzy ? '是' : '否',
+        autoReply.has_regular ? '是' : '否',
+      ]);
     });
 
     // 检查是否存在 excels 文件夹，不存在则创建
@@ -184,6 +201,42 @@ export class KeywordReplyController {
     });
 
     return [...globalKeywords, ...autoReplies];
+  }
+
+  async getReplaceKeywords(platformId: string) {
+    const replaceKeywords = await ReplaceKeyword.findAll({
+      where: {
+        app_id: platformId,
+      },
+    });
+
+    const globalKeywords = await ReplaceKeyword.findAll({
+      where: {
+        app_id: {
+          [Op.or]: [null, ''],
+        },
+      },
+    });
+
+    return [...globalKeywords, ...replaceKeywords];
+  }
+
+  async getTransferKeywords(platformId: string) {
+    const transferKeywords = await TransferKeyword.findAll({
+      where: {
+        app_id: platformId,
+      },
+    });
+
+    const globalKeywords = await TransferKeyword.findAll({
+      where: {
+        app_id: {
+          [Op.or]: [null, ''],
+        },
+      },
+    });
+
+    return [...globalKeywords, ...transferKeywords];
   }
 
   async list({
@@ -409,8 +462,8 @@ export class KeywordReplyController {
       const name = platformMap.get(autoReply.app_id) || '';
       worksheet.addRow([
         autoReply.keyword,
-        autoReply.fuzzy,
-        autoReply.has_regular,
+        autoReply.fuzzy ? '是' : '否',
+        autoReply.has_regular ? '是' : '否',
         name,
       ]);
     });

@@ -11,6 +11,32 @@ export class Keyword extends Model {
   declare mode: string;
 
   declare platform_id: string;
+
+  declare fuzzy: boolean;
+
+  declare has_regular: boolean;
+}
+
+export async function checkAndAddFields(sequelize: Sequelize) {
+  const tableDescription = await Keyword.describe();
+
+  // @ts-ignore
+  if (!tableDescription.fuzzy) {
+    await sequelize.getQueryInterface().addColumn('keyword', 'fuzzy', {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: true,
+    });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.has_regular) {
+    await sequelize.getQueryInterface().addColumn('keyword', 'has_regular', {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+    });
+  }
 }
 
 export function initKeyword(sequelize: Sequelize) {
@@ -37,6 +63,16 @@ export function initKeyword(sequelize: Sequelize) {
         type: DataTypes.STRING(255),
         allowNull: true,
       },
+      fuzzy: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: true,
+      },
+      has_regular: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
     },
     {
       sequelize,
@@ -45,4 +81,6 @@ export function initKeyword(sequelize: Sequelize) {
       timestamps: false,
     },
   );
+
+  checkAndAddFields(sequelize);
 }

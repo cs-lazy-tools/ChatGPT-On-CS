@@ -65,7 +65,7 @@
 - Add experimental support for vscode debugging
 - Revert https://github.com/electron-react-boilerplate/electron-react-boilerplate/pull/2365 as default for users, provide as opt in option
 
-# 1.1.0
+# 1.2.0-beta.1
 
 - Fix #2402
 - Simplify configs (https://github.com/electron-react-boilerplate/electron-react-boilerplate/pull/2406)

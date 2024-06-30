@@ -9,6 +9,11 @@ import {
   ModalBody,
   ModalFooter,
   useToast,
+  Flex,
+  Box,
+  Switch,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -54,6 +59,8 @@ const EditKeyword = ({
   const [currentPlatform, setCurrentPlatform] = useState<App | undefined>(
     undefined,
   );
+  const [fuzzy, setFuzzy] = useState<boolean>(true);
+  const [regular, setRegular] = useState<boolean>(false);
 
   useEffect(() => {
     if (!editKeyword?.keyword) {
@@ -204,6 +211,34 @@ const EditKeyword = ({
               isLoading={isPlatformsLoading}
             />
           )}
+
+          <Flex direction="column">
+            <Box m={2}>
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="fuzzy" mb="0">
+                  模糊匹配
+                </FormLabel>
+                <Switch
+                  id="fuzzy"
+                  isChecked={fuzzy}
+                  onChange={() => setFuzzy(!fuzzy)}
+                />
+              </FormControl>
+            </Box>
+            <Box m={2}>
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="regular" mb="0">
+                  正则匹配
+                </FormLabel>
+                <Switch
+                  id="regular"
+                  isChecked={regular}
+                  onChange={() => setRegular(!regular)}
+                />
+              </FormControl>
+            </Box>
+          </Flex>
+
           <KeywordInput
             newKeyword={newKeyword}
             setNewKeyword={setNewKeyword}

@@ -198,12 +198,12 @@ const PluginPage = ({ appId, instanceId }: PluginPageProps) => {
   const handleEdit = (plugin: Plugin) => {
     if (plugin.type === 'plugin') {
       setCurrentPlugin(plugin);
-      navigate('/settings.html/editor');
+      navigate('/editor');
     }
 
     if (plugin.type === 'custom') {
       setCurrentPlugin(null);
-      navigate('/settings.html/editor');
+      navigate('/editor');
     }
   };
 

@@ -27,7 +27,8 @@ export function initTransfer(sequelize: Sequelize) {
       },
       has_regular: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: false,
       },
       app_id: {
         type: DataTypes.STRING(255),

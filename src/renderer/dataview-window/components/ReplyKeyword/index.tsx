@@ -229,6 +229,8 @@ const ReplyKeyword = () => {
               <Th>平台</Th>
               <Th>关键词</Th>
               <Th>回复内容</Th>
+              <Th>模糊匹配</Th>
+              <Th>正则</Th>
               <Th>操作</Th>
             </Tr>
           </Thead>
@@ -256,6 +258,8 @@ const ReplyKeyword = () => {
                 >
                   {keyword.reply}
                 </Td>
+                <Td>{keyword.fuzzy ? '是' : '否'}</Td>
+                <Td>{keyword.has_regular ? '是' : '否'}</Td>
                 <Td>
                   <Grid templateColumns="repeat(2, 1fr)" gap={2}>
                     <Tooltip label="删除">

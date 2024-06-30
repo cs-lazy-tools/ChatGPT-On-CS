@@ -232,8 +232,8 @@ const TransferKeyword = () => {
             <Tr>
               <Th>平台</Th>
               <Th>关键词</Th>
-              <Th>是否模糊匹配</Th>
-              <Th>是否含正则表达式</Th>
+              <Th>模糊匹配</Th>
+              <Th>正则</Th>
               <Th>操作</Th>
             </Tr>
           </Thead>

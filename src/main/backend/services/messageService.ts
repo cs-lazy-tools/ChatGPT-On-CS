@@ -17,7 +17,11 @@ import {
   CTX_FAN_TAG,
   CTX_NEW_CUSTOMER_TAG,
 } from '../constants';
-import { rangeMatch, specialTokenReplace } from '../../utils/strings';
+import {
+  rangeMatch,
+  specialTokenReplace,
+  replaceKeyword,
+} from '../../utils/strings';
 import {
   ErnieAI,
   GeminiAI,
@@ -55,66 +59,91 @@ export class MessageService {
     this.llmClientMap = new Map();
   }
 
+  /**
+   * 获取默认回复
+   * @param cfg
+   * @param ctx
+   * @param messages
+   * @returns
+   */
   public async getDefaultReply(
     cfg: Config,
     ctx: Context,
     messages: MessageDTO[],
-  ) {
+  ): Promise<{ type: string; content: string }> {
     // 先检查是否存在用户的消息
     const lastUserMsg = messages
       .slice()
       .reverse()
       .find((msg) => msg.role === 'OTHER');
 
-    const reply = {
+    let reply = {
       type: 'TEXT',
       content: cfg.default_reply || '当前消息有点多，我稍后再回复你',
     };
 
     if (!lastUserMsg) {
       this.log.warn(`未匹配到用户消息，所以使用默认回复: ${reply.content}`);
-      return reply;
-    }
-
-    // 再根据 context_count 去保留最后几条消息
-    if (cfg.context_count > 0) {
-      // eslint-disable-next-line no-param-reassign
-      messages = messages.slice(-cfg.context_count);
-    }
-
-    // 等待随机时间
-    await new Promise((resolve) => {
-      const min = cfg.reply_speed;
-      const max = cfg.reply_random_speed + cfg.reply_speed;
-      const randomTime = min + Math.random() * (max - min);
-      setTimeout(resolve, randomTime * 1000);
-    });
-
-    // 再检查是否使用关键词匹配
-    if (cfg.has_keyword_match) {
-      const data = await this.matchKeyword(ctx, lastUserMsg);
-      if (data && data.content) {
-        this.log.success(`匹配关键词: ${data.content}`);
-        return data;
-      }
-      this.log.warn(`未匹配到关键词`);
-    }
-
-    // 最后检查是否使用 GPT 生成回复
-    if (cfg.has_use_gpt) {
-      this.log.info(`开始使用 GPT 生成回复`);
-
-      const data = await this.getLLMResponse(cfg, ctx, messages);
-
-      if (data && data.content) {
-        this.log.success(`GPT 生成回复: ${data.content}`);
-        return data;
+    } else {
+      // 检查是否需要转接
+      const isTransfer = await this.matchTransferKeyword(ctx, lastUserMsg);
+      if (isTransfer) {
+        this.log.info('需要转接');
+        return {
+          type: 'TRANSFER',
+          content: '',
+        };
       }
 
-      this.log.warn(`AI 回复生成失败`);
+      // 再根据 context_count 去保留最后几条消息
+      if (cfg.context_count > 0) {
+        // eslint-disable-next-line no-param-reassign
+        messages = messages.slice(-cfg.context_count);
+      }
+
+      // 等待随机时间
+      await new Promise((resolve) => {
+        const min = cfg.reply_speed;
+        const max = cfg.reply_random_speed + cfg.reply_speed;
+        const randomTime = min + Math.random() * (max - min);
+        setTimeout(resolve, randomTime * 1000);
+      });
+
+      // 再检查是否使用关键词匹配
+      if (cfg.has_keyword_match) {
+        const data = await this.matchKeyword(ctx, lastUserMsg);
+        if (data && data.content) {
+          this.log.success(`匹配关键词: ${data.content}`);
+          reply = data;
+        } else {
+          this.log.warn(`未匹配到关键词`);
+        }
+      }
+
+      // 最后检查是否使用 GPT 生成回复
+      if (
+        cfg.has_use_gpt &&
+        reply.content ===
+          (cfg.default_reply || '当前消息有点多，我稍后再回复你')
+      ) {
+        this.log.info(`开始使用 GPT 生成回复`);
+
+        const data = await this.getLLMResponse(cfg, ctx, messages);
+
+        if (data && data.content) {
+          this.log.success(`GPT 生成回复: ${data.content}`);
+          reply = data;
+        } else {
+          this.log.warn(`AI 回复生成失败`);
+        }
+      }
     }
 
     this.log.info('使用默认回复');
+    if (reply.type === 'TEXT') {
+      reply.content = await this.matchReplaceKeyword(ctx, reply.content);
+    }
+
     return reply;
   }
 
@@ -123,6 +152,85 @@ export class MessageService {
       type: 'TEXT',
       content,
     };
+  }
+
+  /**
+   * 匹配需要替换的关键词
+   * @param ctx
+   * @param message
+   * @returns
+   */
+  public async matchReplaceKeyword(
+    ctx: Context,
+    reply: string,
+  ): Promise<string> {
+    const appId = ctx.get(CTX_APP_ID);
+    if (!appId) return reply;
+
+    const replaceKeywords =
+      await this.autoReplyController.getReplaceKeywords(appId);
+
+    // 先找到匹配的关键词
+    const foundKeywordObj = replaceKeywords.find((keywordObj) => {
+      return keywordObj.keyword.split('|').some((pattern) => {
+        return rangeMatch(
+          pattern,
+          reply,
+          keywordObj.fuzzy,
+          keywordObj.has_regular,
+        );
+      });
+    });
+
+    // 如果找到匹配的关键词对象，进行替换
+    if (foundKeywordObj) {
+      foundKeywordObj.keyword.split('|').forEach((pattern) => {
+        // eslint-disable-next-line no-param-reassign
+        reply = replaceKeyword(
+          pattern,
+          reply,
+          foundKeywordObj.replace,
+          foundKeywordObj.fuzzy,
+          foundKeywordObj.has_regular,
+        );
+      });
+    }
+
+    return reply;
+  }
+
+  /**
+   * 匹配关键词
+   * @param ctx
+   * @param message
+   * @returns
+   */
+  public async matchTransferKeyword(
+    ctx: Context,
+    message: MessageDTO,
+  ): Promise<boolean> {
+    const appId = ctx.get(CTX_APP_ID);
+    if (!appId) return false;
+
+    const keywords = await this.autoReplyController.getTransferKeywords(appId);
+
+    // 先找到匹配的关键词
+    const foundKeywordObj = keywords.find((keywordObj) => {
+      return keywordObj.keyword.split('|').some((pattern) => {
+        return rangeMatch(
+          pattern,
+          message.content,
+          keywordObj.fuzzy,
+          keywordObj.has_regular,
+        );
+      });
+    });
+
+    if (foundKeywordObj) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -143,7 +251,12 @@ export class MessageService {
     // 先找到匹配的关键词
     const foundKeywordObj = keywords.find((keywordObj) => {
       return keywordObj.keyword.split('|').some((pattern) => {
-        return rangeMatch(pattern, message.content);
+        return rangeMatch(
+          pattern,
+          message.content,
+          keywordObj.fuzzy,
+          keywordObj.has_regular,
+        );
       });
     });
 

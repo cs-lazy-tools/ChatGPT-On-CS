@@ -31,7 +31,6 @@ const InstanceListComponent = () => {
   const toast = useToast();
 
   useEffect(() => {
-    console.log('selectedAppId', selectedAppId, filteredInstances);
     setCurrentAppId(selectedAppId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAppId]);

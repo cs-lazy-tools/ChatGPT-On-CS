@@ -177,8 +177,8 @@ const ReplaceKeyword = () => {
     <Box>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Alert status="info" mr={'20px'}>
-          当 ChatGPT
-          生成的回复中包含下面的关键词规则时，将该关键词自动替换为指定的关键词。
+          例如：关键词是“你好”，替换内容是 “您好”，当回复为 “你好，我是 ChatGPT”
+          时，将替换为“您好，我是 ChatGPT”。
         </Alert>
         <Flex alignItems="center">
           <HStack>

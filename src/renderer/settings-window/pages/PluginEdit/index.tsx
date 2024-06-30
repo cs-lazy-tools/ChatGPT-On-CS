@@ -165,7 +165,7 @@ const PluginEdit = () => {
         <Button
           leftIcon={<FiChevronLeft />}
           colorScheme="teal"
-          onClick={() => navigate('/settings.html')}
+          onClick={() => navigate('/')}
         >
           返回列表
         </Button>
@@ -258,7 +258,7 @@ const PluginEdit = () => {
                 onClick={async () => {
                   await handleDeletePlugin();
                   onClose();
-                  navigate('/settings.html');
+                  navigate('/');
                 }}
                 ml={3}
               >

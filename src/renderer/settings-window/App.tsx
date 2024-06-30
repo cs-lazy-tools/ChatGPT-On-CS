@@ -19,7 +19,7 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { loader } from '@monaco-editor/react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import GeneralSettings from './components/Settings/GeneralSettings';
 import LLMSettings from './components/Settings/LLMSettings';
@@ -63,6 +63,9 @@ const App = () => {
   useEffect(() => {
     trackPageView('Settings');
   }, []);
+
+  // 打印当前的 url
+  // console.log('current url:', window.location.href);
 
   const fetchConfigActive = useCallback(
     async (appId: string, instanceId?: string) => {
@@ -236,7 +239,7 @@ const App = () => {
           <Router>
             <Routes>
               <Route
-                path="/settings.html"
+                path="/"
                 element={
                   <PluginPage
                     appId={settings.appId}
@@ -244,10 +247,7 @@ const App = () => {
                   />
                 }
               />
-              <Route
-                path="/settings.html/editor"
-                element={<PluginEditPage />}
-              />
+              <Route path="/editor" element={<PluginEditPage />} />
             </Routes>
           </Router>
         </TabPanel>
