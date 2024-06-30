@@ -74,6 +74,7 @@ export interface GenericConfig {
   defaultReply: string;
   truncateWordCount: number;
   truncateWordKey: string;
+  jinritemaiDefaultReplyMatch: string;
 }
 
 export interface LLMConfig {
@@ -102,6 +103,8 @@ export interface DriverConfig {
   hasUseGpt: boolean;
   hasMouseClose: boolean;
   hasEscClose: boolean;
+  hasTransfer: boolean;
+  hasReplace: boolean;
 }
 
 export interface Session {

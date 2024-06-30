@@ -18,6 +18,8 @@ const Panels = () => {
     hasUseGpt: false,
     hasMouseClose: true,
     hasEscClose: true,
+    hasTransfer: true,
+    hasReplace: true,
   });
 
   const { data } = useQuery(['config', 'driver'], async () => {
@@ -38,22 +40,25 @@ const Panels = () => {
   });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const pausedHandler = useCallback((message: any) => {
-    if (message.event === 'has_paused') {
-      setDriverSettings((prevSettings) => ({
-        ...prevSettings,
-        hasPaused: true,
-      }));
+  const pausedHandler = useCallback(
+    (message: any) => {
+      if (message.event === 'has_paused') {
+        setDriverSettings((prevSettings) => ({
+          ...prevSettings,
+          hasPaused: true,
+        }));
 
-      toast({
-        title: '自动回复已暂停',
-        status: 'info',
-        position: 'top',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  }, []);
+        toast({
+          title: '自动回复已暂停',
+          status: 'info',
+          position: 'top',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    },
+    [toast],
+  );
 
   useEffect(() => {
     const unregister = registerEventHandler(pausedHandler);
@@ -149,7 +154,27 @@ const Panels = () => {
             </Tooltip>
           </Checkbox> */}
           <Checkbox
-            isChecked={driverSettings.hasEscClose}
+            isChecked={driverSettings.hasTransfer}
+            onChange={(e) =>
+              handleUpdateConfig({ hasTransfer: e.target.checked })
+            }
+          >
+            <Tooltip label="如果匹配到设定的关键词，将自动转人工">
+              关键词转人工
+            </Tooltip>
+          </Checkbox>
+          <Checkbox
+            isChecked={driverSettings.hasReplace}
+            onChange={(e) =>
+              handleUpdateConfig({ hasReplace: e.target.checked })
+            }
+          >
+            <Tooltip label="如果匹配到设定的关键词，将自动替换成自定义的关键词">
+              关键词替换
+            </Tooltip>
+          </Checkbox>
+          <Checkbox
+            isChecked={driverSettings.hasReplace}
             onChange={(e) =>
               handleUpdateConfig({ hasEscClose: e.target.checked })
             }

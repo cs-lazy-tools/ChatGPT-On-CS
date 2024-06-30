@@ -59,6 +59,12 @@ export class Config extends Model {
   declare truncate_word_count: number; // 截断词数
 
   declare truncate_word_key: string; // 截断词
+
+  declare has_transfer: boolean; // 是否开启关键词转接给其它客服
+
+  declare has_replace: boolean; // 是否开启关键词替换
+
+  declare jinritemai_default_reply_match: string; // 抖店默认回复
 }
 
 export async function checkAndAddFields(sequelize: Sequelize) {
@@ -68,7 +74,7 @@ export async function checkAndAddFields(sequelize: Sequelize) {
   if (!tableDescription.has_esc_close) {
     await sequelize.getQueryInterface().addColumn('n_config', 'has_esc_close', {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
       defaultValue: true,
     });
   }
@@ -79,8 +85,8 @@ export async function checkAndAddFields(sequelize: Sequelize) {
       .getQueryInterface()
       .addColumn('n_config', 'truncate_word_count', {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 4000,
+        allowNull: true,
+        defaultValue: 210,
       });
   }
 
@@ -90,8 +96,37 @@ export async function checkAndAddFields(sequelize: Sequelize) {
       .getQueryInterface()
       .addColumn('n_config', 'truncate_word_key', {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         defaultValue: '',
+      });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.has_transfer) {
+    await sequelize.getQueryInterface().addColumn('n_config', 'has_transfer', {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: true,
+    });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.has_replace) {
+    await sequelize.getQueryInterface().addColumn('n_config', 'has_replace', {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: true,
+    });
+  }
+
+  // @ts-ignore
+  if (!tableDescription.jinritemai_default_reply_match) {
+    await sequelize
+      .getQueryInterface()
+      .addColumn('n_config', 'jinritemai_default_reply_match', {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: '很高兴为您服务，请问有什么可以帮您？',
       });
   }
 }
@@ -225,12 +260,27 @@ export function initConfig(sequelize: Sequelize) {
       truncate_word_count: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        defaultValue: 4000,
+        defaultValue: 210,
       },
       truncate_word_key: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: '',
+      },
+      has_transfer: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: true,
+      },
+      has_replace: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: true,
+      },
+      jinritemai_default_reply_match: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: '很高兴为您服务，请问有什么可以帮您？',
       },
     },
     {

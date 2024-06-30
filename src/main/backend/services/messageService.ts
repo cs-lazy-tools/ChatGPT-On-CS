@@ -77,6 +77,8 @@ export class MessageService {
       .reverse()
       .find((msg) => msg.role === 'OTHER');
 
+    let hasDefaultReply = true;
+
     let reply = {
       type: 'TEXT',
       content: cfg.default_reply || '当前消息有点多，我稍后再回复你',
@@ -85,14 +87,17 @@ export class MessageService {
     if (!lastUserMsg) {
       this.log.warn(`未匹配到用户消息，所以使用默认回复: ${reply.content}`);
     } else {
-      // 检查是否需要转接
-      const isTransfer = await this.matchTransferKeyword(ctx, lastUserMsg);
-      if (isTransfer) {
-        this.log.info('需要转接');
-        return {
-          type: 'TRANSFER',
-          content: '',
-        };
+      if (cfg.has_transfer) {
+        // 检查是否需要转接
+        const isTransfer = await this.matchTransferKeyword(ctx, lastUserMsg);
+        if (isTransfer) {
+          this.log.info('需要转接');
+          hasDefaultReply = false;
+          return {
+            type: 'TRANSFER',
+            content: '',
+          };
+        }
       }
 
       // 再根据 context_count 去保留最后几条消息
@@ -115,17 +120,14 @@ export class MessageService {
         if (data && data.content) {
           this.log.success(`匹配关键词: ${data.content}`);
           reply = data;
+          hasDefaultReply = false;
         } else {
           this.log.warn(`未匹配到关键词`);
         }
       }
 
       // 最后检查是否使用 GPT 生成回复
-      if (
-        cfg.has_use_gpt &&
-        reply.content ===
-          (cfg.default_reply || '当前消息有点多，我稍后再回复你')
-      ) {
+      if (cfg.has_use_gpt && hasDefaultReply) {
         this.log.info(`开始使用 GPT 生成回复`);
 
         const data = await this.getLLMResponse(cfg, ctx, messages);
@@ -133,15 +135,25 @@ export class MessageService {
         if (data && data.content) {
           this.log.success(`GPT 生成回复: ${data.content}`);
           reply = data;
+          hasDefaultReply = false;
         } else {
           this.log.warn(`AI 回复生成失败`);
         }
       }
     }
 
-    this.log.info('使用默认回复');
-    if (reply.type === 'TEXT') {
-      reply.content = await this.matchReplaceKeyword(ctx, reply.content);
+    if (hasDefaultReply) {
+      const replyContent = await this.choseRandomReply(reply.content);
+      reply = {
+        type: reply.type as MessageType,
+        content: replyContent,
+      };
+    }
+
+    if (cfg.has_replace) {
+      if (reply.type === 'TEXT') {
+        reply.content = await this.matchReplaceKeyword(ctx, reply.content);
+      }
     }
 
     return reply;
@@ -261,10 +273,7 @@ export class MessageService {
     });
 
     if (foundKeywordObj) {
-      const replies = foundKeywordObj.reply.split('[or]');
-      const chosenReply = specialTokenReplace(
-        replies[Math.floor(Math.random() * replies.length)],
-      );
+      const chosenReply = await this.choseRandomReply(foundKeywordObj.reply);
 
       let msgType = 'TEXT';
       if (chosenReply.includes('[@]') && chosenReply.includes('[/@]')) {
@@ -285,6 +294,15 @@ export class MessageService {
     }
 
     return null;
+  }
+
+  public async choseRandomReply(reply: string) {
+    const replies = reply.split('[or]');
+    const chosenReply = specialTokenReplace(
+      replies[Math.floor(Math.random() * replies.length)],
+    );
+
+    return chosenReply;
   }
 
   /**

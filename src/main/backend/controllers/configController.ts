@@ -22,54 +22,69 @@ export class ConfigController {
 
     let config;
 
+    // 先查找实例配置
+    if (instanceId) {
+      config = await Config.findOne({
+        where: { platform_id: appId, instance_id: instanceId },
+      });
+
+      // 如果实例配置存在且激活，直接返回
+      if (config && config.active) {
+        return this.mergeWithGlobalConfig(config);
+      }
+    }
+
+    // 查找应用级别配置
+    if (appId) {
+      config = await Config.findOne({
+        where: { platform_id: appId, instance_id: '' },
+      });
+
+      // 如果应用级别配置存在且激活，直接返回
+      if (config && config.active) {
+        return this.mergeWithGlobalConfig(config);
+      }
+    }
+
+    // 查找全局配置
     config = await Config.findOne({
-      where: { instance_id: instanceId, active: true },
+      where: { global: true },
     });
 
-    if (!config && appId) {
-      config = await Config.findOne({
-        where: { platform_id: appId, active: true },
-      });
-    }
-
-    if (!config) {
-      config = await Config.findOne({
-        where: { global: true },
-      });
-    }
-
+    // 如果全局配置不存在，创建一个默认的全局配置
     if (!config) {
       config = await Config.create({
         global: true,
       });
-    } else {
-      const globalConfig = await Config.findOne({
-        where: { global: true },
-      });
-
-      // 这三个配置项是全局配置，需要合并到实例配置中
-      if (globalConfig) {
-        config.has_keyword_match = globalConfig.has_keyword_match;
-        config.has_paused = globalConfig.has_paused;
-        config.has_use_gpt = globalConfig.has_use_gpt;
-        config.has_mouse_close = globalConfig.has_mouse_close;
-        config.has_esc_close = globalConfig.has_esc_close;
-      }
-
-      // 再检查 key 和 base_url 是否存在，不存在则使用全局配置
-      if (!config.key || !config.base_url) {
-        config.llm_type = globalConfig?.llm_type || 'chatgpt';
-        config.model = globalConfig?.model || 'gpt-3.5-turbo';
-      }
-
-      if (!config.key) {
-        config.key = globalConfig?.key || '';
-      }
-
-      if (!config.base_url) {
-        config.base_url = globalConfig?.base_url || '';
-      }
     }
+
+    return this.mergeWithGlobalConfig(config);
+  }
+
+  /**
+   * 合并全局配置到指定配置
+   * @param config 指定的配置
+   * @returns 合并后的配置
+   */
+  private async mergeWithGlobalConfig(config: Config): Promise<Config> {
+    const globalConfig = await Config.findOne({
+      where: { global: true },
+    });
+
+    if (globalConfig) {
+      // 合并特定的全局配置项到实例配置
+      config.has_keyword_match = globalConfig.has_keyword_match;
+      config.has_paused = globalConfig.has_paused;
+      config.has_use_gpt = globalConfig.has_use_gpt;
+      config.has_mouse_close = globalConfig.has_mouse_close;
+      config.has_esc_close = globalConfig.has_esc_close;
+    }
+
+    // 检查 key 和 base_url，如果不存在则使用全局配置
+    config.llm_type = config.llm_type || globalConfig?.llm_type || 'chatgpt';
+    config.model = config.model || globalConfig?.model || 'gpt-3.5-turbo';
+    config.key = config.key || globalConfig?.key || '';
+    config.base_url = config.base_url || globalConfig?.base_url || '';
 
     return config;
   }
@@ -93,6 +108,7 @@ export class ConfigController {
       config = await Config.findOne({
         where: { instance_id: instanceId },
       });
+
       if (!config) {
         config = await Config.create({
           platform_id: appId,
@@ -105,6 +121,7 @@ export class ConfigController {
       config = await Config.findOne({
         where: { platform_id: appId },
       });
+
       if (!config) {
         config = await Config.create({
           platform_id: appId,
@@ -236,27 +253,7 @@ export class ConfigController {
     appId: string | undefined;
     instanceId: string | undefined;
   }): Promise<boolean> {
-    let config = null;
-    if (instanceId) {
-      config = await Config.findOne({
-        where: { instance_id: instanceId },
-      });
-
-      return config?.active || false;
-    }
-
-    if (appId) {
-      config = await Config.findOne({
-        where: { platform_id: appId },
-      });
-
-      return config?.active || false;
-    }
-
-    config = await Config.findOne({
-      where: { global: true },
-    });
-
+    const config = await this.findConfig(appId, instanceId);
     return config?.active || false;
   }
 
@@ -283,37 +280,7 @@ export class ConfigController {
     | DriverConfig
     | undefined
   > {
-    let config = null;
-    if (instanceId) {
-      config = await Config.findOne({
-        where: { instance_id: instanceId },
-      });
-
-      if (!config) {
-        config = await Config.create({
-          platform_id: appId,
-          instance_id: instanceId,
-        });
-      }
-    }
-
-    if (!config && appId) {
-      config = await Config.findOne({
-        where: { platform_id: appId },
-      });
-
-      if (!config) {
-        config = await Config.create({
-          platform_id: appId,
-        });
-      }
-    }
-
-    if (!config) {
-      config = await Config.findOne({
-        where: { global: true },
-      });
-    }
+    const config = await this.findConfig(appId, instanceId);
 
     if (type === 'generic') {
       return {
@@ -329,6 +296,8 @@ export class ConfigController {
         defaultReply: config?.default_reply || '',
         truncateWordCount: config?.truncate_word_count || 0,
         truncateWordKey: config?.truncate_word_key || '',
+        jinritemaiDefaultReplyMatch:
+          config?.jinritemai_default_reply_match || '',
       };
     }
 
@@ -359,6 +328,8 @@ export class ConfigController {
         hasUseGpt: config?.has_use_gpt || false,
         hasMouseClose: config?.has_mouse_close || false,
         hasEscClose: config?.has_esc_close || false,
+        hasTransfer: config?.has_transfer || false,
+        hasReplace: config?.has_replace || false,
       };
     }
 
@@ -387,38 +358,9 @@ export class ConfigController {
       | PluginConfig
       | DriverConfig;
   }) {
-    let dbConfig = null;
-    if (instanceId) {
-      dbConfig = await Config.findOne({
-        where: { instance_id: instanceId },
-      });
-
-      if (!dbConfig) {
-        dbConfig = await Config.create({
-          platform_id: appId,
-          instance_id: instanceId,
-        });
-      }
-    } else if (appId) {
-      dbConfig = await Config.findOne({
-        where: { platform_id: appId },
-      });
-
-      if (!dbConfig) {
-        dbConfig = await Config.create({
-          platform_id: appId,
-        });
-      }
-    } else {
-      dbConfig = await Config.findOne({
-        where: { global: true },
-      });
-
-      if (!dbConfig) {
-        dbConfig = await Config.create({
-          global: true,
-        });
-      }
+    let dbConfig = await this.findConfig(appId, instanceId);
+    if (!dbConfig) {
+      return;
     }
 
     if (type === 'generic') {
@@ -434,6 +376,7 @@ export class ConfigController {
         default_reply: config.defaultReply,
         truncate_word_count: config.truncateWordCount,
         truncate_word_key: config.truncateWordKey,
+        jinritemai_default_reply_match: config.jinritemaiDefaultReplyMatch,
       });
     } else if (type === 'llm') {
       const config = cfg as LLMConfig;
@@ -469,6 +412,8 @@ export class ConfigController {
         has_use_gpt: config.hasUseGpt,
         has_mouse_close: config.hasMouseClose,
         has_esc_close: config.hasEscClose,
+        has_transfer: config.hasTransfer,
+        has_replace: config.hasReplace,
       });
     } else {
       const config = cfg as AccountConfig;
@@ -526,5 +471,45 @@ export class ConfigController {
     }
 
     return false;
+  }
+
+  /**
+   * 查找配置
+   * @param appId
+   * @param instanceId
+   * @returns
+   */
+  private async findConfig(
+    appId: string | undefined,
+    instanceId: string | undefined,
+  ): Promise<Config | null> {
+    let config = null;
+    if (instanceId) {
+      config = await Config.findOne({
+        where: { instance_id: instanceId },
+      });
+
+      if (config && config.active) {
+        return config;
+      }
+    }
+
+    if (!config && appId) {
+      config = await Config.findOne({
+        where: { platform_id: appId },
+      });
+
+      if (config && config.active) {
+        return config;
+      }
+    }
+
+    if (!config) {
+      config = await Config.findOne({
+        where: { global: true },
+      });
+    }
+
+    return config;
   }
 }

@@ -24,6 +24,7 @@ import {
   useToast,
   Stack,
   Skeleton,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -31,6 +32,7 @@ import {
   updateConfig,
 } from '../../../common/services/platform/controller';
 import { GenericConfig } from '../../../common/services/platform/platform.d';
+import EditKeyword from '../EditKeyword';
 
 const GeneralSettings = ({
   appId,
@@ -42,6 +44,12 @@ const GeneralSettings = ({
   style?: React.CSSProperties;
 }) => {
   const toast = useToast();
+  const {
+    isOpen: isOpenEditKeyword,
+    onOpen: onOpenEditKeyword,
+    onClose: onCloseEditKeyword,
+  } = useDisclosure();
+
   const { data, isLoading } = useQuery(
     ['config', 'generic', appId, instanceId],
     async () => {
@@ -204,10 +212,14 @@ const GeneralSettings = ({
           <Input
             placeholder="输入默认回复内容"
             value={config.defaultReply}
+            disabled
             onChange={(e) =>
               handleUpdateConfig({ defaultReply: e.target.value })
             }
           />
+          <Button ml={2} onClick={onOpenEditKeyword}>
+            编辑
+          </Button>
         </Flex>
       </FormControl>
 
@@ -296,7 +308,7 @@ const GeneralSettings = ({
       </Flex>
       <Slider
         min={50}
-        max={4000}
+        max={210}
         step={5}
         value={config.truncateWordCount}
         onChange={(truncateWordCount) =>
@@ -327,6 +339,34 @@ const GeneralSettings = ({
           />
         </Flex>
       </FormControl>
+
+      <FormControl mt={3}>
+        <FormLabel>
+          {' '}
+          <Tooltip label="因为抖店默认有个不可关闭的首条自动回复，所以如果要自动回复后还能继续回复，这里需要设置的和抖店那个回复内容一致">
+            <Text mb="8px">抖店默认首条回复</Text>
+          </Tooltip>
+        </FormLabel>
+        <Flex>
+          <Input
+            placeholder="抖店默认首条回复"
+            max={5}
+            value={config.jinritemaiDefaultReplyMatch}
+            onChange={(e) =>
+              handleUpdateConfig({
+                jinritemaiDefaultReplyMatch: e.target.value,
+              })
+            }
+          />
+        </Flex>
+      </FormControl>
+
+      <EditKeyword
+        isOpen={isOpenEditKeyword}
+        onClose={onCloseEditKeyword}
+        reply={config.defaultReply}
+        handleEdit={(reply) => handleUpdateConfig({ defaultReply: reply })}
+      />
     </VStack>
   );
 };

@@ -79,6 +79,7 @@ export class KeywordReplyController {
         autoReplies.push({
           keyword: String(keyword),
           reply: String(reply),
+          mode: 'fuzzy', // 废弃字段，这里只是兼容旧数据
           platform_id: String(platformId),
           fuzzy,
           has_regular,

@@ -125,7 +125,7 @@ export class DispatchService {
 
   public async syncConfig(): Promise<boolean> {
     try {
-      const cfg = await this.configController.getConfigByType({
+      let cfg = await this.configController.getConfigByType({
         appId: undefined,
         instanceId: undefined,
         type: 'driver',
@@ -140,10 +140,38 @@ export class DispatchService {
         hasPaused = cfg.hasPaused || false;
       }
 
+      cfg = await this.configController.getConfigByType({
+        appId: undefined,
+        instanceId: undefined,
+        type: 'generic',
+      });
+
+      if (!cfg) {
+        return false;
+      }
+
+      let jdr = '很高兴为您服务，请问有什么可以帮您？';
+      if ('jinritemaiDefaultReplyMatch' in cfg) {
+        jdr = cfg.jinritemaiDefaultReplyMatch || '';
+      }
+
+      let twkey = '';
+      if ('truncateWordKey' in cfg) {
+        twkey = cfg.truncateWordKey || '';
+      }
+
+      let twcount = 210;
+      if ('truncateWordCount' in cfg) {
+        twcount = cfg.truncateWordCount || 210;
+      }
+
       await emitAndWait(this.io, 'strategyService-updateStatus', {
         status: hasPaused
           ? StrategyServiceStatusEnum.STOPPED
           : StrategyServiceStatusEnum.RUNNING,
+        jdr,
+        twkey,
+        twcount,
       });
 
       const instances = await Instance.findAll();
@@ -178,17 +206,6 @@ export class DispatchService {
       );
     } catch (error) {
       console.error('Failed to add task', error);
-      return null;
-    }
-  }
-
-  public async updateStatus(status: StrategyServiceStatusEnum): Promise<any> {
-    try {
-      return await emitAndWait(this.io, 'strategyService-updateStatus', {
-        status,
-      });
-    } catch (error) {
-      console.error('Failed to update status', error);
       return null;
     }
   }
