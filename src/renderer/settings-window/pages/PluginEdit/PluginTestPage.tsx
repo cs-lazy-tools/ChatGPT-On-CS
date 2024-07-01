@@ -49,8 +49,14 @@ const PluginTestPage = ({ code }: { code?: string }) => {
     ContextKeys[0],
   );
   const [contextValue, setContextValue] = useState<string>('');
-  const { context, setContext, addMessage, messages, removeMessage } =
-    useSystemStore();
+  const {
+    context,
+    setContext,
+    clearContext,
+    addMessage,
+    messages,
+    removeMessage,
+  } = useSystemStore();
 
   const handleAddMessage = () => {
     addMessage(newMessage);
@@ -113,6 +119,8 @@ const PluginTestPage = ({ code }: { code?: string }) => {
 
   const handleSetDefault = () => {
     // MockCtx 是一个 Map 对象
+    clearContext();
+
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, value] of MockCtx) {
       setContext(key, value);

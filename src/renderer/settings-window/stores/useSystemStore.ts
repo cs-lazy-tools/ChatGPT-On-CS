@@ -25,6 +25,7 @@ type MessageState = {
   context: Record<string, string>;
   messages: Message[];
   setContext: (key: string, value: string) => void;
+  clearContext: () => void;
   addMessage: (message: Message) => void;
   removeMessage: (index: number) => void;
 };
@@ -40,6 +41,10 @@ export const useSystemStore = create<State>()(
         setContext: (key, value) =>
           set((state) => {
             state.context[key] = value;
+          }),
+        clearContext: () =>
+          set((state) => {
+            state.context = {};
           }),
         messages: [],
         addMessage: (message) =>
