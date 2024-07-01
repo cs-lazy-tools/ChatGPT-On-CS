@@ -8,7 +8,7 @@ import { Sequelize } from 'sequelize';
 import { Config, initConfig } from './entities/config';
 import { initSession } from './entities/session';
 import { initMessage } from './entities/message';
-import { initPlugin } from './entities/plugin';
+import { Plugin, initPlugin } from './entities/plugin';
 import { initInstance } from './entities/instance';
 import { Keyword, initKeyword } from './entities/keyword';
 import { TransferKeyword, initTransfer } from './entities/transfer';
@@ -247,6 +247,13 @@ async function initDb(): Promise<void> {
     ];
     await ReplaceKeyword.bulkCreate(replaces);
   }
+
+  // 因为 Plugin 1.0.0 版本不支持了，这里直接删除
+  await Plugin.destroy({
+    where: {
+      version: '1.0.0',
+    },
+  });
 }
 
 (async () => {

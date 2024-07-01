@@ -66,6 +66,12 @@ const MessageModal = ({ isOpen, onClose }: MessageModalProps) => {
 
   const handleSetDefault = () => {
     // MockCtx 是一个 Map 对象
+    // 先清空所有上下文
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key of ContextKeys) {
+      setContext(key, '');
+    }
+
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, value] of MockCtx) {
       setContext(key, value);

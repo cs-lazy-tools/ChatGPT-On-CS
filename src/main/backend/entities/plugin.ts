@@ -128,7 +128,7 @@ export function initPlugin(sequelize: Sequelize) {
       },
       version: {
         type: DataTypes.STRING(255),
-        defaultValue: '1.2.0-beta.1',
+        defaultValue: '1.2.0',
         allowNull: true,
       },
       source: {

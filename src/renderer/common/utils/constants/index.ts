@@ -1,17 +1,22 @@
 export const PluginExtraLib = `
       type AppContext = {
-        app_name: string; // 当前应用名称
-        app_id: string; // 当前应用 ID
-        instance_id: string; // 当前客服实例 ID
-        username?: string; // 当前操作的用户名
-        platform?: string; // 当前所在平台
-        has_new_message?: boolean; // 是否有新消息
-        has_group_message?: boolean; // 是否有群消息
+        CTX_APP_NAME: string; // 当前应用名称
+        CTX_APP_ID: string; // 当前应用 ID
+        CTX_INSTANCE_ID: string; // 当前客服实例 ID
+        CTX_USERNAME?: string; // 当前操作的用户名
+        CTX_PLATFORM?: string; // 当前所在平台
+        CTX_HAS_NEW_MESSAGE?: boolean; // 是否有新消息
+        CTX_HAS_GROUP_MESSAGE?: boolean; // 是否有群消息
         CTX_CURRENT_GOODS?: string; // 当前商品
         CTX_CURRENT_GOODS_ID?: string; // 当前商品 ID
         CTX_MEMBER_TAG?: string; // 会员标签
         CTX_FAN_TAG?: string; // 粉丝标签
         CTX_NEW_CUSTOMER_TAG?: string; // 新客标签
+        CTX_ORDER_STATUS?: string; // 订单状态
+        CTX_ORDER_ID?: string; // 订单 ID
+        CTX_ORDER_AMOUNT?: string; // PDD 平台特有 [订单金额]
+        CTX_GOODS_SPEC?: string; // PDD 平台特有 [商品规格]
+        CTX_LOGISTICS_STATUS?: string; // 物流状态
       };
 
       type RoleType = 'SELF' | 'OTHER' | 'SYSTEM';
