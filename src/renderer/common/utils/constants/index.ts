@@ -16,7 +16,7 @@ export const PluginExtraLib = `
 
       type RoleType = 'SELF' | 'OTHER' | 'SYSTEM';
 
-      type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE';
+      type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE' | 'NO_REPLY';
 
       type Message = {
         sender: string; // 发送者
@@ -42,7 +42,7 @@ const rp = require('reply_srv');
  */
 async function main(ctx, messages) {
   const cfg = await cc.get(ctx);
-  return await rp.getDefaultReply(cfg, ctx, messages);
+  return await rp.getReply(cfg, ctx, messages);
 }`;
 
 export const LLMTypeList = [
@@ -168,14 +168,14 @@ export const ModelList = [
 ];
 
 // 固定会传递的上下文参数
-export const CTX_APP_NAME = 'app_name';
-export const CTX_APP_ID = 'app_id';
-export const CTX_INSTANCE_ID = 'instance_id';
+export const CTX_APP_NAME = 'CTX_APP_NAME';
+export const CTX_APP_ID = 'CTX_APP_ID';
+export const CTX_INSTANCE_ID = 'CTX_INSTANCE_ID';
 
-export const CTX_USERNAME = 'username'; // 当前操作的用户名
-export const CTX_PLATFORM = 'platform'; // 当前所在平台
-export const CTX_HAS_NEW_MESSAGE = 'has_new_message'; // 是否有新消息
-export const CTX_HAS_GROUP_MESSAGE = 'has_group_message'; // 是否有群消息
+export const CTX_USERNAME = 'CTX_USERNAME'; // 当前操作的用户名
+export const CTX_PLATFORM = 'CTX_PLATFORM'; // 当前所在平台
+export const CTX_HAS_NEW_MESSAGE = 'CTX_HAS_NEW_MESSAGE'; // 是否有新消息
+export const CTX_HAS_GROUP_MESSAGE = 'CTX_HAS_GROUP_MESSAGE'; // 是否有群消息
 
 // 电商平台
 export const CTX_CURRENT_GOODS = 'CTX_CURRENT_GOODS'; // 当前商品
@@ -183,6 +183,12 @@ export const CTX_CURRENT_GOODS_ID = 'CTX_CURRENT_GOODS_ID'; // 当前商品 ID
 export const CTX_MEMBER_TAG = 'CTX_MEMBER_TAG'; // 会员标签
 export const CTX_FAN_TAG = 'CTX_FAN_TAG'; // 粉丝标签
 export const CTX_NEW_CUSTOMER_TAG = 'CTX_NEW_CUSTOMER_TAG'; // 新客标签
+
+export const CTX_ORDER_STATUS = 'CTX_ORDER_STATUS'; // 订单状态
+export const CTX_ORDER_ID = 'CTX_ORDER_ID'; // 订单 ID
+export const CTX_ORDER_AMOUNT = 'CTX_ORDER_AMOUNT'; // PDD 平台特有 [订单金额]
+export const CTX_GOODS_SPEC = 'CTX_GOODS_SPEC'; // PDD 平台特有 [商品规格]
+export const CTX_LOGISTICS_STATUS = 'CTX_LOGISTICS_STATUS'; // 物流状态
 
 export const ContextKeys = [
   CTX_APP_NAME,
@@ -197,6 +203,11 @@ export const ContextKeys = [
   CTX_MEMBER_TAG,
   CTX_FAN_TAG,
   CTX_NEW_CUSTOMER_TAG,
+  CTX_ORDER_STATUS,
+  CTX_ORDER_ID,
+  CTX_ORDER_AMOUNT,
+  CTX_GOODS_SPEC,
+  CTX_LOGISTICS_STATUS,
 ];
 
 export const MockCtx = new Map<string, string>([

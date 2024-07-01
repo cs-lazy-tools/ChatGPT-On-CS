@@ -97,16 +97,15 @@ export class DispatchService {
           }，使用默认回复`,
         );
 
-        reply = {
-          content: cfg.default_reply || 'Failed to execute plugin',
-          type: 'TEXT',
-        };
+        reply = await this.messageService.getDefaultReply(cfg);
       }
 
       callback(reply);
 
-      // 回复后保存消息
-      await this.messageController.saveMessages(ctxMap, reply, msgs);
+      if (reply.type !== 'NO_REPLY') {
+        // 回复后保存消息
+        await this.messageController.saveMessages(ctxMap, reply, msgs);
+      }
     });
   }
 

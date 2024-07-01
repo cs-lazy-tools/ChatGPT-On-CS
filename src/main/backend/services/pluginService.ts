@@ -95,18 +95,12 @@ export class PluginService {
       throw new Error('Plugin not found');
     }
 
-    const cfg = await this.configController.get(ctx);
-
     try {
       const { data } = await this.executePluginCode(plugin.code, ctx, messages);
       return { ...data };
     } catch (error) {
-      console.error('Plugin execution error:', error);
-      return {
-        type: 'TEXT',
-        content:
-          cfg.default_reply || 'An error occurred while executing the plugin',
-      };
+      this.log.error(`插件执行失败: ${error}`);
+      throw error;
     }
   }
 
@@ -211,15 +205,15 @@ export class PluginService {
         return { data: data as ReplyDTO, consoleOutput };
       }
 
-      this.log.error('未返回有效响应');
-
-      throw new Error('Plugin function did not return a valid response');
+      this.log.error(`未返回有效响应，插件返回数据: ${JSON.stringify(data)}`);
+      throw new Error('Plugin function did not return a valid response', data);
     } catch (error: any) {
       console.error('Plugin execution error:', error);
-
+      this.log.error(`运行插件的日志信息: ${JSON.stringify(consoleOutput)}`);
       this.log.error(
         `回复失败: ${error instanceof Error ? error.message : String(error)}`,
       );
+
       error.consoleOutput = consoleOutput;
       throw error;
     }

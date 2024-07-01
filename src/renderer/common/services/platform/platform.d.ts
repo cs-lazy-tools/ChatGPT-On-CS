@@ -24,7 +24,7 @@ export interface PlatformSettings {
 }
 
 export type RoleType = 'SELF' | 'OTHER' | 'SYSTEM';
-export type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE';
+export type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE' | 'NO_REPLY';
 
 export interface Reply {
   content: string;

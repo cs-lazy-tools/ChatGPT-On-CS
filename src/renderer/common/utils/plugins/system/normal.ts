@@ -9,5 +9,5 @@ const rp = require('reply_srv');
  */
 async function main(ctx, messages) {
   const cfg = await cc.get(ctx);
-  return await rp.getDefaultReply(cfg, ctx, messages);
+  return await rp.getReply(cfg, ctx, messages);
 }`;

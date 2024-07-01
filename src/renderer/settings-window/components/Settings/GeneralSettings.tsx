@@ -308,7 +308,7 @@ const GeneralSettings = ({
       </Flex>
       <Slider
         min={50}
-        max={210}
+        max={4000}
         step={5}
         value={config.truncateWordCount}
         onChange={(truncateWordCount) =>

@@ -86,7 +86,7 @@ export async function checkAndAddFields(sequelize: Sequelize) {
       .addColumn('n_config', 'truncate_word_count', {
         type: DataTypes.INTEGER,
         allowNull: true,
-        defaultValue: 210,
+        defaultValue: 4000,
       });
   }
 
@@ -260,7 +260,7 @@ export function initConfig(sequelize: Sequelize) {
       truncate_word_count: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        defaultValue: 210,
+        defaultValue: 4000,
       },
       truncate_word_key: {
         type: DataTypes.STRING,

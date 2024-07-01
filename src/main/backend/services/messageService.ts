@@ -66,11 +66,33 @@ export class MessageService {
    * @param messages
    * @returns
    */
-  public async getDefaultReply(
+  public async getDefaultReply(cfg: Config): Promise<ReplyDTO> {
+    let reply = {
+      type: 'TEXT' as MessageType,
+      content: cfg.default_reply || '当前消息有点多，我稍后再回复你',
+    };
+
+    const replyContent = await this.choseRandomReply(reply.content);
+    reply = {
+      type: reply.type as MessageType,
+      content: replyContent,
+    };
+
+    return reply;
+  }
+
+  /**
+   * 获取回复
+   * @param cfg
+   * @param ctx
+   * @param messages
+   * @returns
+   */
+  public async getReply(
     cfg: Config,
     ctx: Context,
     messages: MessageDTO[],
-  ): Promise<{ type: string; content: string }> {
+  ): Promise<ReplyDTO> {
     // 先检查是否存在用户的消息
     const lastUserMsg = messages
       .slice()
@@ -78,15 +100,9 @@ export class MessageService {
       .find((msg) => msg.role === 'OTHER');
 
     let hasDefaultReply = true;
+    let reply = null;
 
-    let reply = {
-      type: 'TEXT',
-      content: cfg.default_reply || '当前消息有点多，我稍后再回复你',
-    };
-
-    if (!lastUserMsg) {
-      this.log.warn(`未匹配到用户消息，所以使用默认回复: ${reply.content}`);
-    } else {
+    if (lastUserMsg) {
       if (cfg.has_transfer) {
         // 检查是否需要转接
         const isTransfer = await this.matchTransferKeyword(ctx, lastUserMsg);
@@ -94,8 +110,8 @@ export class MessageService {
           this.log.info('需要转接');
           hasDefaultReply = false;
           return {
-            type: 'TRANSFER',
-            content: '',
+            type: 'TRANSFER' as MessageType,
+            content: '无',
           };
         }
       }
@@ -143,20 +159,17 @@ export class MessageService {
     }
 
     if (hasDefaultReply) {
-      const replyContent = await this.choseRandomReply(reply.content);
-      reply = {
-        type: reply.type as MessageType,
-        content: replyContent,
-      };
+      reply = await this.getDefaultReply(cfg);
+      this.log.warn(`未匹配到用户消息，所以使用默认回复: ${reply.content}`);
     }
 
     if (cfg.has_replace) {
-      if (reply.type === 'TEXT') {
+      if (reply && reply.type === 'TEXT') {
         reply.content = await this.matchReplaceKeyword(ctx, reply.content);
       }
     }
 
-    return reply;
+    return reply as ReplyDTO;
   }
 
   public async createTextReply(content: string) {

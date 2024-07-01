@@ -13,7 +13,7 @@ export enum PlatformTypeEnum {
 }
 
 export type RoleType = 'SELF' | 'OTHER' | 'SYSTEM';
-export type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE';
+export type MessageType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE' | 'NO_REPLY';
 
 export type Context = Map<string, string>;
 
