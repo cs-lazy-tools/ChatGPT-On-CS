@@ -22,6 +22,12 @@ import Server from './backend/backend';
 let mainWindow: BrowserWindow | null = null;
 let backendServiceManager: BackendServiceManager | null = null;
 
+const stopBackendServiceManager = async () => {
+  if (backendServiceManager) {
+    await backendServiceManager.stop();
+  }
+};
+
 // 修复 GPU process isn't usable. Goodbye. 错误
 // https://learn.microsoft.com/en-us/answers/questions/1193062/how-to-fix-electron-program-gpu-process-isnt-usabl
 app.commandLine.appendSwitch('no-sandbox');
@@ -31,7 +37,7 @@ app.on('window-all-closed', async () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   console.log('window-all-closed');
-  await backendServiceManager?.stop();
+  await stopBackendServiceManager();
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -39,7 +45,7 @@ app.on('window-all-closed', async () => {
 
 app.on('before-quit', async () => {
   console.log('before-quit');
-  await backendServiceManager?.stop();
+  await stopBackendServiceManager();
 });
 
 const originalUncaughtException = process.listeners('uncaughtException').pop();
@@ -47,7 +53,7 @@ process.removeAllListeners('uncaughtException');
 process.on('uncaughtException', async (error, origin) => {
   console.error('An error occurred in the main process:', error);
   console.error(error.stack);
-  await backendServiceManager?.stop();
+  await stopBackendServiceManager();
   originalUncaughtException?.(error, origin);
 });
 
@@ -144,17 +150,21 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    // 确保所有窗口关闭后退出应用
+    if (BrowserWindow.getAllWindows().length === 0) {
+      app.quit();
+    }
   });
 
-  mainWindow.on('close', async (event) => {
-    event.preventDefault(); // 阻止默认行为
-    await backendServiceManager?.stop();
+  mainWindow.on('close', async () => {
+    // 停止后台服务
+    await stopBackendServiceManager();
+    // 关闭所有窗口
     BrowserWindow.getAllWindows().forEach((win) => {
       if (win !== mainWindow) {
         win.close();
       }
     });
-    app.quit(); // 关闭应用
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
