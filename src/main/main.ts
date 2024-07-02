@@ -146,6 +146,17 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
+  mainWindow.on('close', async (event) => {
+    event.preventDefault(); // 阻止默认行为
+    await backendServiceManager?.stop();
+    BrowserWindow.getAllWindows().forEach((win) => {
+      if (win !== mainWindow) {
+        win.close();
+      }
+    });
+    app.quit(); // 关闭应用
+  });
+
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 

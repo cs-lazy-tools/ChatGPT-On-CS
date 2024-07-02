@@ -9,6 +9,7 @@ import { ConfigController } from '../controllers/configController';
 import { MessageDTO, ReplyDTO, Context } from '../types';
 import { MessageService } from './messageService';
 import { LoggerService } from './loggerService';
+import { PluginDefaultRunCode } from '../constants';
 
 interface PreloadedModules {
   [key: string]: any;
@@ -92,7 +93,14 @@ export class PluginService {
   ): Promise<ReplyDTO> {
     const plugin = await this.configController.getPluginConfig(plugin_id);
     if (!plugin) {
-      throw new Error('Plugin not found');
+      // 有可能插件被删除了，这里直接使用默认插件
+      this.log.info('使用默认插件');
+      const result = await this.executePluginCode(
+        PluginDefaultRunCode,
+        ctx,
+        messages,
+      );
+      return result.data;
     }
 
     try {
