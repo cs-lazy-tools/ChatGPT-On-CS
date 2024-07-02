@@ -63,11 +63,12 @@ const EditKeyword = ({
 
   const handleSave = async () => {
     try {
-      if (reply === '') {
+      if (replyList.length === 0) {
         throw new Error('回复内容不能为空');
       }
 
       await handleEdit(replyList.join('[or]'));
+
       toast({
         position: 'top',
         title: '保存成功',
