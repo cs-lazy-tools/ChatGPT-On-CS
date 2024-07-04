@@ -32,17 +32,10 @@ export class DispatchService {
   public registerHandlers(socket: socketIo.Socket): void {
     socket.on('messageService-broadcast', async (msg: any, callback) => {
       const { event, data } = msg;
-      if (event === 'mouse_move') {
-        const change = await this.configController.moveMouseHandler();
-        if (change) {
-          this.receiveBroadcast({
-            event: 'has_paused',
-            data: {},
-          });
-        }
-      } else if (event === 'key_esc') {
+      if (event === 'key_esc') {
         const change = await this.configController.escKeyDowHandler();
         if (change) {
+          this.syncConfig();
           this.receiveBroadcast({
             event: 'has_paused',
             data: {},
