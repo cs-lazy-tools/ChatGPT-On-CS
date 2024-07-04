@@ -54,10 +54,6 @@
 
 ![微信扫码添加客服进群](docs/contact.png)
 
-或者 QQ 扫码进群
-
-![QQ 扫码进群](docs/contact2.png)
-
 ## 下载地址
 
 <a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.2.0-beta.1/1.2.0-beta.1.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
