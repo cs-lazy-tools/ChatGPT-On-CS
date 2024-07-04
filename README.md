@@ -9,7 +9,7 @@
   <a href="./README.md">简体中文</a>
 </p>
 
-懒人客服是一个基于 LLM 大语言模型的知识库的集成客服系统，提供开箱即用的智能客服解决方案，支持微信、企业微信、千牛、哔哩哔哩、抖音企业号、抖音、抖店、微博聊天、小红书专业号运营、小红书、知乎等平台接入，支持文本、语音和图片，通过插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用.
+懒人客服是一个基于 LLM 大语言模型的知识库的集成客服系统，提供开箱即用的智能客服解决方案，支持微信、企业微信、千牛、哔哩哔哩、抖音企业号、抖音、抖店、拼多多、微博聊天、小红书专业号运营、小红书、知乎等平台接入，支持文本、语音和图片，通过插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用.
 
 </div>
 
@@ -58,11 +58,10 @@
 
 <a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.2.0-beta.1/1.2.0-beta.1.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
 
-如果网络环境导致下载不了，可以使用百度云盘下载：
+如果网络环境导致下载不了，可以使用下面的地址下载：
 
 ```txt
-链接: https://pan.baidu.com/s/1_nXegawLB_pb1SX9QvQ7Qg?pwd=6666 
-提取码: 6666 
+https://down.wizgadg.top/chatgpt-on-cs
 ```
 
 ## 使用说明
