@@ -1,5 +1,12 @@
 import React from 'react';
-import { Box, Text, Stack, useColorModeValue } from '@chakra-ui/react';
+import {
+  Box,
+  Text,
+  Stack,
+  useColorModeValue,
+  Tooltip,
+  Link,
+} from '@chakra-ui/react';
 
 const Footer = () => {
   const bg = useColorModeValue('gray.100', 'gray.900');
@@ -14,6 +21,14 @@ const Footer = () => {
       bg={bg}
     >
       <Stack>
+        <Box position={'absolute'}>
+          <Tooltip label="查看文档获取帮助">
+            <Link href="https://doc.lazaytools.top/docs" isExternal mr="auto">
+              📚文档
+            </Link>
+          </Tooltip>
+        </Box>
+
         <Text fontSize="sm" alignSelf={{ base: 'center' }}>
           &copy; {new Date().getFullYear()} lrhh123. All rights reserved.
         </Text>
