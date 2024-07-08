@@ -22,7 +22,7 @@ import { loader } from '@monaco-editor/react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import GeneralSettings from './components/Settings/GeneralSettings';
-import LLMSettings from './components/Settings/LLMSettings';
+import LLMSettings from './components/LLMSettings';
 import PluginPage from './pages/Plugin';
 import PluginEditPage from './pages/PluginEdit';
 import AboutPage from './components/About';
