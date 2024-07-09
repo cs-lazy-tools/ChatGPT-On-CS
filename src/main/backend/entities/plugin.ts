@@ -93,7 +93,7 @@ export async function checkAndAddFields(sequelize: Sequelize) {
   // 再更新字段的默认版本号
   await sequelize.getQueryInterface().changeColumn('plugins', 'version', {
     type: DataTypes.STRING(255),
-    defaultValue: '1.2.0',
+    defaultValue: '1.3.0',
     allowNull: true,
   });
 }
@@ -135,7 +135,7 @@ export function initPlugin(sequelize: Sequelize) {
       },
       version: {
         type: DataTypes.STRING(255),
-        defaultValue: '1.2.0',
+        defaultValue: '1.3.0',
         allowNull: true,
       },
       source: {

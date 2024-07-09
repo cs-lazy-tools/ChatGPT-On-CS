@@ -52,7 +52,7 @@
 - Downgrade to `electron@8`
 - Bump dependencies to latest semver
 
-# 1.2.0
+# 1.3.0
 
 - Migrate to redux toolkit
 - Lazy load routes with react suspense
@@ -65,7 +65,7 @@
 - Add experimental support for vscode debugging
 - Revert https://github.com/electron-react-boilerplate/electron-react-boilerplate/pull/2365 as default for users, provide as opt in option
 
-# 1.2.0
+# 1.3.0
 
 - Fix #2402
 - Simplify configs (https://github.com/electron-react-boilerplate/electron-react-boilerplate/pull/2406)
