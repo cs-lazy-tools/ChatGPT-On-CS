@@ -28,16 +28,20 @@
   </a>
 </p>
 
-|                                    |                                    |
-| ---------------------------------- | ---------------------------------- |
-| ![Demo](./docs/intro1.png)         | ![alt text](./docs/intro2.png) |
 
-注：本项目只是一个用于对接外部平台的客服工具，不提供任何平台的账号，需要自行准备。并且知识库功能也需要自行准备，该项目目前只支持的 OpenAI 的 API 接口（或代理）接入
+本项目可选择 GPT3.5/GPT4.0/懒人百宝箱/FastGPT/DifyAI/通义千问/文心一言 等平台大模型，能处理文本、语音和图片，通过插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用。
 
 * [GitHub] https://github.com/cs-lazy-tools/ChatGPT-On-CS
 * [Gitee] https://gitee.com/alsritter/ChatGPT-On-CS · (国内用户推荐)
 
 ## 主要功能
+
+<div align="center">
+
+<a href="https://doc.lazaytools.top/"><img src="./docs/intro1.png" width="380" alt="lazaytools logo"></a>
+
+</div>
+
 - [x] 多平台支持：当前支持微信、千牛、哔哩哔哩、抖音企业号、抖音、抖店、微博聊天、小红书专业号运营、小红书、知乎等平台，未来将不断扩展支持更多社交媒体平台.
 - [x] 预设回复内容：允许用户设置自定义回复，以应对常见问题，提高回复效率.
 - [x] 接入ChatGPT接口，根据客户的咨询内容智能生成回复，适用于处理复杂或者个性化的客户咨询.
@@ -45,9 +49,16 @@
 - [x] 知识库： 通过上传知识库文件自定义专属机器人，可作为数字分身、智能客服、私域助手使用.
 - [x] 各个平台独立的插件系统，支持插件访问操作系统和互联网等外部资源，支持基于自有知识库定制企业 AI 应用.
 
-
 ## 演示视频
 [观看视频](https://www.bilibili.com/video/BV1qz421Q73S)
+
+## 功能展示截图
+
+| ![Demo](./docs/intro1.png) | ![alt text](./docs/intro2.png) |
+| -------------------------- | ------------------------------ |
+| ![Demo](./docs/intro3.png) | ![Demo](./docs/intro4.png)     |
+| ![Demo](./docs/intro5.png) | ![alt text](./docs/intro6.png) |
+
 
 ## 社区交流群
 如果有问题需要反馈，或者对项目有什么特性希望支持的，可以添加小助手微信加入开源项目交流群：
