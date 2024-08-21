@@ -497,7 +497,7 @@ packages:
       lru-cache: 6.0.0
       minipass: 3.3.6
       minipass-collect: 1.0.2
-      minipass-fetch: 1.4.1
+      minipass-fetch: 1.4.2
       minipass-flush: 1.0.5
       minipass-pipeline: 1.2.4
       negotiator: 0.6.3
@@ -536,7 +536,7 @@ packages:
     dev: false
     optional: true
 
-  /minipass-fetch@1.4.1:
+  /minipass-fetch@1.4.2:
     resolution: {integrity: sha512-CGH1eblLq26Y15+Azk7ey4xh0J/XfJfrCox5LDJiKqI2Q2iwOLOKrlmIaODiSQS8d18jalF6y2K2ePUm0CmShw==}
     engines: {node: '>=8'}
     requiresBuild: true
