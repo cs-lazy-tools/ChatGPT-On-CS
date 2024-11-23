@@ -65,16 +65,6 @@
 
 ![微信扫码添加客服进群](docs/contact.png)
 
-## 下载地址
-
-<a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/releases/download/v1.4.5/1.4.5.exe" style="display: inline-block; background-color: #008CBA; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 4px 2px; cursor: pointer;">点击下载</a>
-
-如果网络环境导致下载不了，可以使用下面的地址下载：
-
-```txt
-https://down.wizgadg.top/chatgpt-on-cs
-```
-
 ## 使用说明
 可以参考 [使用说明](https://doc.lazaytools.top/) 文档
 
