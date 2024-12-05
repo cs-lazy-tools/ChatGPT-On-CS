@@ -60,10 +60,10 @@
 | ![Demo](./docs/intro5.png) | ![alt text](./docs/intro6.png) |
 
 
-## 社区交流群
-如果有问题需要反馈，或者对项目有什么特性希望支持的，可以添加小助手微信加入开源项目交流群：
+## 联系我们
+如果有问题需要反馈，或者对项目有什么特性希望支持的，可以添加小助手微信：
 
-![微信扫码添加客服进群](docs/contact.png)
+![微信扫码添加客服进群](https://image.siweigpt.com/docimage/202412031818028.png)
 
 ## 使用说明
 可以参考 [使用说明](https://doc.lazaytools.top/) 文档
