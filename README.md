@@ -178,11 +178,11 @@
 
 ## 📈 项目数据
 
-<a href="https://star-history.com/#cs-lazy-tools/ChatGPT-On-CS&Date">
+<a href="https://star-history.dera.page/#cs-lazy-tools/ChatGPT-On-CS&type=Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=cs-lazy-tools/ChatGPT-On-CS&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=cs-lazy-tools/ChatGPT-On-CS&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=cs-lazy-tools/ChatGPT-On-CS&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=cs-lazy-tools/ChatGPT-On-CS&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=cs-lazy-tools/ChatGPT-On-CS&type=Date" />
+   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=cs-lazy-tools/ChatGPT-On-CS&type=Date" />
  </picture>
 </a>
 
