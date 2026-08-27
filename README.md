@@ -50,7 +50,7 @@
 ## ✨ 核心功能
 
 <div align="center">
-<img src="./docs/demo-chat.gif" width="760" alt="聚合聊天演示：客户一问，AI 已经先答了，每条回答都标着依据">
+<video src="https://github.com/user-attachments/assets/bb9230b4-6734-4b1f-b323-4138456b16da" controls muted playsinline width="760"></video>
 </div>
 
 ### 🔥 主要特性
@@ -65,23 +65,25 @@
 
 ## 📸 产品演示
 
-六段完整介绍片，**点图直接播放**——视频就在本仓库 `docs/videos/` 里，不跳外链、不依赖第三方站点。
+六段完整介绍片，**直接在下面播放**——不用跳转，也不用先下载。
 
 <div align="center">
 
-| [<img src="./docs/feature-store-transfer.jpg" width="400" alt="接店铺">](./docs/videos/store-transfer.mp4) | [<img src="./docs/feature-chat.jpg" width="400" alt="聚合聊天">](./docs/videos/chat.mp4) |
+| <video src="https://github.com/user-attachments/assets/587d9a1a-5ac2-4453-9062-80805f066194" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/bb9230b4-6734-4b1f-b323-4138456b16da" controls muted playsinline width="400"></video> |
 | :---: | :---: |
-| **接店铺** · 你的店和替你接待的数字员工，在同一页 | **聚合聊天** · 淘宝、拼多多、抖店、京东的咨询进同一列 |
+| **接店铺 · 客服转接**<br>你的店和替你接待的数字员工，在同一页 | **聚合聊天**<br>淘宝、拼多多、抖店、京东的咨询进同一列 |
 
-| [<img src="./docs/feature-knowledge.jpg" width="400" alt="知识库">](./docs/videos/knowledge.mp4) | [<img src="./docs/feature-scene-agent.jpg" width="400" alt="场景 Agent">](./docs/videos/scene-agent.mp4) |
+| <video src="https://github.com/user-attachments/assets/5aa6f965-4d26-4ecc-8305-0ce54eb5d4d6" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/60036394-9b7a-49d1-a0fe-fa4956fd5c90" controls muted playsinline width="400"></video> |
 | :---: | :---: |
-| **知识库** · 不是手写出来的，是 AI 从真实对话里学出来的 | **场景 Agent** · 场景管专项，行为策略管全店 |
+| **知识库配置**<br>不是手写出来的，是 AI 从真实对话里学出来的 | **场景 Agent 与 AI 行为策略**<br>场景管专项，行为策略管全店 |
 
-| [<img src="./docs/feature-test-bench.jpg" width="400" alt="训练台">](./docs/videos/test-bench.mp4) | [<img src="./docs/feature-data-center.jpg" width="400" alt="数据中心">](./docs/videos/data-center.mp4) |
+| <video src="https://github.com/user-attachments/assets/6dd5015e-7820-4409-ad88-2785b5628a40" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/27187bf1-2384-4933-bb1b-6dbc8949232e" controls muted playsinline width="400"></video> |
 | :---: | :---: |
-| **训练台** · 不用等真客户，自己造一次进线，每条回答都标着依据 | **数据中心** · 这一个月 AI 接了多少、转人工为什么这么多 |
+| **场景训练台**<br>不用等真客户，自己造一次进线，每条回答都标着依据 | **数据中心**<br>这一个月 AI 接了多少、转人工为什么这么多 |
 
 </div>
+
+> 原片同时存放在仓库 `docs/videos/` 下，需要离线或二次使用时可直接取。
 
 ## 🤝 OEM 合作伙伴招募
 
