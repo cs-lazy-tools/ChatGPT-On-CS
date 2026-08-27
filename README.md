@@ -103,7 +103,7 @@
 
 **🔥 扫码添加客服进群交流**
 
-<img src="https://image.jinxiaoai.com/docimage/20250721190715043.png" width="200" alt="微信客服二维码">
+<img src="./docs/wechat-qr.png" width="200" alt="微信客服二维码">
 
 **🌐 在线体验**: [https://jinxiaoai.com/](https://jinxiaoai.com/)
 
