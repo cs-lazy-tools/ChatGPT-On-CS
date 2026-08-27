@@ -13,11 +13,8 @@
 </div>
 
 <p align="center">
-  <a href="https://kcn6j8kpei52.feishu.cn/wiki/NuoIwmhsVidJbIkQ7Iicqe5enbc">
+  <a href="https://jinxiaoai.com/apps">
     <img height="21" src="./docs/相关文档-7d09f1.svg" alt="使用文档">
-  </a>
-  <a href="https://kcn6j8kpei52.feishu.cn/wiki/NuoIwmhsVidJbIkQ7Iicqe5enbc">
-    <img height="21" src="./docs/本地开发-d4eaf7.svg" alt="本地开发">
   </a>
   <a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/blob/main/LICENSE">
     <img height="21" src="./docs/license_AGPL_3.0.svg" alt="开源协议">
@@ -114,7 +111,7 @@
 
 ## 📖 使用指南
 
-详细的使用教程和配置说明，请参考：[📘 官方文档](https://kcn6j8kpei52.feishu.cn/wiki/NuoIwmhsVidJbIkQ7Iicqe5enbc)
+功能怎么用，看上方「产品演示」那六段片子；产品能力与各应用说明见官网：[📘 jinxiaoai.com/apps](https://jinxiaoai.com/apps)
 
 ## 🗓 产品路线图
 
@@ -145,37 +142,11 @@
 
 ## 💡 开源贡献
 
-我们热烈欢迎各种形式的贡献！无论是代码优化、功能建议还是问题反馈，都是推动项目发展的重要力量。
-
 **参与方式：**
-- 🐛 提交 Issue 报告问题或建议
 - 🔧 提交 Pull Request 贡献代码
 - 📝 完善文档和使用指南
-- 💬 参与社区讨论和交流
 
-### 👥 活跃贡献者
-
-<!-- Copy-paste in your Readme.md file -->
-
-<a href="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors?repo_id=768534013&limit=30" target="_blank" style="display: block" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors/thumbnail.png?repo_id=768534013&limit=30&image_size=auto&color_scheme=dark" width="655" height="auto">
-    <img alt="Active Contributors of cs-lazy-tools/ChatGPT-On-CS - Last 28 days" src="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors/thumbnail.png?repo_id=768534013&limit=30&image_size=auto&color_scheme=light" width="655" height="auto">
-  </picture>
-</a>
-
-<!-- Made with [OSS Insight](https://ossinsight.io/) -->
-
-<!-- Copy-paste in your Readme.md file -->
-
-<a href="https://next.ossinsight.io/widgets/official/compose-org-participants-growth?activity=new&period=past_28_days&owner_id=169274333" target="_blank" style="display: block" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-org-participants-growth/thumbnail.png?activity=new&period=past_28_days&owner_id=169274333&image_size=4x7&color_scheme=dark" width="657" height="auto">
-    <img alt="New trends of cs-lazy-tools" src="https://next.ossinsight.io/widgets/official/compose-org-participants-growth/thumbnail.png?activity=new&period=past_28_days&owner_id=169274333&image_size=4x7&color_scheme=light" width="657" height="auto">
-  </picture>
-</a>
-
-<!-- Made with [OSS Insight](https://ossinsight.io/) -->
+使用中遇到问题或有功能建议，请通过下方的微信客服联系我们。
 
 ## 📈 项目数据
 
