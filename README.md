@@ -1,19 +1,29 @@
 <div align="center">
 
-<a href="https://jinxiaoai.com/"><img src="./docs/logo.png" width="180" height="180" alt="金销数据云客服 logo"></a>
+<a href="https://jinxiaoai.com/?utm_source=github&utm_medium=readme&utm_campaign=repo_hero&utm_content=logo"><img src="./docs/logo.png" width="180" height="180" alt="金销数据云客服 logo"></a>
 
 ⚡ **专业的通用电商 SaaS 智能客服平台** ⚡
 
 金销数据云智能客服是基于大语言模型（LLM）打造的专业电商客服 SaaS 解决方案，专为电商行业量身定制。无缝对接主流电商平台，支持微信、千牛、抖音、飞鸽、拼多多、小红书、京东、淘宝、京麦等多平台统一管理，让您的客服工作更智能、更高效！
 
-🌟 **在线体验**：[https://jinxiaoai.com/](https://jinxiaoai.com/)
-
-🧩 **配套应用**：[拼多多自动申诉 · 申多多](https://jinxiaoai.com/apps/negative_review_appeal)
-
 </div>
 
 <p align="center">
-  <a href="https://jinxiaoai.com/apps">
+  <a href="https://jinxiaoai.com/?utm_source=github&utm_medium=readme&utm_campaign=repo_nav&utm_content=website">🌐 在线体验</a> &nbsp;·&nbsp;
+  <a href="https://jinxiaoai.com/apps?utm_source=github&utm_medium=readme&utm_campaign=repo_nav&utm_content=apps">🧩 应用中心</a> &nbsp;·&nbsp;
+  <a href="https://jinxiaoai.com/apps/negative_review_appeal?utm_source=github&utm_medium=readme&utm_campaign=repo_nav&utm_content=appeal_app">📮 申多多 · 拼多多自动申诉</a> &nbsp;·&nbsp;
+  <a href="https://jinxiaoai.com/news?utm_source=github&utm_medium=readme&utm_campaign=repo_nav&utm_content=news">📖 电商干货</a>
+</p>
+<!--
+  🛠 技能市场 —— 槽位已预留，落地后在上面这行末尾补一条：
+      &nbsp;·&nbsp; <a href="https://jinxiaoai.com/skills?utm_source=github&utm_medium=readme&utm_campaign=repo_nav&utm_content=skills">🛠 技能市场</a>
+  对应方案：docs/plans/agent-skill-distribution（上架 SkillHub / 千问 Skill 广场 / 豆包技能市场）。
+  ⚠️ 页面真实存在之前不要放开——README 顶部导航挂 404 比少一条链接贵得多。
+  截至 2026-08-27，https://jinxiaoai.com/skills 实测仍是 404。
+-->
+
+<p align="center">
+  <a href="https://jinxiaoai.com/apps?utm_source=github&utm_medium=readme&utm_campaign=repo_nav&utm_content=badge_docs">
     <img height="21" src="./docs/相关文档-7d09f1.svg" alt="使用文档">
   </a>
   <a href="https://github.com/cs-lazy-tools/ChatGPT-On-CS/blob/main/LICENSE">
@@ -108,13 +118,13 @@
      二维码因此裂了近三个月。换二维码请在 OSS 上同名覆盖，不要改这里的域名。 -->
 <img src="https://image.xingsuancn.com/docimage/20250721190715043.png" width="200" alt="微信客服二维码">
 
-**🌐 在线体验**: [https://jinxiaoai.com/](https://jinxiaoai.com/)
+**🌐 在线体验**：[jinxiaoai.com](https://jinxiaoai.com/?utm_source=github&utm_medium=readme&utm_campaign=repo_contact&utm_content=website)
 
 </div>
 
 ## 📖 使用指南
 
-功能怎么用，看上方「产品演示」那六段片子；产品能力与各应用说明见官网：[📘 jinxiaoai.com/apps](https://jinxiaoai.com/apps)
+功能怎么用，看上方「产品演示」那六段片子；产品能力与各应用说明见官网：[📘 jinxiaoai.com/apps](https://jinxiaoai.com/apps?utm_source=github&utm_medium=readme&utm_campaign=repo_guide&utm_content=apps)
 
 ## 🗓 产品路线图
 
@@ -179,7 +189,7 @@
 
 **⭐ 如果这个项目对您有帮助，请不要忘记给我们一个 Star！⭐**
 
-**🚀 立即体验：[https://jinxiaoai.com/](https://jinxiaoai.com/) 🚀**
+**🚀 立即体验：[jinxiaoai.com](https://jinxiaoai.com/?utm_source=github&utm_medium=readme&utm_campaign=repo_footer&utm_content=website) 🚀**
 
 <a href="#readme">
     <img src="https://img.shields.io/badge/-返回顶部-7d09f1.svg" alt="#" align="right">
