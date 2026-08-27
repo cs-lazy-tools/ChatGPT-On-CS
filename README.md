@@ -50,7 +50,7 @@
 ## ✨ 核心功能
 
 <div align="center">
-<video src="https://github.com/user-attachments/assets/bb9230b4-6734-4b1f-b323-4138456b16da" controls muted playsinline width="760"></video>
+<video src="https://github.com/user-attachments/assets/121098d2-813e-456a-ae4d-fcfac88cca55" controls muted playsinline width="760"></video>
 </div>
 
 ### 🔥 主要特性
@@ -69,15 +69,15 @@
 
 <div align="center">
 
-| <video src="https://github.com/user-attachments/assets/587d9a1a-5ac2-4453-9062-80805f066194" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/bb9230b4-6734-4b1f-b323-4138456b16da" controls muted playsinline width="400"></video> |
+| <video src="https://github.com/user-attachments/assets/10fe52ef-d3df-45e2-9a7f-8f1f3ecf7d0e" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/121098d2-813e-456a-ae4d-fcfac88cca55" controls muted playsinline width="400"></video> |
 | :---: | :---: |
 | **接店铺 · 客服转接**<br>你的店和替你接待的数字员工，在同一页 | **聚合聊天**<br>淘宝、拼多多、抖店、京东的咨询进同一列 |
 
-| <video src="https://github.com/user-attachments/assets/5aa6f965-4d26-4ecc-8305-0ce54eb5d4d6" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/60036394-9b7a-49d1-a0fe-fa4956fd5c90" controls muted playsinline width="400"></video> |
+| <video src="https://github.com/user-attachments/assets/926c0916-97f9-45ce-94a7-ce5f841cb5d5" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/32f84e46-3830-4aff-ac65-6a90e69b39f0" controls muted playsinline width="400"></video> |
 | :---: | :---: |
 | **知识库配置**<br>不是手写出来的，是 AI 从真实对话里学出来的 | **场景 Agent 与 AI 行为策略**<br>场景管专项，行为策略管全店 |
 
-| <video src="https://github.com/user-attachments/assets/6dd5015e-7820-4409-ad88-2785b5628a40" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/27187bf1-2384-4933-bb1b-6dbc8949232e" controls muted playsinline width="400"></video> |
+| <video src="https://github.com/user-attachments/assets/363bb711-b7ee-43c8-9b1d-14f9693a909e" controls muted playsinline width="400"></video> | <video src="https://github.com/user-attachments/assets/2fd41549-4843-412b-a235-b61f21ddae9d" controls muted playsinline width="400"></video> |
 | :---: | :---: |
 | **场景训练台**<br>不用等真客户，自己造一次进线，每条回答都标着依据 | **数据中心**<br>这一个月 AI 接了多少、转人工为什么这么多 |
 
