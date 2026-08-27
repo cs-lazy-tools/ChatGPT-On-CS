@@ -103,7 +103,10 @@
 
 **🔥 扫码添加客服进群交流**
 
-<img src="./docs/wechat-qr.png" width="200" alt="微信客服二维码">
+<!-- ⚠️ 这里的 image.xingsuancn.com 是 OSS 图床域名，**不是站点域名**，不要跟着站点一起改。
+     c6ee9e3「修改域名」曾把它全局替换成 image.jinxiaoai.com（该域名不存在，NXDOMAIN），
+     二维码因此裂了近三个月。换二维码请在 OSS 上同名覆盖，不要改这里的域名。 -->
+<img src="https://image.xingsuancn.com/docimage/20250721190715043.png" width="200" alt="微信客服二维码">
 
 **🌐 在线体验**: [https://jinxiaoai.com/](https://jinxiaoai.com/)
 
