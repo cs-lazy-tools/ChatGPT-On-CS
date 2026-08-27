@@ -10,3 +10,13 @@
 *.ttf   binary
 *.woff  binary
 *.woff2 binary
+# 顶部的 `* text eol=lf` 对所有文件生效，且不做二进制探测——
+# 任何没在这里显式标 binary 的二进制格式，入库时都会被做换行规范化而损坏。
+# 2026-08-27 加介绍片时实测：mp4/gif 入库后 md5 与磁盘不一致，文件已坏。
+# 新增任何二进制格式，必须同时在这里补一行。
+*.mp4   binary
+*.mov   binary
+*.webm  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary

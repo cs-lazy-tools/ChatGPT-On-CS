@@ -6,7 +6,9 @@
 
 金销数据云智能客服是基于大语言模型（LLM）打造的专业电商客服 SaaS 解决方案，专为电商行业量身定制。无缝对接主流电商平台，支持微信、千牛、抖音、飞鸽、拼多多、小红书、京东、淘宝、京麦等多平台统一管理，让您的客服工作更智能、更高效！
 
-🌟 **在线体验**: [https://jinxiaoai.com/](https://jinxiaoai.com/)
+🌟 **在线体验**：[https://jinxiaoai.com/](https://jinxiaoai.com/)
+
+🧩 **配套应用**：[拼多多自动申诉 · 申多多](https://jinxiaoai.com/apps/negative_review_appeal)
 
 </div>
 
@@ -41,7 +43,7 @@
 ## ✨ 核心功能
 
 <div align="center">
-<a href="https://jinxiaoai.com/"><img src="./docs/intro1.jpg" width="480" alt="金销数据云智能客服功能展示"></a>
+<img src="./docs/demo-chat.gif" width="760" alt="聚合聊天演示：客户一问，AI 已经先答了，每条回答都标着依据">
 </div>
 
 ### 🔥 主要特性
@@ -54,24 +56,23 @@
 - ✅ **插件生态**：丰富的插件系统，支持访问外部资源和自定义功能扩展
 - ✅ **数据分析**：完整的客服数据统计和分析功能，助力业务优化
 
-### 🎬 演示视频
-[📺 观看产品演示视频](https://www.bilibili.com/video/BV1qz421Q73S)
+## 📸 产品演示
 
-## 📸 产品展示
+六段完整介绍片，**点图直接播放**——视频就在本仓库 `docs/videos/` 里，不跳外链、不依赖第三方站点。
 
 <div align="center">
 
-| ![多平台管理](./docs/intro1.jpg) | ![一键商品同步](./docs/intro2.png) |
+| [<img src="./docs/feature-store-transfer.jpg" width="400" alt="接店铺">](./docs/videos/store-transfer.mp4) | [<img src="./docs/feature-chat.jpg" width="400" alt="聚合聊天">](./docs/videos/chat.mp4) |
 | :---: | :---: |
-| **多平台管理** | **一键商品同步** |
+| **接店铺** · 你的店和替你接待的数字员工，在同一页 | **聚合聊天** · 淘宝、拼多多、抖店、京东的咨询进同一列 |
 
-| ![高度自定义知识库](./docs/intro3.png) | ![一键学习真人客服聊天记录](./docs/intro4.png) |
+| [<img src="./docs/feature-knowledge.jpg" width="400" alt="知识库">](./docs/videos/knowledge.mp4) | [<img src="./docs/feature-scene-agent.jpg" width="400" alt="场景 Agent">](./docs/videos/scene-agent.mp4) |
 | :---: | :---: |
-| **高度自定义知识库** | **一键学习真人客服聊天记录** |
+| **知识库** · 不是手写出来的，是 AI 从真实对话里学出来的 | **场景 Agent** · 场景管专项，行为策略管全店 |
 
-| ![售后咨询分析](./docs/intro5.png) | ![意图识别详细数据](./docs/intro6.png) |
+| [<img src="./docs/feature-test-bench.jpg" width="400" alt="训练台">](./docs/videos/test-bench.mp4) | [<img src="./docs/feature-data-center.jpg" width="400" alt="数据中心">](./docs/videos/data-center.mp4) |
 | :---: | :---: |
-| **售后咨询分析** | **意图识别详细数据** |
+| **训练台** · 不用等真客户，自己造一次进线，每条回答都标着依据 | **数据中心** · 这一个月 AI 接了多少、转人工为什么这么多 |
 
 </div>
 
